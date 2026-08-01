@@ -1,5 +1,5 @@
 # vscodeLIA
-
+  ![Hard copy](./docs/images/HardCopy.png)
 ## 開発環境
   - [Visual Studio Code](https://code.visualstudio.com/download)
   - [Mingw-w64](https://github.com/niXman/mingw-builds-binaries/releases/)
@@ -31,7 +31,7 @@
   1. Visual Studio Code
      1. Visual Studio Codeのインストール
      2. 拡張機能
-        - Visual Studio Code
+        - C/C++ for Visual Studio Code
         - C/C++ DevTools
         - C/C++ Extension Pack
         - C/C++ Themes
