@@ -45,8 +45,9 @@
         - Makefile Tools
 
 ## 開発方法
-  1. 「ようこそ」タブの「Gitリポジトリのクローン...」をクリック
-  2. vscode上部の「command center」に「Githubから複製」が表示されるので以下のURLを指定
+  1. [git](https://git-scm.com/install/windows)をインストールし、vscodeを再起動
+  2. 「ようこそ」タブの「Gitリポジトリのクローン...」をクリック
+  3. vscode上部の「command center」に「Githubから複製」が表示されるので以下のURLを指定
        ```
        https://github.com/daigokk/vscodeLIA/
        ```
