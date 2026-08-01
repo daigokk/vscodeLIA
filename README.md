@@ -43,7 +43,7 @@
         - C/C++ Extension Pack
         - C/C++ Themes
         - Makefile Tools
-    1. (必要に応じて)git
+  1. (必要に応じて)git
       1. [git](https://git-scm.com/install/windows)をインストールし、vscodeを再起動
       1. 「ようこそ」タブの「Gitリポジトリのクローン...」をクリック
       1. vscode上部の「command center」に「Githubから複製」が表示されるので以下のURLを指定
