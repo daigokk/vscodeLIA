@@ -58,6 +58,6 @@
      - ターゲットのビルド: [all]
      - 起動ターゲット: [vscodeLIA.exe]
      - Makefile: [./Makefile]
-     - Make: mingw32-make.exe
+     - Make: [mingw32-make.exe]
   1. 「MAKEFILE」ウィンドウ上の右三角ボタンでビルドされた実行ファイル(exe)を実行。実行ファイルが存在しなけれがビルドを行う。
   1. 虫ボタンでデバックが可能(ブレイクポイントが有効、件数の値を確認可能、等)
