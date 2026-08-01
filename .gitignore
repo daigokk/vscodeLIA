@@ -1,0 +1,48 @@
+# Compiled object files
+*.o
+*.obj
+*.lo
+*.slo
+
+# Precompiled headers
+*.gch
+*.pch
+
+# Static and shared libraries
+*.a
+*.lib
+*.so
+*.so.*
+*.dylib
+*.dll
+
+# Executables
+*.exe
+*.out
+*.app
+*.bin
+
+# Build directories
+build/
+bin/
+obj/
+out/
+debug/
+release/
+
+# g++/make generated dependency files
+*.d
+
+# Debug symbols / metadata
+*.ilk
+*.pdb
+*.map
+*.exp
+
+# IDE / editor files
+.vscode/
+*.code-workspace
+
+# OS files
+.DS_Store
+Thumbs.db
