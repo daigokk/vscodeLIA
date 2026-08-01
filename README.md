@@ -1,5 +1,9 @@
 # vscodeLIA
   ![Hard copy](./docs/images/HardCopy.png)
+## 概要
+  - シンプルなソフトウェアロックインアンプ
+    - 測定、波形表示、位相敏感検波(未実装)
+  - シンプルではないソフトウェアロックインアンプは[こちら](https://github.com/daigokk/LIA/)
 ## 開発環境
   - [Visual Studio Code](https://code.visualstudio.com/download)
   - [Mingw-w64](https://github.com/niXman/mingw-builds-binaries/releases/)
