@@ -43,21 +43,25 @@
         - C/C++ Extension Pack
         - C/C++ Themes
         - Makefile Tools
-
-## 開発方法
   1. [git](https://git-scm.com/install/windows)をインストールし、vscodeを再起動
-  2. 「ようこそ」タブの「Gitリポジトリのクローン...」をクリック
-  3. vscode上部の「command center」に「Githubから複製」が表示されるので以下のURLを指定
+  1. 「ようこそ」タブの「Gitリポジトリのクローン...」をクリック
+  1. vscode上部の「command center」に「Githubから複製」が表示されるので以下のURLを指定
        ```
        https://github.com/daigokk/vscodeLIA/
        ```
   1. 任意のフォルダを選択し「リポジトリの宛先として選択」をクリック
   1. 「リポジトリを開きますか、または現在のワークスペースに追加しますか？」と表示されるので「開く」をクリック
+
+## 開発方法
+  1. 本ページ上部の「<>Code」から「Download ZIP」をクリック
+  1. 任意のフォルダに解凍する。
   1. 「main.cpp」を開いて「F5」を押すと、vscode左のツールバーに「Makefile」が現れるのでクリック
      - 構成: [Default]
      - ターゲットのビルド: [all]
      - 起動ターゲット: [vscodeLIA.exe]
      - Makefile: [./Makefile]
      - Make: [mingw32-make.exe]
+  1. 「MAKEFILE」ウィンドウ上の右三角ボタンでビルドされた実行ファイル(exe)を実行。実行ファイルが存在しなけれがビルドを行う。
+  1. 虫ボタンでデバックが可能(ブレイクポイントが有効、件数の値を確認可能、等)
   1. 「MAKEFILE」ウィンドウ上の右三角ボタンでビルドされた実行ファイル(exe)を実行。実行ファイルが存在しなけれがビルドを行う。
   1. 虫ボタンでデバックが可能(ブレイクポイントが有効、件数の値を確認可能、等)
