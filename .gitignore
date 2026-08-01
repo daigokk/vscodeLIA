@@ -9,7 +9,6 @@
 *.pch
 
 # Static and shared libraries
-*.a
 *.lib
 *.so
 *.so.*
