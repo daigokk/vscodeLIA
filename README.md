@@ -16,7 +16,7 @@
           ```
           https://github.com/niXman/mingw-builds-binaries/releases/x86_64-16.1.0-release-win32-seh-ucrt-rt_v14-rev1.7z
           ```
-     1. 以下へコピー
+     1. 解凍して以下へコピー
          ```
          C:\Program Files\mingw64
          ```
