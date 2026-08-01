@@ -37,20 +37,21 @@
        - 再起動または再度ログイン
   1. Visual Studio Code
      1. Visual Studio Codeのインストール
-     2. 拡張機能
+     1. 拡張機能
         - C/C++ for Visual Studio Code
         - C/C++ DevTools
         - C/C++ Extension Pack
         - C/C++ Themes
         - Makefile Tools
-  1. [git](https://git-scm.com/install/windows)をインストールし、vscodeを再起動
-  1. 「ようこそ」タブの「Gitリポジトリのクローン...」をクリック
-  1. vscode上部の「command center」に「Githubから複製」が表示されるので以下のURLを指定
-       ```
-       https://github.com/daigokk/vscodeLIA/
-       ```
-  1. 任意のフォルダを選択し「リポジトリの宛先として選択」をクリック
-  1. 「リポジトリを開きますか、または現在のワークスペースに追加しますか？」と表示されるので「開く」をクリック
+    1. (必要に応じて)git
+      1. [git](https://git-scm.com/install/windows)をインストールし、vscodeを再起動
+      1. 「ようこそ」タブの「Gitリポジトリのクローン...」をクリック
+      1. vscode上部の「command center」に「Githubから複製」が表示されるので以下のURLを指定
+          ```
+          https://github.com/daigokk/vscodeLIA/
+          ```
+    1. 任意のフォルダを選択し「リポジトリの宛先として選択」をクリック
+    1. 「リポジトリを開きますか、または現在のワークスペースに追加しますか？」と表示されるので「開く」をクリック
 
 ## 開発方法
   1. 本ページ上部の「<>Code」から「Download ZIP」をクリック
