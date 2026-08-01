@@ -1,6 +1,7 @@
 #include "Gui.h"
 #include "RawWindow.h"
 #include "XyWindow.h"
+#include "ControlWindow.h"
 #include "Cfg.h"
 #include "Daq.h"
 
@@ -15,6 +16,7 @@ int main() {
 
         RawWindow(cfg);
         XyWindow(cfg);
+        ControlWindow(cfg, daq);
 
         Gui::EndFrame(window);
     }
