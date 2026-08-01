@@ -3,9 +3,9 @@
 
 ## 概要
   - シンプルなソフトウェアロックインアンプ
-    - 測定、波形表示、位相敏感検波(未実装)
+    - 測定、波形表示、位相敏感検波(あえて未実装)
     - シンプルではないソフトウェアロックインアンプは[こちら](https://github.com/daigokk/LIA/)
-  - 学習に
+  - 学習やひな形としての使用を想定しています。
 
 ## 開発環境
   - [Visual Studio Code](https://code.visualstudio.com/download)
