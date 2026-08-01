@@ -18,5 +18,10 @@ void ControlWindow(Cfg& cfg, Daq& daq) {
         cfg.excitation.amplitude = amplitude;
         daq.wavegen(cfg.excitation.frequency, cfg.excitation.amplitude);
     }
+    if(ImGui::Button("Defaults")) {
+        frequency = cfg.excitation.frequency = 100e3f;
+        amplitude = cfg.excitation.amplitude = 1.0f;
+        daq.wavegen(cfg.excitation.frequency, cfg.excitation.amplitude);
+    }
     ImGui::End();
 }
