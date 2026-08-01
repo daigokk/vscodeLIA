@@ -2,13 +2,12 @@
 #include "RawWindow.h"
 #include "XyWindow.h"
 #include "Cfg.h"
-#include "daq.h"
-#include <thread>
+#include "Daq.h"
 
 int main() {
     Cfg cfg;
-    std::jthread daqThread(daq, &cfg);
-
+    Daq daq(&cfg);
+    daq.start();
     auto window = Gui::Initialize();
     
     while (!glfwWindowShouldClose(window)) {
@@ -21,7 +20,7 @@ int main() {
     }
 
     Gui::Shutdown(window);
-    daqThread.request_stop();
+    daq.stop();
 
     return 0;
 }
