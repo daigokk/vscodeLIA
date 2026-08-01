@@ -12,9 +12,13 @@
 
 ## 開発環境のセットアップ
   1. Mingw-w64をダウンロード
+    ```
     https://github.com/niXman/mingw-builds-binaries/releases/x86_64-16.1.0-release-win32-seh-ucrt-rt_v14-rev1.7z
+    ```
   1. 以下へコピー
-     C:\Program Files\mingw64
+    ```
+    C:\Program Files\mingw64
+    ```
   1. Pathを通す
      - スタートメニュー → 設定 → システム → バージョン情報 の右側にある 「システムの詳細設定」 をクリック
      - 「環境変数(N)…」ボタンを押す
