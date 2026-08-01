@@ -1,9 +1,12 @@
 # vscodeLIA
   ![Hard copy](./docs/images/HardCopy.png)
+
 ## 概要
   - シンプルなソフトウェアロックインアンプ
     - 測定、波形表示、位相敏感検波(未実装)
-  - シンプルではないソフトウェアロックインアンプは[こちら](https://github.com/daigokk/LIA/)
+    - シンプルではないソフトウェアロックインアンプは[こちら](https://github.com/daigokk/LIA/)
+  - 学習に
+
 ## 開発環境
   - [Visual Studio Code](https://code.visualstudio.com/download)
   - [Mingw-w64](https://github.com/niXman/mingw-builds-binaries/releases/)
@@ -40,3 +43,13 @@
         - C/C++ Extension Pack
         - C/C++ Themes
         - Makefile Tools
+
+## 開発方法
+  1. vscode左のツールバーの「Makefile」に設定
+     - 構成: [Default]
+     - ターゲットのビルド: [all]
+     - 起動ターゲット: [vscodeLIA.exe]
+     - Makefile: [./Makefile]
+     - Make: mingw32-make.exe
+  1. 「MAKEFILE」ウィンドウ上の右三角ボタンでビルドされた実行ファイル(exe)を実行。実行ファイルが存在しなけれがビルドを行う。
+  3. 虫ボタンでデバックが可能(ブレイクポイントが有効、件数の値を確認可能、等)
