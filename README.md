@@ -133,7 +133,8 @@ https://github.com/daigokk/vscodeLIA.git
 
 ## ビルドおよび実行方法
 
-本プロジェクトは VS Code の **Makefile Tools** 拡張機能を利用してビルド・デバッグを行うように構成されています。
+* 本プロジェクトは VS Code の **Makefile Tools** 拡張機能を利用してビルド・デバッグを行うように構成されています。
+* makeを用いることで、ビルド時間が大幅に短縮されます。
 
 1. **Makefile Toolsの初回認識:**
 フォルダを開いた後、左側サイドバーに **C/C++のアイコンがついた「Makefile Tools」**（または `MAKEFILE` タブ）が表示されます。
