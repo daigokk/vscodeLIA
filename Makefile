@@ -11,6 +11,7 @@ IMGUI_DIR     := $(WORKSPACE_DIR)/external/include/IMGUI
 
 # コンパイルオプション
 CXXFLAGS := -std=c++20 -g -fdiagnostics-color=always
+DEPFLAGS := -MMD -MP
 INCLUDES := -I$(WORKSPACE_DIR)/external/include
 
 # ライブラリとリンク設定
@@ -21,6 +22,7 @@ LIBS     := C:/Windows/System32/dwf.dll -lglfw3 -lopengl32 -lgdi32 -luser32
 # カレントディレクトリの .cpp ファイルと ImGui の .cpp ファイルを取得
 SRCS     := $(wildcard *.cpp) $(wildcard $(IMGUI_DIR)/*.cpp)
 OBJS     := $(SRCS:.cpp=.o)
+DEPS     := $(OBJS:.o=.d)
 
 # デフォルトターゲット
 all: $(TARGET)
@@ -31,7 +33,9 @@ $(TARGET): $(OBJS)
 
 # オブジェクトファイルの生成ルール
 %.o: %.cpp
-	$(CXX) $(CXXFLAGS) $(INCLUDES) -c $< -o $@
+	$(CXX) $(CXXFLAGS) $(DEPFLAGS) $(INCLUDES) -c $< -o $@
+
+-include $(DEPS)
 
 # クリーンアップコマンド
 clean:

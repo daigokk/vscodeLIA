@@ -8,6 +8,7 @@
 #define EXCITATION_AMPLITUDE 1.0
 #define PI acos(-1.0)
 
+
 class Cfg{
 public:
     class Excitation {
