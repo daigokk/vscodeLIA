@@ -1,76 +1,161 @@
-# vscodeLIA
-  ![Hard copy](./docs/images/HardCopy.png)
+# vscodeLIA (Simple Software Lock-in Amplifier)
 
 ## 概要
-  - シンプルなソフトウェアロックインアンプ
-    - 測定、波形表示、位相敏感検波(あえて未実装)
-    - シンプルではないソフトウェアロックインアンプは[こちら](https://github.com/daigokk/LIA/)
-  - 学習やひな形としての使用を想定しています。
 
-## 開発環境
-  - [Visual Studio Code](https://code.visualstudio.com/download)
-  - [Mingw-w64](https://github.com/niXman/mingw-builds-binaries/releases/)
+**vscodeLIA** は、Digilent製計測ハードウェアを利用して動作する、C++製のシンプルなソフトウェア・ロックインアンプ（LIA）です。
 
-## 依存ソフトウェア:
-  - [Digilent Waveforms](https://digilent.com/reference/software/waveforms/waveforms-3/start)
-  - [WaveForms-SDK-Getting-Started-Cpp](https://github.com/Digilent/WaveForms-SDK-Getting-Started-Cpp)
-  - [GLFW](https://www.glfw.org/)
-  - [Dear ImGui](https://github.com/ocornut/imgui) & [ImPlot](https://github.com/epezent/implot)
-  - [pocketfft](https://github.com/mreineck/pocketfft)
+* **主な機能:**
+* 信号の測定・集録（WaveForms SDK経由）
+* ImPlotを用いた波形のリアルタイム描画
+* 位相敏感検波(同期検波)による周波数解析(未実装)
+* **※注意:** 学習を目的の一つとしているため、位相敏感検波処理は**あえて未実装**にしています。
 
-## 開発環境のセットアップ(OSはWindowsを想定)
-  1. Waveforms
-     1. 以下からダウンロードしてインストール
-          ```
-          https://digilent.com/reference/software/waveforms/waveforms-3/previous-versions
-          ```
-  1. Mingw-w64
-     1. 以下をダウンロード
-          ```
-          https://github.com/niXman/mingw-builds-binaries/releases/x86_64-16.1.0-release-win32-seh-ucrt-rt_v14-rev1.7z
-          ```
-     1. 解凍して以下へコピー
-         ```
-         C:\Program Files\mingw64
-         ```
-     1. Pathを通す
-         - スタートメニュー → 設定 → システム → バージョン情報 の右側にある 「システムの詳細設定」 をクリック
-         - 「環境変数(N)…」ボタンを押す
-         - 「システム環境変数」の一覧から Path を選択し、編集(E) → 新規(N) で以下を入力
-             ```
-             C:\Program Files\mingw64\bin
-             ```
-       - 再起動または再度ログイン
-  1. Visual Studio Code
-     1. Visual Studio Codeのインストール
-     1. 拡張機能のインストール
-        - C/C++ for Visual Studio Code
-        - C/C++ DevTools
-        - C/C++ Extension Pack
-        - C/C++ Themes
-        - Makefile Tools
-  1. (必要に応じて)gitのインストール
-      1. [git](https://git-scm.com/install/windows)をインストールし、vscodeを再起動
-      1. 「ようこそ」タブの「Gitリポジトリのクローン...」をクリック
-      1. vscode上部の「command center」に「Githubから複製」が表示されるので以下のURLを指定
-          ```
-          https://github.com/daigokk/vscodeLIA/
-          ```
-      1. 任意のフォルダを選択し「リポジトリの宛先として選択」をクリック
-      1. 「リポジトリを開きますか、または現在のワークスペースに追加しますか？」と表示されるので「開く」をクリック
 
-## 開発方法
-  1. 本ページ上部の「<>Code▽」から「Download ZIP」をクリック
-  1. 任意のフォルダに解凍する。
-  1. 「main.cpp」を開き、vscode左のツールバーの一番上ファイルのアイコン「エクスプローラー」をクリックし、現れる「フォルダーを開く」ボタンを押し、現在のフォルダを選択する。
-  1. しばらく待つか「F5」を押すと、左のツールバーの一番下に「C++」の記載がある「Makefile」アイコンが現れるのでクリックし、以下を設定。
-     - 構成: [Default]
-     - ターゲットのビルド: [all]
-     - 起動ターゲット: [vscodeLIA.exe]
-     - Makefile: [./Makefile]
-     - Make: [mingw32-make.exe]
-  1. 「MAKEFILE」ウィンドウ上の右三角ボタンでビルドされた実行ファイル(exe)を実行。実行ファイルが存在しなけれがビルドを行う。
-  1. 虫ボタンでデバックが可能(ブレイクポイントが有効化され、変数の値も確認可能、等)
-  1. 「MAKEFILE」ウィンドウ上の右三角ボタンでビルドされた実行ファイル(exe)を実行。実行ファイルが存在しなけれがビルドを行う。
-  1. 虫ボタンでデバックが可能(ブレイクポイントが有効、件数の値を確認可能、等)
-  - Visual Studio(商業利用は有償)を使えば、このあたりの設定(Maikefile)・機能(デバック)はデフォルトで設定済みかつ利用可能ではある。
+* **発展形リポジトリ:**
+より実用的なフル機能のソフトウェア・ロックインアンプをお探しの場合は、[LIA (daigokk/LIA)](https://github.com/daigokk/LIA/) をご参照ください。
+* **開発目的:**
+データ集録・GUI描画・FFT解析を組み合わせた計測アプリの学習用サンプルコード、または新規計測プロジェクトの雛形（テンプレート）としての使用を想定しています。
+
+---
+
+## 開発環境・技術スタック
+
+* **エディタ / IDE:** [Visual Studio Code](https://code.visualstudio.com/download)
+* **コンパイラ:** [Mingw-w64](https://github.com/niXman/mingw-builds-binaries/releases/) (GCC for Windows)
+* **対象OS:** Windows 10 / 11 (64-bit)
+
+### 依存ライブラリ・SDK
+
+本プロジェクトでは以下のサードパーティ製ライブラリ・SDKを利用しています。
+
+| ライブラリ / SDK | 概要 / 用途 |
+| --- | --- |
+| **[Digilent WaveForms SDK](https://digilent.com/reference/software/waveforms/waveforms-3/start)** | Analog Discovery等のDigilentハードウェア制御用SDK |
+| **[GLFW](https://www.glfw.org/)** | OpenGLウィンドウ作成および入力処理 |
+| **[Dear ImGui](https://github.com/ocornut/imgui)** | 軽量グラフィカルユーザーインターフェース（GUI） |
+| **[ImPlot](https://github.com/epezent/implot)** | Dear ImGui向けのリアルタイムプロット・グラフ描画拡張 |
+| **[pocketfft](https://github.com/mreineck/pocketfft)** | ヘッダーオンリーのFFT（高速フーリエ変換）ライブラリ |
+
+---
+
+## 開発環境のセットアップ (Windows)
+
+以下のステップ順にセットアップを行ってください。
+
+### 1. Digilent WaveForms のインストール
+
+計測用ドライバおよびSDKを取得するためにインストールします。
+
+1. [WaveForms 過去バージョン / ダウンロードページ](https://digilent.com/reference/software/waveforms/waveforms-3/previous-versions) にアクセスします。
+2. Windows用のインストーラー（例: `digilent.waveforms_vX.X.X_64bit.exe`）をダウンロードして実行します。
+3. インストール時のコンポーネント選択で **WaveForms SDK** が選択されていることを確認して完了させます。
+
+### 2. Mingw-w64 (C++コンパイラ) の配置とパス設定
+
+1. 以下のリンクから Mingw-w64 のアーカイブをダウンロードします。
+```
+https://github.com/niXman/mingw-builds-binaries/releases/x86_64-16.1.0-release-win32-seh-ucrt-rt_v14-rev1.7z
+
+```
+
+
+2. ダウンロードした `.7z` ファイルを解凍し、中身の `mingw64` フォルダを以下のディレクトリへ移動（コピー）します。
+```text
+C:\Program Files\mingw64
+
+```
+
+
+*(※ `C:\Program Files\mingw64\bin\g++.exe` が存在する構造になるように配置してください)*
+3. **環境変数 (PATH) の設定:**
+* キーボードの `Win + R` を押し、`sysdm.cpl` と入力して Enter（または 「スタートメニュー」→「設定」→「システム」→「バージョン情報」→「システムの詳細設定」）。
+* **「環境変数(N)…」** ボタンをクリック。
+* 「システム環境変数」欄の一覧から **`Path`** を選択し、**「編集(E)…」** をクリック。
+* **「新規(N)」** を押し、以下を入力して OK を押します。
+```text
+C:\Program Files\mingw64\bin
+
+```
+
+
+
+
+4. **動作確認:**
+コマンドプロンプトを開き、以下を実行してバージョンが表示されれば設定完了です。
+```cmd
+g++ --version
+
+```
+
+
+
+### 3. Visual Studio Code のセットアップ
+
+1. [VS Code 公式サイト](https://code.visualstudio.com/download) からインストーラーを取得し、インストールします。
+2. VS Codeを起動し、左側の拡張機能タブ（`Ctrl + Shift + X`）を開き、以下の拡張機能を検索してインストールします。
+* **C/C++** (`ms-vscode.cpptools`)
+* **C/C++ Extension Pack** (`ms-vscode.cpptools-extension-pack`)
+* **Makefile Tools** (`ms-vscode.makefile-tools`)
+
+
+
+---
+
+## プロジェクトの取得方法
+
+いずれかの方法でソースコードを取得してください。
+
+### 方法A: ZIPダウンロードを使用する場合
+
+1. リポジトリページ上部の **「<> Code」** ボタン → **「Download ZIP」** をクリックします。
+2. ダウンロードしたZIPファイルを任意の場所に解凍します。
+3. VS Codeのメニューから **「ファイル」→「フォルダーを開く...」** を選択し、解凍したフォルダを開きます。
+
+---
+
+### 方法B: Gitを使用する場合
+
+1. [Git for Windows](https://www.google.com/search?q=https://git-scm.com/install/windows) をインストールします。
+2. VS Codeを起動し、上部検索バー（Command Center）または `Ctrl + Shift + P` でコマンドパレットを開きます。
+3. `Git: Clone`（Git: クローン）と入力・選択し、以下のURLを入力します。
+```text
+https://github.com/daigokk/vscodeLIA.git
+
+```
+
+
+4. 保存先のフォルダを選択し、クローン完了後に表示されるダイアログで **「開く」** を選択します。
+
+
+## ビルドおよび実行方法
+
+本プロジェクトは VS Code の **Makefile Tools** 拡張機能を利用してビルド・デバッグを行うように構成されています。
+
+1. **Makefile Toolsの初回認識:**
+フォルダを開いた後、左側サイドバーに **C/C++のアイコンがついた「Makefile Tools」**（または `MAKEFILE` タブ）が表示されます。
+*※表示されない場合は、`main.cpp` などを開くか、`F5` キーを一回押すとアクティブ化されます。*
+
+
+2. **Makefile設定の確認:**
+Makefile Tools のパネル内で、以下のように設定されているか確認・指定します。
+
+* **構成 (Configuration):** `[Default]`
+* **ターゲットのビルド (Build target):** `[all]`
+* **起動ターゲット (Launch target):** `[vscodeLIA.exe]`
+* **Makefile:** `./Makefile`
+* **Make メイク:** `mingw32-make.exe` (または `make`)
+
+
+3. **ビルドと実行:**
+* **実行 (Run):** Makefile Tools パネルの上部にある **再生ボタン（右三角 ▶）** をクリックします。自動的に `mingw32-make` が呼び出されてコンパイルが実行され、完了後に `vscodeLIA.exe` が起動します。
+* **デバッグ実行 (Debug):** **虫アイコン（▶+虫）** をクリックします。ブレイクポイントの設定、ステップ実行、変数レジスタの監視を行いながらデバッグが可能です。
+
+
+---
+
+## 補足・開発メモ
+
+* **Visual Studio (MSVC) との比較:**
+Visual Studio（IDE）を使用すると Makefile やデバッガの手動設定なしで開発を始められますが、ライセンス規約（商業利用時の有償化など）の制限があります。本プロジェクトは、オープンソースかつ軽量な **VS Code + GCC (MinGW-w64)** の組み合わせで開発環境を統一できるように設計されています。
+* **WaveForms SDKのリンクエラーが発生する場合:**
+WaveFormsがデフォルトのパス（`C:\Program Files (x86)\Digilent\WaveFormsSDK` 等）にインストールされているか、`Makefile` 内のライブラリインクルードパス・リンクパスを確認してください。
