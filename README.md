@@ -1,4 +1,4 @@
-# vscodeLIA (Simple Software Lock-in Amplifier)
+# vscodeLIA (Template of Simple Software Lock-in Amplifier)
 
 ![Hard copy](./docs/images/HardCopy.png)
 
