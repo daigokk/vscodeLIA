@@ -1,5 +1,9 @@
 # vscodeLIA (Simple Software Lock-in Amplifier)
 
+![Hard copy](./docs/images/HardCopy.png)
+
+---
+
 ## 概要
 
 **vscodeLIA** は、Digilent製計測ハードウェアを利用して動作する、C++製のシンプルなソフトウェア・ロックインアンプ（LIA）です。
