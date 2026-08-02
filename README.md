@@ -12,12 +12,18 @@
   - [Mingw-w64](https://github.com/niXman/mingw-builds-binaries/releases/)
 
 ## 依存ソフトウェア:
+  - [Digilent Waveforms](https://digilent.com/reference/software/waveforms/waveforms-3/start)
   - [WaveForms-SDK-Getting-Started-Cpp](https://github.com/Digilent/WaveForms-SDK-Getting-Started-Cpp)
   - [GLFW](https://www.glfw.org/)
   - [Dear ImGui](https://github.com/ocornut/imgui) & [ImPlot](https://github.com/epezent/implot)
   - [pocketfft](https://github.com/mreineck/pocketfft)
 
 ## 開発環境のセットアップ(OSはWindowsを想定)
+  1. Waveforms
+     1. 以下からダウンロードしてインストール
+       ```
+       https://digilent.com/reference/software/waveforms/waveforms-3/previous-versions
+       ```
   1. Mingw-w64
      1. 以下をダウンロード
           ```
