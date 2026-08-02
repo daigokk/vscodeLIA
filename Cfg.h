@@ -10,12 +10,10 @@
 
 class Cfg{
 public:
-    double dt = 1.0 / SAMPLE_RATE;
-
     class Excitation {
     public:
-        double frequency = EXCITATION_FREQUENCY;
-        double amplitude = EXCITATION_AMPLITUDE;
+        float frequency = EXCITATION_FREQUENCY;
+        float amplitude = EXCITATION_AMPLITUDE;
     } excitation;
 
     class Status {
@@ -27,6 +25,7 @@ public:
 
     class RawData {
     public:
+        double dt = 1.0 / SAMPLE_RATE;
         std::vector<double> times, ch1, ch2;
     } rawData;
 
@@ -44,9 +43,9 @@ public:
         rawData.times.resize(SAMPLE_COUNT);
         rawData.ch1.resize(SAMPLE_COUNT);
         rawData.ch2.resize(SAMPLE_COUNT);
-        double wdt = 2.0 * PI * excitation.frequency * dt;
+        double wdt = 2.0 * PI * excitation.frequency * rawData.dt;
         for (int i = 0; i < SAMPLE_COUNT; i++) {
-            rawData.times[i] = static_cast<double>(i) * dt;
+            rawData.times[i] = static_cast<double>(i) * rawData.dt;
             rawData.ch1[i] = std::sin(i * wdt);
             rawData.ch2[i] = std::cos(i * wdt);
         }

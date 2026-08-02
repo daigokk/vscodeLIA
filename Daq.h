@@ -65,7 +65,7 @@ void Daq::run(std::stop_token st) {
         // waveform generation
         wavegen(pCfg->excitation.frequency, pCfg->excitation.amplitude);
         // scope setup
-        scope(1.0/pCfg->dt, pCfg->rawData.times.size(), 0, 5);
+        scope(1.0/pCfg->rawData.dt, pCfg->rawData.times.size(), 0, 5);
         // do work until the window requests shutdown
         pCfg->status.isDwf = true;
         for (size_t nloop = 0; !st.stop_requested(); ++nloop) {
