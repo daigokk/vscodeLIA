@@ -21,9 +21,9 @@
 ## 開発環境のセットアップ(OSはWindowsを想定)
   1. Waveforms
      1. 以下からダウンロードしてインストール
-         ```
-         https://digilent.com/reference/software/waveforms/waveforms-3/previous-versions
-         ```
+          ```
+          https://digilent.com/reference/software/waveforms/waveforms-3/previous-versions
+          ```
   1. Mingw-w64
      1. 以下をダウンロード
           ```
