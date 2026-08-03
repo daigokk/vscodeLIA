@@ -63,7 +63,7 @@ https://github.com/niXman/mingw-builds-binaries/releases/x86_64-16.1.0-release-w
 ```
 
 
-2. ダウンロードした `.7z` ファイルを解凍し、中身の `mingw64` フォルダを以下のディレクトリへ移動（コピー）します。
+1. ダウンロードした `.7z` ファイルを解凍し、中身の `mingw64` フォルダを以下のディレクトリへ移動（コピー）します。
 ```text
 C:\Program Files\mingw64
 
@@ -71,7 +71,7 @@ C:\Program Files\mingw64
 
 
 *(※ `C:\Program Files\mingw64\bin\g++.exe` が存在する構造になるように配置してください)*
-3. **環境変数 (PATH) の設定:**
+1. **環境変数 (PATH) の設定:**
 * キーボードの `Win + R` を押し、`sysdm.cpl` と入力して Enter（または 「スタートメニュー」→「設定」→「システム」→「バージョン情報」→「システムの詳細設定」）。
 * **「環境変数(N)…」** ボタンをクリック。
 * 「システム環境変数」欄の一覧から **`Path`** を選択し、**「編集(E)…」** をクリック。
@@ -84,7 +84,7 @@ C:\Program Files\mingw64\bin
 
 
 
-4. **動作確認:**
+1. **動作確認:**
 コマンドプロンプトを開き、以下を実行してバージョンが表示されれば設定完了です。
 ```cmd
 g++ --version
@@ -96,7 +96,7 @@ g++ --version
 ### 3. Visual Studio Code のセットアップ
 
 1. [VS Code 公式サイト](https://code.visualstudio.com/download) からインストーラーを取得し、インストールします。
-2. VS Codeを起動し、左側の拡張機能タブ（`Ctrl + Shift + X`）を開き、以下の拡張機能を検索してインストールします。
+1. VS Codeを起動し、左側の拡張機能タブ（`Ctrl + Shift + X`）を開き、以下の拡張機能を検索してインストールします。
 * **C/C++** (`ms-vscode.cpptools`)
 * **C/C++ Extension Pack** (`ms-vscode.cpptools-extension-pack`)
 * **Makefile Tools** (`ms-vscode.makefile-tools`)
