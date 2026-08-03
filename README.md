@@ -9,8 +9,8 @@
 **vscodeLIA** は、DAQ (Data Acquisition) を利用して動作する、C++製のシンプルなソフトウェア・ロックインアンプ(LIA)です。
 
 * **主な機能:**
-    * Digilent製DAQ(Analog Discovery)を用いた信号の測定・集録
-    * ImPlotを用いた波形のリアルタイム描画
+    * Digilent製DAQ([Analog Discovery](https://digilent.com/shop/analog-discovery-3/))を用いた信号の測定・集録
+    * [ImPlot](https://github.com/epezent/implot)を用いた波形のリアルタイム描画
     * 位相敏感検波(同期検波)等による信号処理(未実装)
       * **※注意:** 学習を目的の一つとしているため、位相敏感検波処理は**あえて未実装**にしています。
 
