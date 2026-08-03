@@ -15,7 +15,7 @@
     * [ImPlot](https://github.com/epezent/implot)を用いた波形のリアルタイム描画
     * 位相敏感検波(同期検波)等による信号処理(未実装)
       * **※注意:** 学習を目的の一つとしているため、位相敏感検波処理は**あえて未実装**にしています。
-| ![Hard copy](./docs/images/PSD.svg) |
+| ![Phase sensitive detection](./docs/images/PSD.svg) |
 | --- |
 | 図2 位相敏感検波 |
 
