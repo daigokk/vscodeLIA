@@ -15,7 +15,21 @@
     * [ImPlot](https://github.com/epezent/implot)を用いた波形のリアルタイム描画
     * 位相敏感検波(同期検波)等による信号処理(未実装)
       * **※注意:** 学習を目的の一つとしているため、位相敏感検波処理は**あえて未実装**にしています。
+| ![Hard copy](./docs/images/PSD.svg) |
+| --- |
+| 図2 位相敏感検波 |
 
+```c++
+void psd(Cfg* pCfg){
+    double ch1x = 0, ch1y = 0;
+    for (size_t i = 0; i < pCfg->rawData.times.size(); ++i) {
+        ch1x += pCfg->rawData.ch1[i] * sin(2 * PI * pCfg->excitation.frequency * pCfg->rawData.times[i]);
+        ch1y += pCfg->rawData.ch1[i] * cos(2 * PI * pCfg->excitation.frequency * pCfg->rawData.times[i]);
+    }
+    pCfg->buffer.ch1.x = ch1x / pCfg->rawData.times.size();
+    pCfg->buffer.ch1.y = ch1y / pCfg->rawData.times.size();
+}
+```
 
 * **このリポジトリの発展形:**
 より実用的なフル機能のソフトウェア・ロックインアンプをお探しの場合は、[LIA (daigokk/LIA)](https://github.com/daigokk/LIA/) をご参照ください。
@@ -29,11 +43,11 @@
 
 | ![Schematic](./docs/images/Schematic.svg) |
 | --- |
-| 図2 回路図 |
+| 図3 回路図 |
 
 | ![Front of circuit board](./docs/images/CircuitBoard_front.jpg) | ![Back of circuit board](./docs/images/CircuitBoard_back.jpg) |
 | --- | --- |
-| 図3 基板表 | 図4 基板裏 |
+| 図4 基板表 | 図5 基板裏 |
 
   | 部品 | 型番 | 備考 |
   | ---- | ---- | ---- |
