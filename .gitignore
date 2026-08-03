@@ -20,6 +20,8 @@
 *.out
 *.app
 *.bin
+
+# Configuration files
 *.ini
 
 # Build directories
