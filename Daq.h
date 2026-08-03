@@ -3,7 +3,6 @@
 #include <dwf.h>
 #include <iostream>
 #include <thread>
-#include <chrono>
 #include "Cfg.h"
 #define PI acos(-1.0)
 
