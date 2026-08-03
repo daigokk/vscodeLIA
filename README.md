@@ -25,7 +25,7 @@
 
 | ![Phase sensitive detection](./docs/images/PSD.svg) |
 | --- |
-| 図2 位相敏感検波 |
+| 図2 位相敏感検波のブロック図 |
 
 ```c++
 void psd(Cfg* pCfg){
