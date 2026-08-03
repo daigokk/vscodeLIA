@@ -52,7 +52,7 @@
 
 1. [WaveForms 過去バージョン / ダウンロードページ](https://digilent.com/reference/software/waveforms/waveforms-3/previous-versions) にアクセスします。
 1. Windows用のインストーラー（例: `digilent.waveforms_vX.X.X_64bit.exe`）をダウンロードして実行します。
-1. インストール時のコンポーネント選択で **WaveForms SDK** が選択されていることを確認して完了させます。
+1. インストール時の設定はデフォルトでよいです。
 
 ### 2. Mingw-w64 (C++コンパイラ) の配置とパス設定
 
@@ -63,12 +63,12 @@
 
 
 1. ダウンロードした `.7z` ファイルを解凍し、中身の `mingw64` フォルダを以下のディレクトリへ移動（コピー）します。
-    ```text
+   ```text
    C:\Program Files\mingw64
    ```
 
 
-    *(※ `C:\Program Files\mingw64\bin\g++.exe` が存在する構造になるように配置してください)*
+   *(※ `C:\Program Files\mingw64\bin\g++.exe` が存在する構造になるように配置してください)*
 1. **環境変数 (PATH) の設定:**
    * キーボードの `Win + R` を押し、`sysdm.cpl` と入力して Enter（または 「スタートメニュー」→「設定」→「システム」→「バージョン情報」→「システムの詳細設定」）。
    * **「環境変数(N)…」** ボタンをクリック。
