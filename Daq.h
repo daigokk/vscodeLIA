@@ -17,8 +17,36 @@ private:
     wf::Device::Data *device_data = nullptr;
     Cfg* pCfg;
     void run(std::stop_token st);
+    void runWithoutDaq(std::stop_token st);
 public:
-    Daq(Cfg* cfg) : pCfg(cfg) {}
+    Daq(Cfg* cfg) : pCfg(cfg) {
+        // do initialization and configuration of the device here
+        try {
+            // connect to the device
+            device_data = wf::device.open();
+            FDwfEnumDeviceName(0, pCfg->status.deviceName);
+            FDwfEnumSN(0, pCfg->status.serialNumber);
+            std::cout << "WaveForms version: " << device_data->version << std::endl;
+            std::cout << "Device name: " << pCfg->status.deviceName << std::endl;
+            std::cout << "Serial number: " << pCfg->status.serialNumber << std::endl;
+            // power supply
+            supplies(5);
+            // waveform generation
+            wavegen(pCfg->excitation.frequency, pCfg->excitation.amplitude);
+            // scope setup
+            scope(1.0/pCfg->rawData.dt, pCfg->rawData.times.size(), 0, 5);
+        }
+        catch (wf::Error error) {
+            std::cout << "Error: ";
+            std::cout << error.instrument << " -> ";
+            std::cout << error.function << " -> ";
+            std::cout << error.message << std::endl;
+            if (device_data) {
+                wf::device.close(device_data);
+            }
+            device_data = nullptr;
+        }
+    }
     void supplies(const double voltage = 5) {
         wf::Supplies::Data supplies_data;
         supplies_data.master_state = true;
@@ -37,9 +65,16 @@ public:
         FDwfAnalogInConfigure(device_data->handle, true, true);
     }
     void start() {
-        thread_ = std::jthread([this](std::stop_token st) {
-            run(st);
-        });
+        if(device_data) {
+            thread_ = std::jthread([this](std::stop_token st) {
+                run(st);
+            });
+        }
+        else{
+            thread_ = std::jthread([this](std::stop_token st) {
+                runWithoutDaq(st);
+            });
+        }
     }
     void stop() {
         thread_.request_stop();
@@ -51,23 +86,8 @@ public:
 
 void Daq::run(std::stop_token st) {
     try {
-        // connect to the device
-        device_data = wf::device.open();
-        FDwfEnumDeviceName(0, pCfg->status.deviceName);
-        FDwfEnumSN(0, pCfg->status.serialNumber);
-        std::cout << "WaveForms version: " << device_data->version << std::endl;
-        std::cout << "Device name: " << pCfg->status.deviceName << std::endl;
-        std::cout << "Serial number: " << pCfg->status.serialNumber << std::endl;
-
-        // do initialization and configuration of the device here
-        // power supply
-        supplies(5);
-        // waveform generation
-        wavegen(pCfg->excitation.frequency, pCfg->excitation.amplitude);
-        // scope setup
-        scope(1.0/pCfg->rawData.dt, pCfg->rawData.times.size(), 0, 5);
         // do work until the window requests shutdown
-        pCfg->status.isDwf = true;
+        pCfg->status.isRun = true;
         for (size_t nloop = 0; !st.stop_requested(); ++nloop) {
             // do something with the device
             STS sts;
@@ -89,5 +109,21 @@ void Daq::run(std::stop_token st) {
         wf::device.close(device_data);
     }
     device_data = nullptr;
-    pCfg->status.isDwf = false;
+    pCfg->status.isRun = false;
+}
+
+void Daq::runWithoutDaq(std::stop_token st) {
+    // Implementation for running without DAQ device
+    pCfg->status.isRun = true;
+    double theta = 0.0;
+    for (size_t nloop = 0; !st.stop_requested(); ++nloop) {
+        theta += 2.0 * PI / 36000;
+        theta = std::fmod(theta, 2.0 * PI);
+        for(int i = 0; i < pCfg->rawData.times.size(); ++i) {
+            double t = pCfg->rawData.times[i];
+            pCfg->rawData.ch1[i] = std::sin(theta + 2.0 * PI * pCfg->excitation.frequency * t) * pCfg->excitation.amplitude;
+        }
+        psd(pCfg);
+    }
+    pCfg->status.isRun = false;
 }

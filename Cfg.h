@@ -19,9 +19,9 @@ public:
 
     class Status {
     public:
-        bool isDwf = false;
+        bool isRun = false;
         char deviceName[32] = {0};
-        char serialNumber[32] = {0};
+        char serialNumber[32] = "Disconnected";
     } status;
 
     class RawData {

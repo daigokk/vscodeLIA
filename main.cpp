@@ -9,7 +9,7 @@ int main() {
     Cfg cfg;
     Daq daq(&cfg);
     daq.start();
-    auto window = Gui::Initialize();
+    auto window = Gui::Initialize(cfg.status.serialNumber);
     
     while (!glfwWindowShouldClose(window)) {
         Gui::BeginFrame(window);
