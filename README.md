@@ -35,7 +35,20 @@
 | --- | --- |
 | 図3 基板表 | 図4 基板裏 |
 
-
+  | 部品 | 型番 | 備考 |
+  | ---- | ---- | ---- |
+  | DAQ | Digilent Analog Discovery 3 | [Analog Discovery 3: 125 MS/s USB Oscilloscope, Waveform Generator, Logic Analyzer, and Variable Power Supply](https://digilent.com/reference/test-and-measurement/analog-discovery-3/start) |
+  | L型ピンソケット | 2×15 | https://akizukidenshi.com/catalog/g/g113419/ |
+  | ブレッドボード |  47×36mm  | https://akizukidenshi.com/catalog/g/g111960/ |
+  | 計装アンプ | Analog Devices AD620ANZ | https://akizukidenshi.com/catalog/g/g113693/ |
+  | ゲイン設定用抵抗(40dB) | 510Ω | [See "Gain Selection" on page 15 of the AD620 datasheet.](https://www.analog.com/media/en/technical-documentation/data-sheets/AD620.pdf) |
+  | コンデンサ | 0.1uF×2 | https://akizukidenshi.com/catalog/g/g110149/ |
+  | 可変抵抗器 | 100Ω | https://akizukidenshi.com/catalog/g/g117821/ |
+  | 同軸ケーブル | Characteristic impedance 50Ω | https://akizukidenshi.com/catalog/g/g116943/|
+  | メスコネクタ | 多治見無線電機 PRC03-12A10-7F10.5 | 探傷器側コネクタ |
+  | $L_1$, Sensor coil| Approximately 50Ω at the operating frequency | https://akizukidenshi.com/catalog/g/g116967/ |
+  | $L_2$, Reference coil | Same as above | https://akizukidenshi.com/catalog/g/g116967/ |
+  
 ---
 
 ## 開発環境・技術スタック
