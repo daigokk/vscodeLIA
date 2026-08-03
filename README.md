@@ -58,6 +58,7 @@ void psd(Cfg* pCfg){
   | 計装アンプ | Analog Devices AD620ANZ | https://akizukidenshi.com/catalog/g/g113693/ |
   | ゲイン設定用抵抗(40dB) | 510Ω | [See "Gain Selection" on page 15 of the AD620 datasheet.](https://www.analog.com/media/en/technical-documentation/data-sheets/AD620.pdf) |
   | コンデンサ | 0.1uF×2 | https://akizukidenshi.com/catalog/g/g110149/ |
+  | (表面実装コンデンサ) | 0.1uF×2 | https://akizukidenshi.com/catalog/g/g116143/ |
   | 可変抵抗器 | 100Ω | https://akizukidenshi.com/catalog/g/g117821/ |
   | 同軸ケーブル | 特性インピーダンス50Ω | https://akizukidenshi.com/catalog/g/g116943/|
   | $L_1$, Sensor coil| 励磁周波数で50Ω程度 | https://akizukidenshi.com/catalog/g/g116967/ |
