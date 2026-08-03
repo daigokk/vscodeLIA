@@ -85,29 +85,19 @@ public:
 };
 
 void Daq::run(std::stop_token st) {
-    try {
-        // do work until the window requests shutdown
-        pCfg->status.isRun = true;
-        for (size_t nloop = 0; !st.stop_requested(); ++nloop) {
-            // do something with the device
-            STS sts;
-            do {
-                FDwfAnalogInStatus(device_data->handle, true, &sts);
-            } while (sts != stsDone);
-            FDwfAnalogInStatusData(device_data->handle, 0, pCfg->rawData.ch1.data(), pCfg->rawData.ch1.size());
-            FDwfAnalogInStatusData(device_data->handle, 1, pCfg->rawData.ch2.data(), pCfg->rawData.ch2.size());
-            psd(pCfg);
-        }
+    // do work until the window requests shutdown
+    pCfg->status.isRun = true;
+    for (size_t nloop = 0; !st.stop_requested(); ++nloop) {
+        // do something with the device
+        STS sts;
+        do {
+            FDwfAnalogInStatus(device_data->handle, true, &sts);
+        } while (sts != stsDone);
+        FDwfAnalogInStatusData(device_data->handle, 0, pCfg->rawData.ch1.data(), pCfg->rawData.ch1.size());
+        FDwfAnalogInStatusData(device_data->handle, 1, pCfg->rawData.ch2.data(), pCfg->rawData.ch2.size());
+        psd(pCfg);
     }
-    catch (wf::Error error) {
-        std::cout << "Error: ";
-        std::cout << error.instrument << " -> ";
-        std::cout << error.function << " -> ";
-        std::cout << error.message << std::endl;
-    }
-    if (device_data) {
-        wf::device.close(device_data);
-    }
+    wf::device.close(device_data);
     device_data = nullptr;
     pCfg->status.isRun = false;
 }
@@ -117,7 +107,7 @@ void Daq::runWithoutDaq(std::stop_token st) {
     pCfg->status.isRun = true;
     double theta = 0.0;
     for (size_t nloop = 0; !st.stop_requested(); ++nloop) {
-        theta += 2.0 * PI / 36000;
+        theta += 2.0 * PI / 60 / 360;
         theta = std::fmod(theta, 2.0 * PI);
         for(int i = 0; i < pCfg->rawData.times.size(); ++i) {
             double t = pCfg->rawData.times[i];
