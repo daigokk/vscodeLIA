@@ -90,10 +90,9 @@
 
 1. [VS Code 公式サイト](https://code.visualstudio.com/download) からインストーラーを取得し、インストールします。
 1. VS Codeを起動し、左側の拡張機能タブ（`Ctrl + Shift + X`）を開き、以下の拡張機能を検索してインストールします。
-* **C/C++** (`ms-vscode.cpptools`)
-* **C/C++ Extension Pack** (`ms-vscode.cpptools-extension-pack`)
-* **Makefile Tools** (`ms-vscode.makefile-tools`)
-
+   * **C/C++** (`ms-vscode.cpptools`)
+   * **C/C++ Extension Pack** (`ms-vscode.cpptools-extension-pack`)
+   * **Makefile Tools** (`ms-vscode.makefile-tools`)
 
 
 ---
@@ -105,23 +104,22 @@
 ### 方法A: ZIPダウンロードを使用する場合
 
 1. リポジトリページ上部の **「<> Code」** ボタン → **「Download ZIP」** をクリックします。
-2. ダウンロードしたZIPファイルを任意の場所に解凍します。
-3. VS Codeのメニューから **「ファイル」→「フォルダーを開く...」** を選択し、解凍したフォルダを開きます。
+1. ダウンロードしたZIPファイルを任意の場所に解凍します。
+1. VS Codeのメニューから **「ファイル」→「フォルダーを開く...」** を選択し、解凍したフォルダを開きます。
 
 ---
 
 ### 方法B: Gitを使用する場合
 
 1. [Git for Windows](https://www.google.com/search?q=https://git-scm.com/install/windows) をインストールします。
-2. VS Codeを起動し、上部検索バー（Command Center）または `Ctrl + Shift + P` でコマンドパレットを開きます。
-3. `Git: Clone`（Git: クローン）と入力・選択し、以下のURLを入力します。
-```text
-https://github.com/daigokk/vscodeLIA.git
+1. VS Codeを起動し、上部検索バー（Command Center）または `Ctrl + Shift + P` でコマンドパレットを開きます。
+1. `Git: Clone`（Git: クローン）と入力・選択し、以下のURLを入力します。
+   ```text
+   https://github.com/daigokk/vscodeLIA.git
+   ```
 
-```
 
-
-4. 保存先のフォルダを選択し、クローン完了後に表示されるダイアログで **「開く」** を選択します。
+1. 保存先のフォルダを選択し、クローン完了後に表示されるダイアログで **「開く」** を選択します。
 
 
 ## ビルドおよび実行方法
