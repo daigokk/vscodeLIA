@@ -6,16 +6,16 @@
 
 ## 概要
 
-**vscodeLIA** は、Digilent製計測ハードウェアを利用して動作する、C++製のシンプルなソフトウェア・ロックインアンプ（LIA）です。
+**vscodeLIA** は、DAQ (Data Acquisition) を利用して動作する、C++製のシンプルなソフトウェア・ロックインアンプ(LIA)です。
 
 * **主な機能:**
-    * 信号の測定・集録（WaveForms SDK経由）
+    * Digilent製DAQ(Analog Discovery)を用いた信号の測定・集録
     * ImPlotを用いた波形のリアルタイム描画
     * 位相敏感検波(同期検波)等による信号処理(未実装)
       * **※注意:** 学習を目的の一つとしているため、位相敏感検波処理は**あえて未実装**にしています。
 
 
-* **発展形リポジトリ:**
+* **このリポジトリの発展形:**
 より実用的なフル機能のソフトウェア・ロックインアンプをお探しの場合は、[LIA (daigokk/LIA)](https://github.com/daigokk/LIA/) をご参照ください。
 * **開発目的:**
 データ集録・GUI描画・信号処理を組み合わせた計測アプリの学習用サンプルコード、または新規計測プロジェクトの雛形（テンプレート）としての使用を想定しています。
@@ -36,9 +36,9 @@
 | --- | --- |
 | **[Digilent WaveForms SDK](https://digilent.com/reference/software/waveforms/waveforms-3/start)** | Analog Discovery等のDigilentハードウェア制御用SDK |
 | **[GLFW](https://www.glfw.org/)** | OpenGLウィンドウ作成および入力処理 |
-| **[Dear ImGui](https://github.com/ocornut/imgui)** | 軽量グラフィカルユーザーインターフェース（GUI） |
+| **[Dear ImGui](https://github.com/ocornut/imgui)** | 軽量グラフィカルユーザーインターフェース (GUI) |
 | **[ImPlot](https://github.com/epezent/implot)** | Dear ImGui向けのリアルタイムプロット・グラフ描画拡張 |
-| **[pocketfft](https://github.com/mreineck/pocketfft)** | ヘッダーオンリーのFFT（高速フーリエ変換）ライブラリ |
+| **[pocketfft](https://github.com/mreineck/pocketfft)** | ヘッダーオンリーのFFT (高速フーリエ変換) ライブラリ |
 
 ---
 
@@ -51,56 +51,48 @@
 計測用ドライバおよびSDKを取得するためにインストールします。
 
 1. [WaveForms 過去バージョン / ダウンロードページ](https://digilent.com/reference/software/waveforms/waveforms-3/previous-versions) にアクセスします。
-2. Windows用のインストーラー（例: `digilent.waveforms_vX.X.X_64bit.exe`）をダウンロードして実行します。
-3. インストール時のコンポーネント選択で **WaveForms SDK** が選択されていることを確認して完了させます。
+1. Windows用のインストーラー（例: `digilent.waveforms_vX.X.X_64bit.exe`）をダウンロードして実行します。
+1. インストール時のコンポーネント選択で **WaveForms SDK** が選択されていることを確認して完了させます。
 
 ### 2. Mingw-w64 (C++コンパイラ) の配置とパス設定
 
 1. 以下のリンクから Mingw-w64 のアーカイブをダウンロードします。
-```
-https://github.com/niXman/mingw-builds-binaries/releases/x86_64-16.1.0-release-win32-seh-ucrt-rt_v14-rev1.7z
-
-```
-
-
-2. ダウンロードした `.7z` ファイルを解凍し、中身の `mingw64` フォルダを以下のディレクトリへ移動（コピー）します。
-```text
-C:\Program Files\mingw64
-
-```
+    ```
+    https://github.com/niXman/mingw-builds-binaries/releases/x86_64-16.1.0-release-win32-seh-ucrt-rt_v14-rev1.7z
+    ```
 
 
-*(※ `C:\Program Files\mingw64\bin\g++.exe` が存在する構造になるように配置してください)*
-3. **環境変数 (PATH) の設定:**
-* キーボードの `Win + R` を押し、`sysdm.cpl` と入力して Enter（または 「スタートメニュー」→「設定」→「システム」→「バージョン情報」→「システムの詳細設定」）。
-* **「環境変数(N)…」** ボタンをクリック。
-* 「システム環境変数」欄の一覧から **`Path`** を選択し、**「編集(E)…」** をクリック。
-* **「新規(N)」** を押し、以下を入力して OK を押します。
-```text
-C:\Program Files\mingw64\bin
-
-```
+1. ダウンロードした `.7z` ファイルを解凍し、中身の `mingw64` フォルダを以下のディレクトリへ移動（コピー）します。
+    ```text
+   C:\Program Files\mingw64
+   ```
 
 
+    *(※ `C:\Program Files\mingw64\bin\g++.exe` が存在する構造になるように配置してください)*
+1. **環境変数 (PATH) の設定:**
+   * キーボードの `Win + R` を押し、`sysdm.cpl` と入力して Enter（または 「スタートメニュー」→「設定」→「システム」→「バージョン情報」→「システムの詳細設定」）。
+   * **「環境変数(N)…」** ボタンをクリック。
+   * 「システム環境変数」欄の一覧から **`Path`** を選択し、**「編集(E)…」** をクリック。
+   * **「新規(N)」** を押し、以下を入力して OK を押します。
+     ```text
+     C:\Program Files\mingw64\bin
+     ```
 
 
-4. **動作確認:**
-コマンドプロンプトを開き、以下を実行してバージョンが表示されれば設定完了です。
-```cmd
-g++ --version
-
-```
-
+1. **動作確認:**
+  コマンドプロンプトを開き、以下を実行してバージョンが表示されれば設定完了です。
+    ```cmd
+   g++ --version
+   ```
 
 
 ### 3. Visual Studio Code のセットアップ
 
 1. [VS Code 公式サイト](https://code.visualstudio.com/download) からインストーラーを取得し、インストールします。
-2. VS Codeを起動し、左側の拡張機能タブ（`Ctrl + Shift + X`）を開き、以下の拡張機能を検索してインストールします。
-* **C/C++** (`ms-vscode.cpptools`)
-* **C/C++ Extension Pack** (`ms-vscode.cpptools-extension-pack`)
-* **Makefile Tools** (`ms-vscode.makefile-tools`)
-
+1. VS Codeを起動し、左側の拡張機能タブ（`Ctrl + Shift + X`）を開き、以下の拡張機能を検索してインストールします。
+   * **C/C++** (`ms-vscode.cpptools`)
+   * **C/C++ Extension Pack** (`ms-vscode.cpptools-extension-pack`)
+   * **Makefile Tools** (`ms-vscode.makefile-tools`)
 
 
 ---
@@ -112,23 +104,22 @@ g++ --version
 ### 方法A: ZIPダウンロードを使用する場合
 
 1. リポジトリページ上部の **「<> Code」** ボタン → **「Download ZIP」** をクリックします。
-2. ダウンロードしたZIPファイルを任意の場所に解凍します。
-3. VS Codeのメニューから **「ファイル」→「フォルダーを開く...」** を選択し、解凍したフォルダを開きます。
+1. ダウンロードしたZIPファイルを任意の場所に解凍します。
+1. VS Codeのメニューから **「ファイル」→「フォルダーを開く...」** を選択し、解凍したフォルダを開きます。
 
 ---
 
 ### 方法B: Gitを使用する場合
 
 1. [Git for Windows](https://www.google.com/search?q=https://git-scm.com/install/windows) をインストールします。
-2. VS Codeを起動し、上部検索バー（Command Center）または `Ctrl + Shift + P` でコマンドパレットを開きます。
-3. `Git: Clone`（Git: クローン）と入力・選択し、以下のURLを入力します。
-```text
-https://github.com/daigokk/vscodeLIA.git
+1. VS Codeを起動し、上部検索バー（Command Center）または `Ctrl + Shift + P` でコマンドパレットを開きます。
+1. `Git: Clone`（Git: クローン）と入力・選択し、以下のURLを入力します。
+   ```text
+   https://github.com/daigokk/vscodeLIA.git
+   ```
 
-```
 
-
-4. 保存先のフォルダを選択し、クローン完了後に表示されるダイアログで **「開く」** を選択します。
+1. 保存先のフォルダを選択し、クローン完了後に表示されるダイアログで **「開く」** を選択します。
 
 
 ## ビルドおよび実行方法
@@ -144,9 +135,9 @@ https://github.com/daigokk/vscodeLIA.git
 2. **Makefile設定の確認:**
 Makefile Tools のパネル内で、以下のように設定されているか確認・指定します。
 
-* **構成 (Configuration):** `[Default]`
-* **ターゲットのビルド (Build target):** `[all]`
-* **起動ターゲット (Launch target):** `[vscodeLIA.exe]`
+* **構成 (Configuration):** `Default`
+* **ターゲットのビルド (Build target):** `all`
+* **起動ターゲット (Launch target):** `vscodeLIA.exe`
 * **Makefile:** `./Makefile`
 * **Make メイク:** `mingw32-make.exe` (または `make`)
 
