@@ -1,7 +1,9 @@
 # vscodeLIA (Template of Simple Software Lock-in Amplifier)
 
-![Hard copy](./docs/images/HardCopy.png)
 
+| ![Hard copy](./docs/images/HardCopy.png) |
+| --- |
+| 図1 Hard copy |
 ---
 
 ## 概要
@@ -25,9 +27,13 @@
 
 ## ハードウェア
 
-| ![Hard copy](./docs/images/HardCopy.png) | ![Hard copy](./docs/images/HardCopy.png) |
+| ![Schematic](./docs/images/Schematic.svg) |
+| --- |
+| 図2 回路図 |
+
+| ![Front of circuit board](./docs/images/CircuitBoard_front.jpg) | ![Back of circuit board](./docs/images/CircuitBoard_back.jpg) |
 | --- | --- |
-|     |     |
+| 図3 基板表 | 図4 基板裏 |
 
 
 ---
