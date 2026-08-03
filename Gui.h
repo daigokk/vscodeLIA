@@ -24,7 +24,7 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
 
 class Gui {
 public:
-    static GLFWwindow* Initialize(char* serialNumber) {
+    static GLFWwindow* Initialize(char* title) {
         if (!glfwInit()) {
             std::cerr << "Failed to initialize GLFW" << std::endl;
             exit(EXIT_FAILURE);
@@ -40,7 +40,7 @@ public:
             glfwTerminate();
             exit(EXIT_FAILURE);
         }
-        glfwSetWindowTitle(window, std::format("vscodeLIA - ({})", serialNumber).c_str());
+        glfwSetWindowTitle(window, std::format("vscodeLIA - ({})", title).c_str());
         glfwSetKeyCallback(window, key_callback);
         glfwMakeContextCurrent(window);
         glfwSwapInterval(1);

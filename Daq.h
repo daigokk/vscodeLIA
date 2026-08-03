@@ -53,7 +53,7 @@ public:
         supplies_data.positive_state = true;
         supplies_data.negative_state = true;
         supplies_data.positive_voltage = voltage;
-        supplies_data.negative_voltage = voltage;
+        supplies_data.negative_voltage = -voltage;
         wf::supplies.switch_(device_data, supplies_data);
     }
     void wavegen(const double frequency = 100e3, const double amplitude = 1) {
