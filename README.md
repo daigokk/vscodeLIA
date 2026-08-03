@@ -6,10 +6,10 @@
 
 ## 概要
 
-**vscodeLIA** は、Digilent製計測ハードウェアを利用して動作する、C++製のシンプルなソフトウェア・ロックインアンプ（LIA）です。
+**vscodeLIA** は、DAQ (Data Acquisition) を利用して動作する、C++製のシンプルなソフトウェア・ロックインアンプ(LIA)です。
 
 * **主な機能:**
-    * 信号の測定・集録（WaveForms SDK経由）
+    * Digilent製DAQ(Analog Discovery)を用いた信号の測定・集録
     * ImPlotを用いた波形のリアルタイム描画
     * 位相敏感検波(同期検波)等による信号処理(未実装)
       * **※注意:** 学習を目的の一つとしているため、位相敏感検波処理は**あえて未実装**にしています。
@@ -36,9 +36,9 @@
 | --- | --- |
 | **[Digilent WaveForms SDK](https://digilent.com/reference/software/waveforms/waveforms-3/start)** | Analog Discovery等のDigilentハードウェア制御用SDK |
 | **[GLFW](https://www.glfw.org/)** | OpenGLウィンドウ作成および入力処理 |
-| **[Dear ImGui](https://github.com/ocornut/imgui)** | 軽量グラフィカルユーザーインターフェース（GUI） |
+| **[Dear ImGui](https://github.com/ocornut/imgui)** | 軽量グラフィカルユーザーインターフェース (GUI) |
 | **[ImPlot](https://github.com/epezent/implot)** | Dear ImGui向けのリアルタイムプロット・グラフ描画拡張 |
-| **[pocketfft](https://github.com/mreineck/pocketfft)** | ヘッダーオンリーのFFT（高速フーリエ変換）ライブラリ |
+| **[pocketfft](https://github.com/mreineck/pocketfft)** | ヘッダーオンリーのFFT (高速フーリエ変換) ライブラリ |
 
 ---
 
@@ -144,9 +144,9 @@ https://github.com/daigokk/vscodeLIA.git
 2. **Makefile設定の確認:**
 Makefile Tools のパネル内で、以下のように設定されているか確認・指定します。
 
-* **構成 (Configuration):** `[Default]`
-* **ターゲットのビルド (Build target):** `[all]`
-* **起動ターゲット (Launch target):** `[vscodeLIA.exe]`
+* **構成 (Configuration):** `Default`
+* **ターゲットのビルド (Build target):** `all`
+* **起動ターゲット (Launch target):** `vscodeLIA.exe`
 * **Makefile:** `./Makefile`
 * **Make メイク:** `mingw32-make.exe` (または `make`)
 
