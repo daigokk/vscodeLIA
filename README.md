@@ -57,10 +57,9 @@
 ### 2. Mingw-w64 (C++コンパイラ) の配置とパス設定
 
 1. 以下のリンクから Mingw-w64 のアーカイブをダウンロードします。
-```
-https://github.com/niXman/mingw-builds-binaries/releases/x86_64-16.1.0-release-win32-seh-ucrt-rt_v14-rev1.7z
-
-```
+  ```
+  https://github.com/niXman/mingw-builds-binaries/releases/x86_64-16.1.0-release-win32-seh-ucrt-rt_v14-rev1.7z
+  ```
 
 
 1. ダウンロードした `.7z` ファイルを解凍し、中身の `mingw64` フォルダを以下のディレクトリへ移動（コピー）します。
