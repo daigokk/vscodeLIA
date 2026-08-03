@@ -138,7 +138,7 @@ Makefile Tools のパネル内で、以下のように設定されているか�
 * **構成 (Configuration):** `Default`
 * **ターゲットのビルド (Build target):** `all`
 * **起動ターゲット (Launch target):** `vscodeLIA.exe`
-* **Makefile:** `./Makefile`
+* **Makefile:** `Makefile`
 * **Make メイク:** `mingw32-make.exe`
 
 
