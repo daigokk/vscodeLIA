@@ -42,7 +42,7 @@ void psd(Cfg* pCfg){
 
 ## ハードウェア
 
-| ![Schematic](./docs/images/Schematic.svg) |
+| ![Schematic](./docs/images/Schematic.svg) ![Schematic_AD620](./docs/images/AD620.svg) |
 | --- |
 | 図3 回路図 |
 
