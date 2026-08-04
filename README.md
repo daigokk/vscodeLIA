@@ -30,12 +30,12 @@
 ```c++
 void psd(Cfg* pCfg){
     double ch1x = 0, ch1y = 0;
-    for (size_t i = 0; i < pCfg->rawData.times.size(); ++i) {
-        ch1x += pCfg->rawData.ch1[i] * 2 * sin(2 * PI * pCfg->excitation.frequency * pCfg->rawData.times[i]);
-        ch1y += pCfg->rawData.ch1[i] * 2 * cos(2 * PI * pCfg->excitation.frequency * pCfg->rawData.times[i]);
+    for (size_t i = 0; i < pCfg->rawData.ch1.size(); ++i) {
+        ch1x += pCfg->rawData.ch1[i] * 2 * sin(2 * PI * pCfg->excitation.frequency * pCfg->rawData.dt * i);
+        ch1y += pCfg->rawData.ch1[i] * 2 * cos(2 * PI * pCfg->excitation.frequency * pCfg->rawData.dt * i);
     }
-    pCfg->buffer.ch1.x = ch1x / pCfg->rawData.times.size();
-    pCfg->buffer.ch1.y = ch1y / pCfg->rawData.times.size();
+    pCfg->buffer.ch1.x = ch1x / pCfg->rawData.ch1.size();
+    pCfg->buffer.ch1.y = ch1y / pCfg->rawData.ch1.size();
 }
 ```
 ---
