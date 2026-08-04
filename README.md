@@ -1,7 +1,9 @@
 # vscodeLIA (Template of Simple Software Lock-in Amplifier)
 
-![Hard copy](./docs/images/HardCopy.png)
 
+| ![Hard copy](./docs/images/HardCopy.png) |
+| --- |
+| 図1 Hard copy |
 ---
 
 ## 概要
@@ -10,16 +12,60 @@
 
 * **主な機能:**
     * Digilent製DAQ([Analog Discovery](https://digilent.com/shop/analog-discovery-3/))を用いた信号の測定・集録
+      * Daq.hとMakefileを書き換えることで、他のDAQ(例えばNI-DAQ)に対応させることも可能です。
     * [ImPlot](https://github.com/epezent/implot)を用いた波形のリアルタイム描画
     * 位相敏感検波(同期検波)等による信号処理(未実装)
       * **※注意:** 学習を目的の一つとしているため、位相敏感検波処理は**あえて未実装**にしています。
 
-
 * **このリポジトリの発展形:**
 より実用的なフル機能のソフトウェア・ロックインアンプをお探しの場合は、[LIA (daigokk/LIA)](https://github.com/daigokk/LIA/) をご参照ください。
 * **このリポジトリの目的:**
-データ集録・GUI描画・信号処理を組み合わせた計測アプリの学習用サンプルコード、または新規計測プロジェクトの雛形（テンプレート）としての使用を想定しています。
+データ集録・GUI描画・信号処理を組み合わせた「計測アプリの学習用サンプルコード」、または「新規計測プロジェクトの雛形 (テンプレート)」としての使用を想定しています。
 
+
+
+| ![Phase sensitive detection](./docs/images/PSD.svg) |
+| --- |
+| 図2 位相敏感検波のブロック図 |
+
+```c++
+void psd(Cfg* pCfg){
+    double ch1x = 0, ch1y = 0;
+    for (size_t i = 0; i < pCfg->rawData.ch1.size(); ++i) {
+        double wt = 2 * PI * pCfg->excitation.frequency * pCfg->rawData.dt * i;
+        ch1x += pCfg->rawData.ch1[i] * 2 * sin(wt);
+        ch1y += pCfg->rawData.ch1[i] * 2 * cos(wt);
+    }
+    pCfg->buffer.ch1.x = ch1x / pCfg->rawData.ch1.size();
+    pCfg->buffer.ch1.y = ch1y / pCfg->rawData.ch1.size();
+}
+```
+---
+
+## ハードウェア
+
+| ![Schematic](./docs/images/Schematic.svg) ![Schematic_AD620](./docs/images/AD620.svg) |
+| --- |
+| 図3 回路図 |
+
+| ![Front of circuit board](./docs/images/CircuitBoard_front.jpg) | ![Back of circuit board](./docs/images/CircuitBoard_back.jpg) |
+| --- | --- |
+| 図4 基板表 | 図5 基板裏 |
+
+  | 部品 | 型番 | 備考 |
+  | ---- | ---- | ---- |
+  | DAQ | Digilent Analog Discovery 3 | [Analog Discovery 3: 125 MS/s USB Oscilloscope, Waveform Generator, Logic Analyzer, and Variable Power Supply](https://digilent.com/reference/test-and-measurement/analog-discovery-3/start) |
+  | L型ピンソケット | 2×15 | https://akizukidenshi.com/catalog/g/g113419/ |
+  | ブレッドボード |  47×36mm  | https://akizukidenshi.com/catalog/g/g111960/ |
+  | 計装アンプ | Analog Devices AD620ANZ | https://akizukidenshi.com/catalog/g/g113693/ |
+  | ゲイン設定用抵抗(40dB) | 510Ω | [See "Gain Selection" on page 15 of the AD620 datasheet.](https://www.analog.com/media/en/technical-documentation/data-sheets/AD620.pdf) |
+  | コンデンサ | 0.1uF×2 | https://akizukidenshi.com/catalog/g/g110149/ |
+  | (表面実装コンデンサ) | 0.1uF×2 | https://akizukidenshi.com/catalog/g/g116143/ |
+  | 可変抵抗器 | 100Ω | https://akizukidenshi.com/catalog/g/g117821/ |
+  | 同軸ケーブル | 特性インピーダンス50Ω | https://akizukidenshi.com/catalog/g/g116943/|
+  | $L_1$, Sensor coil| 励磁周波数で50Ω程度 | 例えば https://akizukidenshi.com/catalog/g/g116967/ |
+  | $L_2$, Reference coil | 励磁周波数で50Ω程度 | 例えば https://akizukidenshi.com/catalog/g/g116967/ |
+  | (必要であれば)メスコネクタ | 多治見無線電機 PRC03-12A10-7F10.5 | 探傷器側コネクタ |
 ---
 
 ## 開発環境・技術スタック
@@ -154,6 +200,6 @@ Makefile Tools のパネル内で、以下のように設定されているか�
 ## 補足
 
 * **Visual Studio (MSVC) との比較:**
-Visual Studio（IDE）を使用すると Makefile やデバッガの手動設定なしで開発を始められますが、商業利用時の有償化の制限があります。本プロジェクトは、オープンソースかつ軽量な **VS Code + GCC (MinGW-w64)** の組み合わせで開発できるように設計されています。VS Codeでももっと簡単にC++開発ができるかもしれません。
+Visual Studio（IDE）を使用すると Makefile やデバッガの手動設定なしで開発を始められますが、商業利用時は有償であるなどの制限があります。本プロジェクトは、オープンソースかつ軽量な **VS Code + GCC (MinGW-w64)** の組み合わせで開発できるように設計されています。VS Codeでももっと簡単にC++開発ができるかもしれません。
 * **WaveForms SDKのリンクエラーが発生する場合:**
 WaveFormsがデフォルトのパス（`C:\Program Files (x86)\Digilent\WaveFormsSDK` 等）にインストールされているか、`Makefile` 内のライブラリインクルードパス・リンクパスを確認してください。
