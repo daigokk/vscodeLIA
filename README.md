@@ -62,8 +62,8 @@ void psd(Cfg* pCfg){
   | (表面実装コンデンサ) | 0.1uF×2 | https://akizukidenshi.com/catalog/g/g116143/ |
   | 可変抵抗器 | 100Ω | https://akizukidenshi.com/catalog/g/g117821/ |
   | 同軸ケーブル | 特性インピーダンス50Ω | https://akizukidenshi.com/catalog/g/g116943/|
-  | $L_1$, Sensor coil| 励磁周波数で50Ω程度 | https://akizukidenshi.com/catalog/g/g116967/ |
-  | $L_2$, Reference coil | 励磁周波数で50Ω程度 | https://akizukidenshi.com/catalog/g/g116967/ |
+  | $L_1$, Sensor coil| 励磁周波数で50Ω程度 | 例えば https://akizukidenshi.com/catalog/g/g116967/ |
+  | $L_2$, Reference coil | 励磁周波数で50Ω程度 | 例えば https://akizukidenshi.com/catalog/g/g116967/ |
   | (必要であれば)メスコネクタ | 多治見無線電機 PRC03-12A10-7F10.5 | 探傷器側コネクタ |
 ---
 
