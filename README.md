@@ -12,7 +12,7 @@
 
 * **主な機能:**
     * Digilent製DAQ([Analog Discovery](https://digilent.com/shop/analog-discovery-3/))を用いた信号の測定・集録
-      * DAQ.hとMakefileを書き換えることで、他のDAQ(例えばNI-DAQ)に対応させることも可能です。
+      * Daq.hとMakefileを書き換えることで、他のDAQ(例えばNI-DAQ)に対応させることも可能です。
     * [ImPlot](https://github.com/epezent/implot)を用いた波形のリアルタイム描画
     * 位相敏感検波(同期検波)等による信号処理(未実装)
       * **※注意:** 学習を目的の一つとしているため、位相敏感検波処理は**あえて未実装**にしています。
