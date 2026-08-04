@@ -10,7 +10,7 @@ WORKSPACE_DIR := $(CURDIR)
 IMGUI_DIR     := $(WORKSPACE_DIR)/external/include/IMGUI
 
 # コンパイルオプション
-CXXFLAGS := -std=c++20 -g -fdiagnostics-color=always
+CXXFLAGS := -O2 -std=c++20 -g -fdiagnostics-color=always
 DEPFLAGS := -MMD -MP
 INCLUDES := -I$(WORKSPACE_DIR)/external/include
 
