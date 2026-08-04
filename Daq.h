@@ -3,12 +3,14 @@
 #include <dwf.h>
 #include <iostream>
 #include <thread>
+#include <chrono>
 #include "Cfg.h"
 #define PI acos(-1.0)
 
 void psd(Cfg* pCfg){
 
 }
+
 
 class Daq {
 private:
@@ -86,6 +88,8 @@ public:
 void Daq::run(std::stop_token st) {
     // do work until the window requests shutdown
     pCfg->status.isRun = true;
+    // ループ開始時刻を基準点として取得
+    auto next_time = std::chrono::steady_clock::now();
     for (size_t nloop = 0; !st.stop_requested(); ++nloop) {
         // do something with the device
         STS sts;
@@ -95,6 +99,11 @@ void Daq::run(std::stop_token st) {
         FDwfAnalogInStatusData(device_data->handle, 0, pCfg->rawData.ch1.data(), pCfg->rawData.ch1.size());
         FDwfAnalogInStatusData(device_data->handle, 1, pCfg->rawData.ch2.data(), pCfg->rawData.ch2.size());
         psd(pCfg);
+
+        // 次の予定時刻まで待機
+        std::this_thread::sleep_until(next_time);
+         // 次の予定時刻を計算
+        next_time += std::chrono::milliseconds((int)(pCfg->buffer.dt * 1000));
     }
     wf::device.close(device_data);
     device_data = nullptr;
@@ -105,14 +114,21 @@ void Daq::runWithoutDaq(std::stop_token st) {
     // Implementation for running without DAQ device
     pCfg->status.isRun = true;
     double theta = 0.0;
+    // ループ開始時刻を基準点として取得
+    auto next_time = std::chrono::steady_clock::now();
     for (size_t nloop = 0; !st.stop_requested(); ++nloop) {
-        theta += 2.0 * PI / 60 / 360;
+        theta += (10.0 * pCfg->buffer.dt) / 180.0 * PI; // 1sごとに1度回転するようにthetaを更新
         theta = std::fmod(theta, 2.0 * PI);
         for(int i = 0; i < pCfg->rawData.times.size(); ++i) {
             double t = pCfg->rawData.times[i];
             pCfg->rawData.ch1[i] = std::sin(theta + 2.0 * PI * pCfg->excitation.frequency * t) * pCfg->excitation.amplitude;
         }
         psd(pCfg);
+
+        // 次の予定時刻まで待機
+        std::this_thread::sleep_until(next_time);
+         // 次の予定時刻を計算
+        next_time += std::chrono::milliseconds((int)(pCfg->buffer.dt * 1000));
     }
     pCfg->status.isRun = false;
 }
