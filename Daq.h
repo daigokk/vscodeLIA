@@ -100,10 +100,10 @@ void Daq::run(std::stop_token st) {
         FDwfAnalogInStatusData(device_data->handle, 1, pCfg->rawData.ch2.data(), pCfg->rawData.ch2.size());
         psd(pCfg);
 
+        // 次の予定時刻を計算
+        next_time += std::chrono::microseconds((int)(pCfg->buffer.dt * 1e6));
         // 次の予定時刻まで待機
         std::this_thread::sleep_until(next_time);
-         // 次の予定時刻を計算
-        next_time += std::chrono::milliseconds((int)(pCfg->buffer.dt * 1000));
     }
     wf::device.close(device_data);
     device_data = nullptr;
@@ -125,10 +125,10 @@ void Daq::runWithoutDaq(std::stop_token st) {
         }
         psd(pCfg);
 
+        // 次の予定時刻を計算
+        next_time += std::chrono::milliseconds((int)(pCfg->buffer.dt * 1000));
         // 次の予定時刻まで待機
         std::this_thread::sleep_until(next_time);
-         // 次の予定時刻を計算
-        next_time += std::chrono::milliseconds((int)(pCfg->buffer.dt * 1000));
     }
     pCfg->status.isRun = false;
 }
