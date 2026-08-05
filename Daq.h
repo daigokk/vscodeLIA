@@ -4,14 +4,22 @@
 #include <dwf.h>
 #include <chrono>
 #include <cmath>
+#include <numbers>
 #include <iostream>
 #include <thread>
 
 #include "Cfg.h"
+#include <pocketfft_hdronly.h>
+
+
+inline void fft(Cfg* pCfg) {
+    // TODO: ここのフーリエ変換(FFT)のコードを入力
+}
 
 inline void psd(Cfg* pCfg) {
     // TODO: ここの位相敏感検波(PSD)のコードを入力
 }
+
 
 class Daq {
 public:

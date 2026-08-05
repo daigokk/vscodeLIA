@@ -3,10 +3,10 @@
 #include <cmath>
 #define RAW_COUNT 10000
 #define RAW_RATE 100e6
-#define RING_BUFFER_SIZE 1000
 #define EXCITATION_FREQUENCY 100e3
 #define EXCITATION_AMPLITUDE 1.0
 #define BUFFER_DT 2e-3 // 2ms
+#define BUFFER_SIZE 1
 
 
 class Cfg{
@@ -33,7 +33,7 @@ public:
 
     class ComplexData {
     public:
-        double x, y;
+        std::vector<double> xs, ys;
     };
     
     class Buffer {
@@ -41,6 +41,11 @@ public:
         double dt = BUFFER_DT;
         ComplexData ch1, ch2;
     } buffer;
+
+    class FFTBuffer {
+    public:
+        std::vector<double> numHarmonics_x, numHarmonics_y;
+    } fftBuffer;
     
     Cfg() {
         rawData.times.resize(RAW_COUNT);
@@ -52,5 +57,11 @@ public:
             rawData.ch1[i] = std::sin(i * wdt);
             rawData.ch2[i] = std::cos(i * wdt);
         }
+        buffer.ch1.xs.resize(BUFFER_SIZE);
+        buffer.ch1.ys.resize(BUFFER_SIZE);
+        buffer.ch2.xs.resize(BUFFER_SIZE);
+        buffer.ch2.ys.resize(BUFFER_SIZE);
+        fftBuffer.numHarmonics_x.resize(5);
+        fftBuffer.numHarmonics_y.resize(5);
     }
 };

@@ -8,8 +8,8 @@
 void XyWindow(Cfg& cfg) {
     ImGui::Begin("XY");
     if (ImPlot::BeginPlot("##XY")) {
-        ImPlot::PlotScatter("##NOW1", &(cfg.buffer.ch1.x), &(cfg.buffer.ch1.y), 1);
-
+        ImPlot::PlotScatter("PSD", &(cfg.buffer.ch1.xs[0]), &(cfg.buffer.ch1.ys[0]), 1);
+        ImPlot::PlotScatter("FFT", cfg.fftBuffer.numHarmonics_x.data(), cfg.fftBuffer.numHarmonics_y.data(), cfg.fftBuffer.numHarmonics_x.size());
         ImPlot::EndPlot();
     }
     ImGui::End();
