@@ -24,9 +24,9 @@ public:
     void start();
     void stop();
 
-    void supplies(double voltage = 5.0);
-    void wavegen(double frequency = 100e3, double amplitude = 1.0);
-    void scope(double sample_rate = 100e6, int buffer_size = 10000, double offset = 0.0, double range = 5.0);
+    void supplies(const double voltage = 5.0);
+    void wavegen(const double frequency = 100e3, const double amplitude = 1.0, const int channel = 1);
+    void scope(const double sample_rate = 100e6, const int buffer_size = 10000, const double offset = 0.0, const double range = 5.0);
 
 private:
     const double PI_ = std::acos(-1.0);
@@ -89,7 +89,7 @@ inline void Daq::printDeviceInfo() const {
     std::cout << "Serial number: " << pCfg_->status.serialNumber << std::endl;
 }
 
-inline void Daq::supplies(double voltage) {
+inline void Daq::supplies(const double voltage) {
     wf::Supplies::Data supplies_data;
     supplies_data.master_state = true;
     supplies_data.positive_state = true;
@@ -100,11 +100,11 @@ inline void Daq::supplies(double voltage) {
     wf::supplies.switch_(device_data_, supplies_data);
 }
 
-inline void Daq::wavegen(double frequency, double amplitude) {
-    wf::wavegen.generate(device_data_, 1, wf::wavegen.function.sine, 0, frequency, amplitude);
+inline void Daq::wavegen(const double frequency, const double amplitude, const int channel) {
+    wf::wavegen.generate(device_data_, channel, wf::wavegen.function.sine, 0, frequency, amplitude);
 }
 
-inline void Daq::scope(double sample_rate, int buffer_size, double offset, double range) {
+inline void Daq::scope(const double sample_rate, const int buffer_size, const double offset, const double range) {
     wf::scope.open(device_data_, sample_rate, buffer_size, offset, range);
     wf::scope.trigger(device_data_, true, trigsrcAnalogOut1, 1, 0);
     FDwfAnalogInConfigure(device_data_->handle, true, true);
