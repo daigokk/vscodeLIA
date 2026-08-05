@@ -10,9 +10,8 @@
 
 
 class Cfg{
-private:
-    const double PI_ = std::acos(-1.0);
 public:
+    const double PI_ = std::acos(-1.0);
     class Excitation {
     public:
         float frequency = EXCITATION_FREQUENCY;

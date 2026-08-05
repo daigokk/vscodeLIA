@@ -29,7 +29,6 @@ public:
     void scope(const double sample_rate = 100e6, const int buffer_size = 10000, const double offset = 0.0, const double range = 5.0);
 
 private:
-    const double PI_ = std::acos(-1.0);
     static constexpr double kDefaultVoltage = 5.0;
 
     Cfg* pCfg_ = nullptr;
@@ -156,7 +155,7 @@ inline void Daq::runWithoutDaq(std::stop_token st) {
     double theta = 0.0;
     const auto loop_period = std::chrono::duration_cast<std::chrono::steady_clock::duration>(
         std::chrono::duration<double>(pCfg_->buffer.dt));
-    const double angular_step = (10.0 / 180.0) * PI_;
+    const double angular_step = (10.0 / 180.0) * pCfg_->PI_;
     const auto& times = pCfg_->rawData.times;
     const auto frequency = pCfg_->excitation.frequency;
     const auto amplitude = pCfg_->excitation.amplitude;
@@ -165,10 +164,10 @@ inline void Daq::runWithoutDaq(std::stop_token st) {
 
     while (!st.stop_requested()) {
         theta += angular_step * pCfg_->buffer.dt;
-        theta = std::fmod(theta, 2.0 * PI_);
+        theta = std::fmod(theta, 2.0 * pCfg_->PI_);
 
         for (size_t i = 0; i < times.size(); ++i) {
-            const double wt = 2.0 * PI_ * frequency * times[i];
+            const double wt = 2.0 * pCfg_->PI_ * frequency * times[i];
             pCfg_->rawData.ch1[i] = amplitude * std::sin(wt + theta);
         }
 
