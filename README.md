@@ -28,11 +28,12 @@
 | --- |
 | 図2 位相敏感検波のブロック図 |
 
+* [答え] 以下のコードは図2のブロック図を具現化したものです。`Daq.h`に記載の`psd`関数に以下を記述すると、プローブの状態に合わせてリアルタイムにXYウィンドウの輝点が移動します。
 ```c++
 void psd(Cfg* pCfg){
     double ch1x = 0, ch1y = 0;
     for (size_t i = 0; i < pCfg->rawData.ch1.size(); ++i) {
-        double wt = 2 * PI * pCfg->excitation.frequency * pCfg->rawData.dt * i;
+        double wt = 2 * pCfg->PI_ * pCfg->excitation.frequency * pCfg->rawData.dt * i;
         ch1x += pCfg->rawData.ch1[i] * 2 * sin(wt);
         ch1y += pCfg->rawData.ch1[i] * 2 * cos(wt);
     }
