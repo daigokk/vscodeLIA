@@ -33,7 +33,7 @@
 void psd(Cfg* pCfg){
     double ch1x = 0, ch1y = 0;
     for (size_t i = 0; i < pCfg->rawData.ch1.size(); ++i) {
-        double wt = 2 * PI * pCfg->excitation.frequency * pCfg->rawData.dt * i;
+        double wt = 2 * pCfg->PI_ * pCfg->excitation.frequency * pCfg->rawData.dt * i;
         ch1x += pCfg->rawData.ch1[i] * 2 * sin(wt);
         ch1y += pCfg->rawData.ch1[i] * 2 * cos(wt);
     }
