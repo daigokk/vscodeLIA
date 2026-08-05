@@ -108,19 +108,14 @@ void psd(Cfg* pCfg){
 
 ### 2. Mingw-w64 (C++コンパイラ) の配置とパス設定
 
-1. 以下のリンクから Mingw-w64 のアーカイブをダウンロードします。
-    ```text
-    https://github.com/niXman/mingw-builds-binaries/releases/x86_64-16.1.0-release-win32-seh-ucrt-rt_v14-rev1.7z
-    ```
-
-
+1. [niXman/mingw-builds-binaries](https://github.com/niXman/mingw-builds-binaries/releases/)にアクセスします。
+1. Mingw-w64 のアーカイブ(例: `x86_64-16.1.0-release-win32-seh-ucrt-rt_v14-rev1.7z`)をダウンロードします。
 1. ダウンロードした `.7z` ファイルを解凍し、中身の `mingw64` フォルダを以下のディレクトリへ移動（コピー）します。
    ```text
    C:\Program Files\mingw64
    ```
-
-
    *(※ `C:\Program Files\mingw64\bin\g++.exe` が存在する構造になるように配置してください)*
+
 1. **環境変数 (PATH) の設定:**
    * キーボードの `Win + R` を押し、`sysdm.cpl` と入力して Enter（または 「スタートメニュー」→「設定」→「システム」→「バージョン情報」→「システムの詳細設定」）。
    * **「環境変数(N)…」** ボタンをクリック。
