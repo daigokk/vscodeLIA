@@ -9,7 +9,6 @@
 
 #include <iostream>
 #include <cmath>
-#include <format>
 
 static void error_callback(int error, const char* description)
 {
@@ -24,7 +23,7 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
 
 class Gui {
 public:
-    static GLFWwindow* Initialize(char* title) {
+    static GLFWwindow* Initialize(const char* title = "", const int width = 1280, const int height = 720) {
         if (!glfwInit()) {
             std::cerr << "Failed to initialize GLFW" << std::endl;
             exit(EXIT_FAILURE);
@@ -34,13 +33,13 @@ public:
         glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 
         const char* glsl_version = "#version 130";
-        GLFWwindow* window = glfwCreateWindow(1280, 720, "codeLIA - Dear ImGui", NULL, NULL);
+        GLFWwindow* window = glfwCreateWindow(width, height, "codeLIA - Dear ImGui", NULL, NULL);
         if (!window) {
             std::cerr << "Failed to create GLFW window" << std::endl;
             glfwTerminate();
             exit(EXIT_FAILURE);
         }
-        glfwSetWindowTitle(window, std::format("vscodeLIA - ({})", title).c_str());
+        glfwSetWindowTitle(window, title);
         glfwSetKeyCallback(window, key_callback);
         glfwMakeContextCurrent(window);
         glfwSwapInterval(1);

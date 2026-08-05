@@ -1,3 +1,4 @@
+#include <format>
 #include "Gui.h"
 #include "RawWindow.h"
 #include "XyWindow.h"
@@ -9,7 +10,9 @@ int main() {
     Cfg cfg;
     Daq daq(&cfg);
     daq.start();
-    auto window = Gui::Initialize(cfg.status.serialNumber);
+    auto window = Gui::Initialize(
+        std::format("codeLIA - {}", cfg.status.serialNumber).c_str()
+    );
     
     while (!glfwWindowShouldClose(window)) {
         Gui::BeginFrame(window);
