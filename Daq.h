@@ -29,13 +29,11 @@ public:
     void scope(double sample_rate = 100e6, int buffer_size = 10000, double offset = 0.0, double range = 5.0);
 
 private:
-    const double kPi = std::acos(-1.0);
+    const double PI_ = std::acos(-1.0);
     static constexpr double kDefaultVoltage = 5.0;
 
-    using DeviceData = wf::Device::Data;
-
     Cfg* pCfg_ = nullptr;
-    DeviceData* device_data_ = nullptr;
+    wf::Device::Data* device_data_ = nullptr;
     std::jthread thread_;
 
     void initializeDevice();
@@ -158,7 +156,7 @@ inline void Daq::runWithoutDaq(std::stop_token st) {
     double theta = 0.0;
     const auto loop_period = std::chrono::duration_cast<std::chrono::steady_clock::duration>(
         std::chrono::duration<double>(pCfg_->buffer.dt));
-    const double angular_step = (10.0 / 180.0) * kPi;
+    const double angular_step = (10.0 / 180.0) * PI_;
     const auto& times = pCfg_->rawData.times;
     const auto frequency = pCfg_->excitation.frequency;
     const auto amplitude = pCfg_->excitation.amplitude;
@@ -167,10 +165,10 @@ inline void Daq::runWithoutDaq(std::stop_token st) {
 
     while (!st.stop_requested()) {
         theta += angular_step * pCfg_->buffer.dt;
-        theta = std::fmod(theta, 2.0 * kPi);
+        theta = std::fmod(theta, 2.0 * PI_);
 
         for (size_t i = 0; i < times.size(); ++i) {
-            const double wt = 2.0 * kPi * frequency * times[i];
+            const double wt = 2.0 * PI_ * frequency * times[i];
             pCfg_->rawData.ch1[i] = amplitude * std::sin(wt + theta);
         }
 

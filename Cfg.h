@@ -7,10 +7,11 @@
 #define EXCITATION_FREQUENCY 100e3
 #define EXCITATION_AMPLITUDE 1.0
 #define BUFFER_DT 2e-3 // 2ms
-#define PI acos(-1.0)
 
 
 class Cfg{
+private:
+    const double PI_ = std::acos(-1.0);
 public:
     class Excitation {
     public:
@@ -46,7 +47,7 @@ public:
         rawData.times.resize(RAW_COUNT);
         rawData.ch1.resize(RAW_COUNT);
         rawData.ch2.resize(RAW_COUNT);
-        double wdt = 2.0 * PI * excitation.frequency * rawData.dt;
+        double wdt = 2.0 * PI_ * excitation.frequency * rawData.dt;
         for (int i = 0; i < RAW_COUNT; i++) {
             rawData.times[i] = static_cast<double>(i) * rawData.dt;
             rawData.ch1[i] = std::sin(i * wdt);
