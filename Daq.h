@@ -97,14 +97,27 @@ inline void Daq::printDeviceInfo() const {
 }
 
 inline void Daq::supplies(const double voltage) {
-    wf::Supplies::Data supplies_data;
-    supplies_data.master_state = true;
-    supplies_data.positive_state = true;
-    supplies_data.negative_state = true;
-    supplies_data.positive_voltage = voltage;
-    supplies_data.negative_voltage = -voltage;
-
-    wf::supplies.switch_(device_data_, supplies_data);
+    /**
+    * @brief 電源供給 (V+, V-) を設定する
+    * @param voltage 供給電圧 (0.0を指定するとOFFになる)
+    */
+    bool flag = (volts != 0.0);
+    double abs_voltage = abs(voltage);
+    // Channel 0 = V+
+    // Channel 1 = V-
+    // Node 0 = Enable/Disable
+    // Node 1 = Voltage Level
+    
+    // V+ 電圧設定
+    FDwfAnalogIOChannelNodeSet(device_data_->handle, 0, 1, abs_voltage);
+    // V- 電圧設定
+    FDwfAnalogIOChannelNodeSet(device_data_->handle, 1, 1, -abs_voltage);
+    // V+ 有効/無効
+    FDwfAnalogIOChannelNodeSet(device_data_->handle, 0, 0, flag);
+    // V- 有効/無効
+    FDwfAnalogIOChannelNodeSet(device_data_->handle, 1, 0, flag);
+    // 電源のマスター有効/無効
+    FDwfAnalogIOEnableSet(device_data_->handle, flag);
 }
 
 inline void Daq::wavegen(const double frequency, const double amplitude, const int channel) {
