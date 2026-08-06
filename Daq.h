@@ -25,7 +25,7 @@ class Daq {
 public:
     explicit Daq(Cfg* cfg);
     ~Daq();
-
+    // コピーを禁止するコード (リソースハンドルを扱うクラスの定石)
     Daq(const Daq&) = delete;
     Daq& operator=(const Daq&) = delete;
 
