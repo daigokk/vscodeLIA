@@ -20,6 +20,21 @@ inline void psd(Cfg* pCfg) {
     // TODO: ここの位相敏感検波(PSD)のコードを入力
 }
 
+class Function {
+    /* function names */
+    public:
+        static const FUNC custom = funcCustom;
+        static const FUNC sine = funcSine;
+        static const FUNC square = funcSquare;
+        static const FUNC triangle = funcTriangle;
+        static const FUNC noise = funcNoise;
+        static const FUNC dc = funcDC;
+        static const FUNC pulse = funcPulse;
+        static const FUNC trapezium = funcTrapezium;
+        static const FUNC sine_power = funcSinePower;
+        static const FUNC ramp_up = funcRampUp;
+        static const FUNC ramp_down = funcRampDown;
+};
 
 class Daq {
 public:
@@ -33,7 +48,7 @@ public:
     void stop();
 
     void supplies(const double voltage = 5.0);
-    void wavegen(const double frequency = 100e3, const double amplitude = 1.0, int channel = 1, FUNC function = wf::wavegen.function.sine, std::vector<double> data = std::vector<double>());
+    void wavegen(const double frequency = 100e3, const double amplitude = 1.0, int channel = 1, FUNC function = Function::sine, std::vector<double> data = std::vector<double>());
     void scope(const double sample_rate = 100e6, const int buffer_size = 10000, const double offset = 0.0, const double range = 5.0);
 
 private:
@@ -66,9 +81,13 @@ inline void Daq::initializeDevice() {
 
         FDwfEnumDeviceName(0, pCfg_->status.deviceName);
         FDwfEnumSN(0, pCfg_->status.serialNumber);
-
+        // Analog input buffer size
+        int buffer_size = 0;
+        if (FDwfAnalogInBufferSizeInfo(device_data_->handle, 0, &buffer_size) == 0) {
+            wf::device.check_error(device_data_);
+        }
         printDeviceInfo();
-        pCfg_->RawInit(device_data_->analog.input.max_buffer_size);
+        pCfg_->RawInit(buffer_size);
         supplies(DefaultVoltage);
         wavegen(pCfg_->excitation.frequency, pCfg_->excitation.amplitude);
         scope(1.0 / pCfg_->rawData.dt, static_cast<int>(pCfg_->rawData.times.size()), 0.0, 5.0);

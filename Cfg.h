@@ -1,6 +1,5 @@
 #pragma once
 #include <vector>
-#include <cmath>
 #define RAW_COUNT 10000
 #define RAW_RATE 100e6
 #define EXCITATION_FREQUENCY 100e3
@@ -21,7 +20,7 @@ public:
     class Status {
     public:
         bool isRun = false;
-        char deviceName[32] = {0};
+        char deviceName[64] = {0};
         char serialNumber[32] = "Disconnected";
     } status;
 
@@ -54,8 +53,6 @@ public:
         double wdt = 2.0 * PI_ * excitation.frequency * rawData.dt;
         for (int i = 0; i < rawData.times.size(); i++) {
             rawData.times[i] = static_cast<double>(i) * rawData.dt;
-            rawData.ch1[i] = std::sin(i * wdt);
-            rawData.ch2[i] = std::cos(i * wdt);
         }
     }
     Cfg() {
