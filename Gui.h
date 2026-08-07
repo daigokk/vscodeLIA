@@ -3,11 +3,13 @@
 #include <GL/gl.h>
 
 #include <IMGUI/imgui.h>
+#include <IMGUI/imgui_internal.h>
 #include <IMGUI/imgui_impl_glfw.h>
 #include <IMGUI/imgui_impl_opengl3.h>
 #include <IMGUI/implot.h>
 
 #include <iostream>
+#include <fstream>
 
 static void error_callback(int error, const char* description)
 {
@@ -20,25 +22,68 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
         glfwSetWindowShouldClose(window, GLFW_TRUE);
 }
 
+static void* WindowSettingsHandler_ReadOpen(ImGuiContext*, ImGuiSettingsHandler*, const char* name)
+{
+    // ini ファイル内の [GLFWWindow][Data] セクションを対象にする
+    if (strcmp(name, "Data") == 0)
+        return (void*)1;
+    return NULL;
+}
 
-class GuiCfg {
-public:
-    class WindowPosition {
-    public:
-        int x = 100;
-        int y = 100;
-    } w_pos;
-    class WindowSize {
-    public:
-        int width = 1280;
-        int height = 720;
-    } w_size;
-};
+static void WindowSettingsHandler_ReadLine(ImGuiContext*, ImGuiSettingsHandler*, void* entry, const char* line)
+{
+    GLFWwindow* window = (GLFWwindow*)ImGui::GetIO().UserData;
+    if (!window) return;
+
+    int x, y, w, h;
+    if (sscanf(line, "Pos=%d,%d", &x, &y) == 2)
+    {
+        glfwSetWindowPos(window, x, y);
+    }
+    else if (sscanf(line, "Size=%d,%d", &w, &h) == 2)
+    {
+        // 0以下の異常値でウィンドウが消えるのを防止
+        if (w > 100 && h > 100) 
+            glfwSetWindowSize(window, w, h);
+    }
+}
+
+static void WindowSettingsHandler_WriteAll(ImGuiContext*, ImGuiSettingsHandler* handler, ImGuiTextBuffer* buf)
+{
+    GLFWwindow* window = (GLFWwindow*)ImGui::GetIO().UserData;
+    if (!window) return;
+
+    int x, y, w, h;
+    glfwGetWindowPos(window, &x, &y);
+    glfwGetWindowSize(window, &w, &h);
+
+    // ini ファイルに書き出すフォーマットを出力
+    buf->appendf("[%s][%s]\n", handler->TypeName, "Data");
+    buf->appendf("Pos=%d,%d\n", x, y);
+    buf->appendf("Size=%d,%d\n", w, h);
+    buf->appendf("\n");
+}
+
+// ハンドラーの登録関数
+void RegisterGLFWWindowSettingsHandler(GLFWwindow* window)
+{
+    // 回避策として UserData に GLFWwindow のポインタを保持させる
+    ImGui::GetIO().UserData = window;
+
+    ImGuiSettingsHandler ini_handler;
+    ini_handler.TypeName = "GLFWWindow";
+    ini_handler.TypeHash = ImHashStr("GLFWWindow");
+    ini_handler.ReadOpenFn = WindowSettingsHandler_ReadOpen;
+    ini_handler.ReadLineFn = WindowSettingsHandler_ReadLine;
+    ini_handler.WriteAllFn = WindowSettingsHandler_WriteAll;
+    
+    ImGui::AddSettingsHandler(&ini_handler);
+}
 
 
 class Gui {
 public:
-    static GLFWwindow* Initialize(const char* title = "", const GuiCfg& cfg = GuiCfg()) {
+    static GLFWwindow* Initialize(const char* title = "") {
         if (!glfwInit()) {
             std::cerr << "Failed to initialize GLFW" << std::endl;
             exit(EXIT_FAILURE);
@@ -48,13 +93,12 @@ public:
         glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 
         const char* glsl_version = "#version 130";
-        GLFWwindow* window = glfwCreateWindow(cfg.w_size.width, cfg.w_size.height, "codeLIA - Dear ImGui", NULL, NULL);
+        GLFWwindow* window = glfwCreateWindow(1280, 720, "codeLIA - Dear ImGui", NULL, NULL);
         if (!window) {
             std::cerr << "Failed to create GLFW window" << std::endl;
             glfwTerminate();
             exit(EXIT_FAILURE);
         }
-        glfwSetWindowPos(window, cfg.w_pos.x, cfg.w_pos.y);
         glfwSetWindowTitle(window, title);
         glfwSetKeyCallback(window, key_callback);
         glfwMakeContextCurrent(window);
@@ -67,11 +111,12 @@ public:
         ImGui::StyleColorsDark();
         ImGui_ImplGlfw_InitForOpenGL(window, true);
         ImGui_ImplOpenGL3_Init(glsl_version);
-
+        RegisterGLFWWindowSettingsHandler(window);
         return window;
     }
     
     static void Shutdown(GLFWwindow* window){
+        
         ImGui_ImplOpenGL3_Shutdown();
         ImGui_ImplGlfw_Shutdown();
         ImPlot::DestroyContext();
