@@ -13,11 +13,11 @@
 
 
 inline void fft(Cfg* pCfg) {
-    // TODO: ここのフーリエ変換(FFT)のコードを入力
+    // TODO: ここにフーリエ変換のコードを入力
 }
 
 inline void psd(Cfg* pCfg) {
-    // TODO: ここの位相敏感検波(PSD)のコードを入力
+    // TODO: ここに位相敏感検波のコードを入力
 }
 
 class Function {
@@ -138,6 +138,14 @@ inline void Daq::supplies(const double voltage) {
 }
 
 inline void Daq::wavegen(const double frequency, const double amplitude, int channel, FUNC function, std::vector<double> data) {
+    /**
+    * @brief 波形生成器を設定する
+    * @param frequency 周波数
+    * @param amplitude 振幅
+    * @param channel チャンネル (1 or 2)
+    * @param function 関数タイプ
+    * @param data カスタムデータ
+    */
     double offset = 0;
     // enable channel
     channel--;
@@ -179,6 +187,13 @@ inline void Daq::wavegen(const double frequency, const double amplitude, int cha
 }
 
 inline void Daq::scope(const double sample_rate, const int buffer_size, const double offset, const double range) {
+    /**
+    * @brief スコープを設定する
+    * @param sample_rate サンプルレート
+    * @param buffer_size バッファサイズ
+    * @param offset オフセット
+    * @param range ダイナミックレンジ (5: ±2.5V, 50: ±25V)
+    */
     wf::scope.open(device_data_, sample_rate, buffer_size, offset, range);
     wf::scope.trigger(device_data_, true, trigsrcAnalogOut1, 1, 0);
     if (FDwfAnalogInConfigure(device_data_->handle, true, true) == 0) {

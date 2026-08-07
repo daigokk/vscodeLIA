@@ -8,7 +8,6 @@
 #include <IMGUI/implot.h>
 
 #include <iostream>
-#include <cmath>
 
 static void error_callback(int error, const char* description)
 {
