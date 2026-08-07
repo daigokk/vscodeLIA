@@ -33,7 +33,7 @@ public:
     void stop();
 
     void supplies(const double voltage = 5.0);
-    void wavegen(const double frequency = 100e3, const double amplitude = 1.0, const int channel = 1);
+    void wavegen(const double frequency = 100e3, const double amplitude = 1.0, int channel = 1, FUNC function = wf::wavegen.function.sine, std::vector<double> data = std::vector<double>());
     void scope(const double sample_rate = 100e6, const int buffer_size = 10000, const double offset = 0.0, const double range = 5.0);
 
 private:
@@ -78,7 +78,6 @@ inline void Daq::initializeDevice() {
                   << error.instrument << " -> "
                   << error.function << " -> "
                   << error.message << std::endl;
-
         closeDevice();
     }
 }
@@ -119,8 +118,45 @@ inline void Daq::supplies(const double voltage) {
     }
 }
 
-inline void Daq::wavegen(const double frequency, const double amplitude, const int channel) {
-    wf::wavegen.generate(device_data_, channel, wf::wavegen.function.sine, 0, frequency, amplitude);
+inline void Daq::wavegen(const double frequency, const double amplitude, int channel, FUNC function, std::vector<double> data) {
+    double offset = 0;
+    // enable channel
+    channel--;
+    if (FDwfAnalogOutNodeEnableSet(device_data_->handle, channel, AnalogOutNodeCarrier, true) == 0) {
+        wf::device.check_error(device_data_);
+    }
+    
+    // set function type
+    if (FDwfAnalogOutNodeFunctionSet(device_data_->handle, channel, AnalogOutNodeCarrier, function) == 0) {
+        wf::device.check_error(device_data_);
+    }
+    
+    // load data if the function type is custom
+    if (function == funcCustom) {
+        if (FDwfAnalogOutNodeDataSet(device_data_->handle, channel, AnalogOutNodeCarrier, data.data(), data.size()) == 0) {
+            wf::device.check_error(device_data_);
+        }
+    }
+    
+    // set frequency
+    if (FDwfAnalogOutNodeFrequencySet(device_data_->handle, channel, AnalogOutNodeCarrier, frequency) == 0) {
+        wf::device.check_error(device_data_);
+    }
+    
+    // set amplitude or DC voltage
+    if (FDwfAnalogOutNodeAmplitudeSet(device_data_->handle, channel, AnalogOutNodeCarrier, amplitude) == 0) {
+        wf::device.check_error(device_data_);
+    }
+    
+    // set offset
+    if (FDwfAnalogOutNodeOffsetSet(device_data_->handle, channel, AnalogOutNodeCarrier, offset) == 0) {
+        wf::device.check_error(device_data_);
+    }
+    
+    // start
+    if (FDwfAnalogOutConfigure(device_data_->handle, channel, true) == 0) {
+        wf::device.check_error(device_data_);
+    }
 }
 
 inline void Daq::scope(const double sample_rate, const int buffer_size, const double offset, const double range) {
