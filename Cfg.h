@@ -47,16 +47,19 @@ public:
         std::vector<double> numHarmonics_x, numHarmonics_y;
     } fftBuffer;
     
-    Cfg() {
-        rawData.times.resize(RAW_COUNT);
-        rawData.ch1.resize(RAW_COUNT);
-        rawData.ch2.resize(RAW_COUNT);
+    void RawInit(const int raw_count) {
+        rawData.times.resize(raw_count);
+        rawData.ch1.resize(raw_count);
+        rawData.ch2.resize(raw_count);
         double wdt = 2.0 * PI_ * excitation.frequency * rawData.dt;
-        for (int i = 0; i < RAW_COUNT; i++) {
+        for (int i = 0; i < rawData.times.size(); i++) {
             rawData.times[i] = static_cast<double>(i) * rawData.dt;
             rawData.ch1[i] = std::sin(i * wdt);
             rawData.ch2[i] = std::cos(i * wdt);
         }
+    }
+    Cfg() {
+        RawInit(RAW_COUNT);
         buffer.ch1.xs.resize(BUFFER_SIZE);
         buffer.ch1.ys.resize(BUFFER_SIZE);
         buffer.ch2.xs.resize(BUFFER_SIZE);

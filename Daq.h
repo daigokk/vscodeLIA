@@ -37,7 +37,7 @@ public:
     void scope(const double sample_rate = 100e6, const int buffer_size = 10000, const double offset = 0.0, const double range = 5.0);
 
 private:
-    static constexpr double kDefaultVoltage = 5.0;
+    static constexpr double DefaultVoltage = 5.0;
 
     Cfg* pCfg_ = nullptr;
     wf::Device::Data* device_data_ = nullptr;
@@ -68,8 +68,8 @@ inline void Daq::initializeDevice() {
         FDwfEnumSN(0, pCfg_->status.serialNumber);
 
         printDeviceInfo();
-
-        supplies(kDefaultVoltage);
+        pCfg_->RawInit(device_data_->analog.input.max_buffer_size);
+        supplies(DefaultVoltage);
         wavegen(pCfg_->excitation.frequency, pCfg_->excitation.amplitude);
         scope(1.0 / pCfg_->rawData.dt, static_cast<int>(pCfg_->rawData.times.size()), 0.0, 5.0);
     }
@@ -99,25 +99,24 @@ inline void Daq::printDeviceInfo() const {
 inline void Daq::supplies(const double voltage) {
     /**
     * @brief 電源供給 (V+, V-) を設定する
-    * @param voltage 供給電圧 (0.0を指定するとOFFになる)
+    * @param voltage 供給電圧 (0~5V, 0.0を指定するとOFFになる)
     */
-    bool flag = (volts != 0.0);
+    bool flag = (voltage != 0.0);
     double abs_voltage = abs(voltage);
-    // Channel 0 = V+
-    // Channel 1 = V-
-    // Node 0 = Enable/Disable
-    // Node 1 = Voltage Level
-    
-    // V+ 電圧設定
-    FDwfAnalogIOChannelNodeSet(device_data_->handle, 0, 1, abs_voltage);
-    // V- 電圧設定
-    FDwfAnalogIOChannelNodeSet(device_data_->handle, 1, 1, -abs_voltage);
-    // V+ 有効/無効
-    FDwfAnalogIOChannelNodeSet(device_data_->handle, 0, 0, flag);
-    // V- 有効/無効
-    FDwfAnalogIOChannelNodeSet(device_data_->handle, 1, 0, flag);
+    // idxChannel=0: V+ 電圧設定, idxChannel=1: V- 電圧設定
+    // idxNode=0: Enable/Disable, idxNode=1: Voltage Level
+    for(int idxChannel=0; idxChannel<2; idxChannel++) {
+        if (FDwfAnalogIOChannelNodeSet(device_data_->handle, idxChannel, 1, abs_voltage) == 0) {
+            wf::device.check_error(device_data_);
+        }
+        if (FDwfAnalogIOChannelNodeSet(device_data_->handle, idxChannel, 0, flag) == 0) {
+            wf::device.check_error(device_data_);
+        }   
+    }
     // 電源のマスター有効/無効
-    FDwfAnalogIOEnableSet(device_data_->handle, flag);
+    if (FDwfAnalogIOEnableSet(device_data_->handle, flag) == 0) {
+        wf::device.check_error(device_data_);
+    }
 }
 
 inline void Daq::wavegen(const double frequency, const double amplitude, const int channel) {
@@ -127,7 +126,9 @@ inline void Daq::wavegen(const double frequency, const double amplitude, const i
 inline void Daq::scope(const double sample_rate, const int buffer_size, const double offset, const double range) {
     wf::scope.open(device_data_, sample_rate, buffer_size, offset, range);
     wf::scope.trigger(device_data_, true, trigsrcAnalogOut1, 1, 0);
-    FDwfAnalogInConfigure(device_data_->handle, true, true);
+    if (FDwfAnalogInConfigure(device_data_->handle, true, true) == 0) {
+        wf::device.check_error(device_data_);
+    }
 }
 
 inline void Daq::start() {
@@ -176,7 +177,7 @@ inline void Daq::runWithoutDaq(std::stop_token st) {
     double theta = 0.0;
     const auto loop_period = std::chrono::duration_cast<std::chrono::steady_clock::duration>(
         std::chrono::duration<double>(pCfg_->buffer.dt));
-    const double angular_step = (10.0 / 180.0) * pCfg_->PI_;
+    const double angular_step = (100.0 / 180.0) * pCfg_->PI_;
     const auto& times = pCfg_->rawData.times;
     const auto frequency = pCfg_->excitation.frequency;
     const auto amplitude = pCfg_->excitation.amplitude;
