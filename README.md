@@ -60,7 +60,8 @@ void psd(Cfg* pCfg){
 
 | ![Front of circuit board](./docs/images/CircuitBoard_front.jpg) | ![Back of circuit board](./docs/images/CircuitBoard_back.jpg) |
 | --- | --- |
-| 図4. 基板表 | 図5. 基板裏 |
+| (a) 表 | (b) 裏 |
+| 図4. 電子回路基板 |  |
 
   | 部品 | 型番 | 備考 |
   | ---- | ---- | ---- |
