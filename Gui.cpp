@@ -1,6 +1,7 @@
 #include "Gui.h"
 #include <GLFW/glfw3.h>
 #include <GL/gl.h>
+
 #include <IMGUI/imgui.h>
 #include <IMGUI/imgui_internal.h>
 #include <IMGUI/imgui_impl_glfw.h>
@@ -22,7 +23,10 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
 
 static void* WindowSettingsHandler_ReadOpen(ImGuiContext*, ImGuiSettingsHandler*, const char* name)
 {
-    // ini ファイル内の [GLFWWindow][Data] セクションを対象にする
+    /**
+    * @brief ini ファイルからウィンドウの設定を読み込む際に呼び出される関数
+    * @param name ini ファイルのエントリ名
+    */
     if (strcmp(name, "Data") == 0)
         return (void*)1;
     return NULL;
@@ -30,6 +34,11 @@ static void* WindowSettingsHandler_ReadOpen(ImGuiContext*, ImGuiSettingsHandler*
 
 static void WindowSettingsHandler_ReadLine(ImGuiContext*, ImGuiSettingsHandler*, void* entry, const char* line)
 {
+    /**
+    * @brief ini ファイルからウィンドウの位置とサイズを読み込む
+    * @param entry ini ファイルのエントリ
+    * @param line ini ファイルの行
+    */
     GLFWwindow* window = (GLFWwindow*)ImGui::GetIO().UserData;
     if (!window) return;
 
@@ -48,6 +57,11 @@ static void WindowSettingsHandler_ReadLine(ImGuiContext*, ImGuiSettingsHandler*,
 
 static void WindowSettingsHandler_WriteAll(ImGuiContext*, ImGuiSettingsHandler* handler, ImGuiTextBuffer* buf)
 {
+    /**
+    * @brief ini ファイルにウィンドウの位置とサイズを書き出す
+    * @param handler ini ファイルのハンドラー
+    * @param buf ini ファイルのバッファ
+    */
     GLFWwindow* window = (GLFWwindow*)ImGui::GetIO().UserData;
     if (!window) return;
 
@@ -65,7 +79,11 @@ static void WindowSettingsHandler_WriteAll(ImGuiContext*, ImGuiSettingsHandler* 
 // ハンドラーの登録関数
 void RegisterGLFWWindowSettingsHandler(GLFWwindow* window)
 {
-    // 回避策として UserData に GLFWwindow のポインタを保持させる
+    /**
+    * @brief GLFWwindow のWindows位置、サイズをimgui.iniファイルから読み込み、保存するハンドラーを ImGui に登録する
+    * @param window GLFWwindow のポインタ
+    */
+    // GLFWの終了処理時にwindowポインタが破棄される回避策として UserData に GLFWwindow のポインタを保持させる
     ImGui::GetIO().UserData = window;
 
     ImGuiSettingsHandler ini_handler;
