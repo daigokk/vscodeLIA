@@ -3,7 +3,7 @@
 
 | ![Hard copy](./docs/images/HardCopy.png) |
 | --- |
-| 図1 Hard copy |
+| 図1. Hard copy |
 ---
 
 ## 概要
@@ -30,7 +30,7 @@
 
 | ![Phase sensitive detection](./docs/images/PSD.svg) |
 | --- |
-| 図2 位相敏感検波のブロック図 |
+| 図2. 位相敏感検波のブロック図 |
 
 * [答え] 以下のコードは図2のブロック図を具現化したものです。`Daq.h`に記載の`psd`関数に以下を記述すると、プローブの状態に合わせてリアルタイムにXYウィンドウの輝点が移動します。
 
@@ -56,11 +56,11 @@ void psd(Cfg* pCfg){
 
 | ![Schematic](./docs/images/Schematic.svg) ![Schematic_AD620](./docs/images/AD620.svg) |
 | --- |
-| 図3 回路図 |
+| 図3. 回路図 |
 
 | ![Front of circuit board](./docs/images/CircuitBoard_front.jpg) | ![Back of circuit board](./docs/images/CircuitBoard_back.jpg) |
 | --- | --- |
-| 図4 基板表 | 図5 基板裏 |
+| 図4. 基板表 | 図5. 基板裏 |
 
   | 部品 | 型番 | 備考 |
   | ---- | ---- | ---- |
