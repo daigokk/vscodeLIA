@@ -16,7 +16,7 @@
     * [ImPlot](https://github.com/epezent/implot)を用いた波形のリアルタイム描画
     * 位相敏感検波(同期検波)等による信号処理(未実装)
       * **※注意:** 学習を目的の一つとしているため、位相敏感検波処理は**あえて未実装**にしています。
-    * オープンソースである **Visual Studio Code + GCC (MinGW-w64)** の組み合わせで開発できるように設計されています。
+    * オープンソースである **[Visual Studio Code](https://code.visualstudio.com/) + GCC ([MinGW-w64](https://www.mingw-w64.org/))** の組み合わせで開発できるように設計されています。
 
 * **このリポジトリの発展形:**
 より実用的なフル機能のソフトウェア・ロックインアンプをお探しの場合は、[LIA (daigokk/LIA)](https://github.com/daigokk/LIA/) をご参照ください。
@@ -77,7 +77,7 @@ void psd(Cfg* pCfg){
 
 ## 開発環境・技術スタック
 
-* **エディタ / IDE:** [Visual Studio Code](https://code.visualstudio.com/download)
+* **エディタ / IDE:** [Visual Studio Code](https://code.visualstudio.com/)
 * **コンパイラ:** [Mingw-w64](https://github.com/niXman/mingw-builds-binaries/releases/) (GCC for Windows)
 * **対象OS:** Windows 10 / 11 (64-bit)
 
