@@ -63,6 +63,7 @@ void psd(Cfg* pCfg){
 | (a) 表 | (b) 裏 |
 | 図4. 電子回路基板 |  |
 
+表1. 部品一覧
   | 部品 | 型番 | 備考 |
   | ---- | ---- | ---- |
   | DAQ | Digilent Analog Discovery 3 | [Analog Discovery 3: 125 MS/s USB Oscilloscope, Waveform Generator, Logic Analyzer, and Variable Power Supply](https://digilent.com/reference/test-and-measurement/analog-discovery-3/start) |
@@ -89,6 +90,7 @@ void psd(Cfg* pCfg){
 
 本プロジェクトでは以下のサードパーティ製ライブラリ・SDKを利用しています。
 
+表2. 依存ライブラリ・SDK一覧
 | ライブラリ / SDK | 概要 / 用途 |
 | --- | --- |
 | **[Digilent WaveForms SDK](https://digilent.com/reference/software/waveforms/waveforms-3/start)** | Analog Discovery等のDigilentハードウェア制御用SDK |
