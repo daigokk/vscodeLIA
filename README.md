@@ -14,7 +14,7 @@
     * Digilent製DAQ([Analog Discovery](https://digilent.com/shop/analog-discovery-3/))を用いた信号の測定・集録
       * Daq.hとMakefileを書き換えることで、他のDAQ(例えばNI-DAQ)に対応させることも可能です。
     * [ImPlot](https://github.com/epezent/implot)を用いた波形のリアルタイム描画
-    * 位相敏感検波(同期検波)等による信号処理(未実装)
+    * [位相敏感検波](https://www.youtube.com/watch?v=pHyuB1YW4qY)(同期検波)等による信号処理(未実装)
       * **※注意:** 学習を目的の一つとしているため、位相敏感検波処理は**あえて未実装**にしています。
     * オープンソースである **[Visual Studio Code](https://code.visualstudio.com/) + GCC ([MinGW-w64](https://www.mingw-w64.org/))** の組み合わせで開発できるように設計されています。
 
