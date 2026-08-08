@@ -87,7 +87,9 @@ inline void Daq::initializeDevice() {
             wf::device.check_error(device_data_);
         }
         printDeviceInfo();
-        pCfg_->RawInit(buffer_size);
+        if(pCfg_->rawData.times.size() > buffer_size){
+            pCfg_->RawInit(buffer_size);
+        }
         supplies(DefaultVoltage);
         wavegen(pCfg_->excitation.frequency, pCfg_->excitation.amplitude);
         scope(1.0 / pCfg_->rawData.dt, static_cast<int>(pCfg_->rawData.times.size()), 0.0, 5.0);
