@@ -88,6 +88,7 @@ inline void Daq::initializeDevice() {
         }
         printDeviceInfo();
         if(pCfg_->rawData.times.size() > buffer_size){
+            std::cout << "Raw buffer size: " << pCfg_->rawData.times.size() << " => " << buffer_size << std::endl;
             pCfg_->RawInit(buffer_size);
         }
         supplies(DefaultVoltage);
