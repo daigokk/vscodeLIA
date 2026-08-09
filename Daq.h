@@ -58,6 +58,8 @@ private:
     wf::Device::Data* device_data_ = nullptr;
     std::jthread thread_;
 
+    void check_error(wf::Device::Data *device_data, const char *caller = __builtin_FUNCTION(), const char *file = __FILE__);
+
     void initializeDevice();
     void closeDevice();
     void printDeviceInfo() const;
@@ -65,6 +67,37 @@ private:
     void run(std::stop_token st);
     void runWithoutDaq(std::stop_token st);
 };
+
+inline void Daq::check_error(wf::Device::Data *device_data, const char *caller, const char *file) {
+    /*
+        check for errors
+    */
+    char err_msg[512];  // variable for the error message
+    FDwfGetLastErrorMsg(err_msg);  // get the error message
+    device_data->error.message = err_msg;   // cast it to string
+    if (device_data->error.message != "") {
+        device_data->error.function = caller;
+        device_data->error.instrument = file;
+        // delete the extension
+        size_t index = device_data->error.instrument.find('.');
+        if (index != std::string::npos) {
+            device_data->error.instrument = device_data->error.instrument.substr(0, index);
+        }
+        // delete the path
+        device_data->error.instrument = std::string(device_data->error.instrument.rbegin(), device_data->error.instrument.rend());
+        index = device_data->error.instrument.find('/');
+        if (index != std::string::npos) {
+            device_data->error.instrument = device_data->error.instrument.substr(0, index);
+        }
+        index = device_data->error.instrument.find('\\');
+        if (index != std::string::npos) {
+            device_data->error.instrument = device_data->error.instrument.substr(0, index);
+        }
+        device_data->error.instrument = std::string(device_data->error.instrument.rbegin(), device_data->error.instrument.rend());
+        throw device_data->error;
+    }
+    return;
+}
 
 inline Daq::Daq(Cfg* cfg) : pCfg_(cfg) {
     initializeDevice();
@@ -128,15 +161,15 @@ inline void Daq::supplies(const double voltage) {
     // idxNode=0: Enable/Disable, idxNode=1: Voltage Level
     for(int idxChannel=0; idxChannel<2; idxChannel++) {
         if (FDwfAnalogIOChannelNodeSet(device_data_->handle, idxChannel, 1, abs_voltage) == 0) {
-            wf::device.check_error(device_data_);
+            check_error(device_data_);
         }
         if (FDwfAnalogIOChannelNodeSet(device_data_->handle, idxChannel, 0, flag) == 0) {
-            wf::device.check_error(device_data_);
+            check_error(device_data_);
         }   
     }
     // 電源のマスター有効/無効
     if (FDwfAnalogIOEnableSet(device_data_->handle, flag) == 0) {
-        wf::device.check_error(device_data_);
+        check_error(device_data_);
     }
 }
 
@@ -153,39 +186,39 @@ inline void Daq::wavegen(const double frequency, const double amplitude, int cha
     // enable channel
     channel--;
     if (FDwfAnalogOutNodeEnableSet(device_data_->handle, channel, AnalogOutNodeCarrier, true) == 0) {
-        wf::device.check_error(device_data_);
+        check_error(device_data_);
     }
     
     // set function type
     if (FDwfAnalogOutNodeFunctionSet(device_data_->handle, channel, AnalogOutNodeCarrier, function) == 0) {
-        wf::device.check_error(device_data_);
+        check_error(device_data_);
     }
     
     // load data if the function type is custom
     if (function == funcCustom) {
         if (FDwfAnalogOutNodeDataSet(device_data_->handle, channel, AnalogOutNodeCarrier, data.data(), data.size()) == 0) {
-            wf::device.check_error(device_data_);
+            check_error(device_data_);
         }
     }
     
     // set frequency
     if (FDwfAnalogOutNodeFrequencySet(device_data_->handle, channel, AnalogOutNodeCarrier, frequency) == 0) {
-        wf::device.check_error(device_data_);
+        check_error(device_data_);
     }
     
     // set amplitude or DC voltage
     if (FDwfAnalogOutNodeAmplitudeSet(device_data_->handle, channel, AnalogOutNodeCarrier, amplitude) == 0) {
-        wf::device.check_error(device_data_);
+        check_error(device_data_);
     }
     
     // set offset
     if (FDwfAnalogOutNodeOffsetSet(device_data_->handle, channel, AnalogOutNodeCarrier, offset) == 0) {
-        wf::device.check_error(device_data_);
+        check_error(device_data_);
     }
     
     // start
     if (FDwfAnalogOutConfigure(device_data_->handle, channel, true) == 0) {
-        wf::device.check_error(device_data_);
+        check_error(device_data_);
     }
 }
 
@@ -200,7 +233,7 @@ inline void Daq::scope(const double sample_rate, const int buffer_size, const do
     wf::scope.open(device_data_, sample_rate, buffer_size, offset, range);
     wf::scope.trigger(device_data_, true, trigsrcAnalogOut1, 1, 0);
     if (FDwfAnalogInConfigure(device_data_->handle, true, true) == 0) {
-        wf::device.check_error(device_data_);
+        check_error(device_data_);
     }
 }
 
