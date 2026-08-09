@@ -10,6 +10,12 @@
 
 **vscodeLIA** は、DAQ (Data Acquisition) を利用して動作する、C++製のシンプルなソフトウェア・ロックインアンプ(LIA)です。
 
+* **このリポジトリの目的:**
+データ集録・GUI描画・信号処理を組み合わせた、以下のような使用を想定しています。
+  * **計測アプリの学習用サンプルコード**
+  * **新規計測プロジェクトの雛形 (テンプレート)**
+  * [職業能力開発総合大学校](https://www.uitec.jeed.go.jp/) 電気工学専攻 3年時プレゼミ([応用センシング研究室](https://www.uitec.jeed.go.jp/kenkyu/laboratory/lab039/index.html))の課題
+
 * **主な機能:**
     * Digilent製DAQ([Analog Discovery](https://digilent.com/shop/analog-discovery-3/))を用いた信号の測定・集録
       * Daq.hとMakefileを書き換えることで、他のDAQ(例えばNI-DAQ)に対応させることも可能です。
@@ -20,10 +26,7 @@
 
 * **このリポジトリの発展形:**
 より実用的なフル機能のソフトウェア・ロックインアンプをお探しの場合は、[LIA (daigokk/LIA)](https://github.com/daigokk/LIA/) をご参照ください。
-* **このリポジトリの目的:**
-データ集録・GUI描画・信号処理を組み合わせた、以下のような使用を想定しています。
-  * **計測アプリの学習用サンプルコード**
-  * **新規計測プロジェクトの雛形 (テンプレート)**
+
 
 
 
