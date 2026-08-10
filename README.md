@@ -18,7 +18,7 @@
 
 * **主な機能:**
     * Digilent製DAQ([Analog Discovery](https://digilent.com/shop/analog-discovery-3/))を用いた信号の測定・集録
-      * Daq.hとMakefileを書き換えることで、他のDAQ(例えばNI-DAQ)に対応させることも可能です。
+      * `Daq.h`と`Makefile`を書き換えることで、他のDAQ(例えばNI-DAQ)に対応させることも可能です。
     * [ImPlot](https://github.com/epezent/implot)を用いた波形のリアルタイム描画
     * [位相敏感検波](https://www.youtube.com/watch?v=pHyuB1YW4qY)(同期検波)等による信号処理(未実装)
       * **※注意:** 学習を目的の一つとしているため、位相敏感検波処理は**あえて未実装**にしています。
@@ -206,6 +206,7 @@ Makefile Tools のパネル内で、以下のように設定します。
 
 1. **課題:**
     * `Daq.h`に記載の`psd`関数を完成させてください。
+    * (オプション)`fft`関数を完成させてください。
     * (オプション)追加したい機能はありませんか？その機能を実装してみましょう。[LIA (daigokk/LIA)](https://github.com/daigokk/LIA/) が参考になるかもしれません。
     * (オプション)C++からメモリ安全なRustに書き換えてみましょう。
 
