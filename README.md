@@ -6,7 +6,7 @@
 | 図1. Hard copy |
 ---
 
-## 概要
+## 1. 概要
 
 **vscodeLIA** は、DAQ (Data Acquisition) を利用して動作する、C++製のシンプルなソフトウェア・ロックインアンプ(LIA)です。
 
@@ -55,7 +55,7 @@ void psd(Cfg* pCfg){
 
 ---
 
-## ハードウェア
+## 2. ハードウェア
 
 | ![Schematic](./docs/images/Schematic.svg) ![Schematic_AD620](./docs/images/AD620.svg) |
 | --- |
@@ -83,15 +83,13 @@ void psd(Cfg* pCfg){
   | (必要であれば)メスコネクタ | 多治見無線電機 PRC03-12A10-7F10.5 | 探傷器側コネクタ |
 ---
 
-## 開発環境・技術スタック
+## 3. 開発環境・依存ライブラリ・SDK
+
+本プロジェクトでは以下の先人の成果を活用させていただいています。
 
 * **エディタ / IDE:** [Visual Studio Code](https://code.visualstudio.com/)
 * **コンパイラ:** [Mingw-w64](https://github.com/niXman/mingw-builds-binaries/releases/) (GCC for Windows)
 * **対象OS:** Windows 10 / 11 (64-bit)
-
-### 依存ライブラリ・SDK
-
-本プロジェクトでは以下のサードパーティ製ライブラリ・SDKを利用しています。
 
 表2. 依存ライブラリ・SDK一覧
 | ライブラリ / SDK | 概要 / 用途 |
@@ -104,7 +102,7 @@ void psd(Cfg* pCfg){
 
 ---
 
-## 開発環境のセットアップ (Windows)
+## 4. 開発環境のセットアップ (Windows)
 
 以下のステップ順にセットアップを行ってください。
 
@@ -154,7 +152,7 @@ void psd(Cfg* pCfg){
 
 ---
 
-## プロジェクトの取得方法
+## 4. プロジェクトの取得方法
 
 いずれかの方法でソースコードを取得してください。
 
@@ -181,7 +179,7 @@ void psd(Cfg* pCfg){
 ---
 
 
-## ビルドおよび実行方法
+## 5. ビルドおよび実行方法
 
 * 本プロジェクトは VS Code の **Makefile Tools** 拡張機能を利用してビルド・デバッグを行うように構成されています。
 * makeを用いることで、ビルド時間が大幅に短縮されます。
