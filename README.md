@@ -90,7 +90,7 @@ void psd(Cfg* pCfg){
 * **コンパイラ:** [Mingw-w64](https://github.com/niXman/mingw-builds-binaries/releases/) (GCC for Windows)
 * **対象OS:** Windows 10 / 11 (64-bit)
 
-以下のステップ順にセットアップを行ってください。
+以下を参考にセットアップを行ってください。
 
 ### 1. Digilent WaveForms のインストール
 
@@ -140,7 +140,7 @@ void psd(Cfg* pCfg){
 
 ## 4. プロジェクトの取得方法
 
-このプロジェクトは表2に示すライブラリに依存しています。偉大なる先人に感謝！
+* このプロジェクトは表2に示すライブラリに依存しています。偉大なる先人に感謝！
 
 表2. 依存ライブラリ一覧
 | ライブラリ | 概要 / 用途 |
@@ -151,10 +151,7 @@ void psd(Cfg* pCfg){
 | **[ImPlot](https://github.com/epezent/implot)** | Dear ImGui向けのリアルタイムプロット・グラフ描画拡張 |
 | **[pocketfft](https://github.com/mreineck/pocketfft)** | ヘッダーオンリーのFFT (高速フーリエ変換) ライブラリ |
 
----
-
-
-いずれかの方法でソースコードを取得してください。
+* いずれかの方法でソースコードを取得してください。
 
 ### 方法A: ZIPダウンロードを使用する場合
 
@@ -171,8 +168,6 @@ void psd(Cfg* pCfg){
    ```text
    https://github.com/daigokk/vscodeLIA.git
    ```
-
-
 1. 保存先のフォルダを選択し、クローン完了後に表示されるダイアログで **「開く」** を選択します。
 
 
