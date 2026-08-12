@@ -160,7 +160,10 @@ inline void Daq::supplies(const double voltage) {
     // idxChannel=0: V+ 電圧設定, idxChannel=1: V- 電圧設定
     // idxNode=0: Enable/Disable, idxNode=1: Voltage Level
     for(int idxChannel=0; idxChannel<2; idxChannel++) {
-        if (FDwfAnalogIOChannelNodeSet(device_data_->handle, idxChannel, 1, abs_voltage) == 0) {
+        if (FDwfAnalogIOChannelNodeSet(
+            device_data_->handle, idxChannel, 1, 
+            (idxChannel % 2==0 ? 1 : -1)*abs_voltage
+        ) == 0) {
             check_error(device_data_);
         }
         if (FDwfAnalogIOChannelNodeSet(device_data_->handle, idxChannel, 0, flag) == 0) {
