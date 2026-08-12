@@ -68,8 +68,6 @@ public:
     };
 
 private:
-    static constexpr double DefaultVoltage = 5.0;
-
     Cfg* pCfg_ = nullptr;
     wf::Device::Data* device_data_ = nullptr;
     std::jthread thread_;
@@ -140,7 +138,7 @@ inline void Daq::initializeDevice() {
             std::cout << "Raw buffer size: " << pCfg_->rawData.times.size() << " => " << buffer_size << std::endl;
             pCfg_->RawInit(buffer_size);
         }
-        supplies(DefaultVoltage);
+        supplies();
         wavegen(pCfg_->excitation.frequency, pCfg_->excitation.amplitude);
         scope(1.0 / pCfg_->rawData.dt, static_cast<int>(pCfg_->rawData.times.size()), 0.0, 5.0);
     }
