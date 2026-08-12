@@ -140,17 +140,6 @@ void psd(Cfg* pCfg){
 
 ## 4. プロジェクトの取得方法
 
-* このプロジェクトは表2に示すライブラリに依存しています。偉大なる先人に感謝！
-
-表2. 依存ライブラリ一覧
-| ライブラリ | 概要 / 用途 |
-| --- | --- |
-| **[Digilent WaveForms SDK](https://digilent.com/reference/software/waveforms/waveforms-3/start)** | Analog Discovery等のDigilentハードウェア制御用SDK |
-| **[GLFW](https://www.glfw.org/)** | OpenGLウィンドウ作成および入力処理 |
-| **[Dear ImGui](https://github.com/ocornut/imgui)** | 軽量グラフィカルユーザーインターフェース (GUI) |
-| **[ImPlot](https://github.com/epezent/implot)** | Dear ImGui向けのリアルタイムプロット・グラフ描画拡張 |
-| **[pocketfft](https://github.com/mreineck/pocketfft)** | ヘッダーオンリーのFFT (高速フーリエ変換) ライブラリ |
-
 * いずれかの方法でソースコードを取得してください。
 
 ### 方法A: ZIPダウンロードを使用する場合
@@ -170,6 +159,17 @@ void psd(Cfg* pCfg){
    ```
 1. 保存先のフォルダを選択し、クローン完了後に表示されるダイアログで **「開く」** を選択します。
 
+
+* このプロジェクトは表2に示すライブラリに依存しています。偉大なる先人に感謝！
+
+表2. 依存ライブラリ一覧
+| ライブラリ | 概要 / 用途 |
+| --- | --- |
+| **[Digilent WaveForms SDK](https://digilent.com/reference/software/waveforms/waveforms-3/start)** | Analog Discovery等のDigilentハードウェア制御用SDK |
+| **[GLFW](https://www.glfw.org/)** | OpenGLウィンドウ作成および入力処理 |
+| **[Dear ImGui](https://github.com/ocornut/imgui)** | 軽量グラフィカルユーザーインターフェース (GUI) |
+| **[ImPlot](https://github.com/epezent/implot)** | Dear ImGui向けのリアルタイムプロット・グラフ描画拡張 |
+| **[pocketfft](https://github.com/mreineck/pocketfft)** | ヘッダーオンリーのFFT (高速フーリエ変換) ライブラリ |
 
 ---
 
