@@ -9,7 +9,7 @@
 #define BUFFER_SIZE 1
 
 
-class Cfg{
+class Config{
 public:
     const double PI_ = std::acos(-1.0);
     class Excitation {
@@ -56,7 +56,7 @@ public:
             rawData.times[i] = static_cast<double>(i) * rawData.dt;
         }
     }
-    explicit Cfg() {
+    explicit Config() {
         RawInit(RAW_COUNT);
         buffer.ch1.xs.resize(BUFFER_SIZE);
         buffer.ch1.ys.resize(BUFFER_SIZE);
@@ -65,6 +65,6 @@ public:
         fftBuffer.numHarmonics_x.resize(5);
         fftBuffer.numHarmonics_y.resize(5);
     }
-    Cfg(const Cfg&) = delete;
-    Cfg& operator=(const Cfg&) = delete;
+    Config(const Config&) = delete;
+    Config& operator=(const Config&) = delete;
 };

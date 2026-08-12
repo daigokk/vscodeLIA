@@ -3,10 +3,10 @@
 #include <IMGUI/imgui_impl_glfw.h>
 #include <IMGUI/imgui_impl_opengl3.h>
 #include <IMGUI/implot.h>
-#include "Cfg.h"
+#include "Config.h"
 #include "Daq.h"
 
-void ControlWindow(Cfg& cfg, Daq& daq) {
+void ControlWindow(Config& cfg, Daq& daq) {
     ImGui::Begin("Control");
     ImGui::Text("%s", cfg.status.serialNumber);
     if(ImGui::SliderFloat("Frequency", &cfg.excitation.frequency, 1e3f, 100e3f)) {

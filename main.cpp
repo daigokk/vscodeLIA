@@ -3,11 +3,11 @@
 #include "RawWindow.h"
 #include "XyWindow.h"
 #include "ControlWindow.h"
-#include "Cfg.h"
+#include "Config.h"
 #include "Daq.h"
 
 int main() {
-    Cfg cfg;
+    Config cfg;
     Daq daq(&cfg);
     daq.start();
     auto window = Gui::Initialize(

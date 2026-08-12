@@ -3,9 +3,9 @@
 #include <IMGUI/imgui_impl_glfw.h>
 #include <IMGUI/imgui_impl_opengl3.h>
 #include <IMGUI/implot.h>
-#include "Cfg.h"
+#include "Config.h"
 
-void XyWindow(Cfg& cfg) {
+void XyWindow(Config& cfg) {
     ImGui::Begin("XY");
     if (ImPlot::BeginPlot("##XY")) {
         ImPlot::PlotScatter("PSD", &(cfg.buffer.ch1.xs[0]), &(cfg.buffer.ch1.ys[0]), 1);

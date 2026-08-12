@@ -3,9 +3,9 @@
 #include <IMGUI/imgui_impl_glfw.h>
 #include <IMGUI/imgui_impl_opengl3.h>
 #include <IMGUI/implot.h>
-#include "Cfg.h"
+#include "Config.h"
 
-void RawWindow(Cfg& cfg) {
+void RawWindow(Config& cfg) {
     ImGui::Begin("Raw");
     if (ImPlot::BeginPlot("##Raw")) {
         ImPlot::PlotLine("Ch1", cfg.rawData.times.data(), cfg.rawData.ch1.data(), cfg.rawData.times.size());

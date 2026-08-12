@@ -8,15 +8,15 @@
 #include <iostream>
 #include <thread>
 
-#include "Cfg.h"
+#include "Config.h"
 #include <pocketfft_hdronly.h>
 
 
-inline void fft(Cfg* pCfg) {
+inline void fft(Config* pCfg) {
     // TODO: ここにフーリエ変換のコードを入力
 }
 
-inline void psd(Cfg* pCfg) {
+inline void psd(Config* pCfg) {
     // TODO: ここに位相敏感検波のコードを入力
 }
 
@@ -38,7 +38,7 @@ class Function {
 
 class Daq {
 public:
-    explicit Daq(Cfg* cfg);
+    explicit Daq(Config* cfg);
     ~Daq();
     // コピーを禁止するコード (リソースハンドルを扱うクラスの定石)
     Daq(const Daq&) = delete;
@@ -59,20 +59,28 @@ public:
                 parameters: - device data
                             - True means output, False means input
             */
-            FDwfDigitalIOOutputEnableSet(device_data->handle, fsOutputEnable);
+           if (FDwfDigitalIOOutputEnableSet(device_data->handle, fsOutputEnable) == 0) {
+                Daq::check_error(device_data);
+            }
         }
         static void set_state(wf::Device::Data* device_data, unsigned int fsOutput) {
-            FDwfDigitalIOOutputSet(device_data->handle, fsOutput);// 設定
-            FDwfDigitalIOConfigure(device_data->handle);// 反映
+            // 設定
+            if (FDwfDigitalIOOutputSet(device_data->handle, fsOutput) == 0) {
+                Daq::check_error(device_data);
+            }
+            // 反映
+            if (FDwfDigitalIOConfigure(device_data->handle) == 0) {
+                Daq::check_error(device_data);
+            }
         }
-    };
+    } dio;
 
 private:
-    Cfg* pCfg_ = nullptr;
+    Config* pCfg_ = nullptr;
     wf::Device::Data* device_data_ = nullptr;
     std::jthread thread_;
 
-    void check_error(wf::Device::Data *device_data, const char *caller = __builtin_FUNCTION(), const char *file = __FILE__);
+    static void check_error(wf::Device::Data *device_data, const char *caller = __builtin_FUNCTION(), const char *file = __FILE__);
 
     void initializeDevice();
     void closeDevice();
@@ -113,7 +121,7 @@ inline void Daq::check_error(wf::Device::Data *device_data, const char *caller, 
     return;
 }
 
-inline Daq::Daq(Cfg* cfg) : pCfg_(cfg) {
+inline Daq::Daq(Config* cfg) : pCfg_(cfg) {
     initializeDevice();
 }
 
