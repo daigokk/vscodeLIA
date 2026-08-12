@@ -44,6 +44,8 @@ public:
     Daq(const Daq&) = delete;
     Daq& operator=(const Daq&) = delete;
 
+    static void check_error(wf::Device::Data *device_data, const char *caller = __builtin_FUNCTION(), const char *file = __FILE__);
+
     void start();
     void stop();
 
@@ -73,14 +75,25 @@ public:
                 Daq::check_error(device_data);
             }
         }
+        static unsigned int get_state(wf::Device::Data *device_data){
+            // load internal buffer with current state of the pins
+            if (FDwfDigitalIOStatus(device_data->handle) == 0) {
+                Daq::check_error(device_data);
+            }
+            
+            // get the current state of the pins
+            unsigned int data = 0;  // variable for this current state
+            if (FDwfDigitalIOInputStatus(device_data->handle, &data) == 0) {
+                Daq::check_error(device_data);
+            }
+            return data;
+        }
     } dio;
 
 private:
     Config* pCfg_ = nullptr;
     wf::Device::Data* device_data_ = nullptr;
     std::jthread thread_;
-
-    static void check_error(wf::Device::Data *device_data, const char *caller = __builtin_FUNCTION(), const char *file = __FILE__);
 
     void initializeDevice();
     void closeDevice();
