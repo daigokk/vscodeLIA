@@ -80,7 +80,7 @@ void psd(Cfg* pCfg){
   | (必要であれば)メスコネクタ | 多治見無線電機 PRC03-12A10-7F10.5 | 探傷器側コネクタ |
 ---
 
-## 3. 開発環境・依存ライブラリ・SDK
+## 3. 開発環境・依存ライブラリ
 
 本プロジェクトでは以下の先人の成果を活用させていただいています。
 
@@ -88,8 +88,8 @@ void psd(Cfg* pCfg){
 * **コンパイラ:** [Mingw-w64](https://github.com/niXman/mingw-builds-binaries/releases/) (GCC for Windows)
 * **対象OS:** Windows 10 / 11 (64-bit)
 
-表2. 依存ライブラリ・SDK一覧
-| ライブラリ / SDK | 概要 / 用途 |
+表2. 依存ライブラリ一覧
+| ライブラリ | 概要 / 用途 |
 | --- | --- |
 | **[Digilent WaveForms SDK](https://digilent.com/reference/software/waveforms/waveforms-3/start)** | Analog Discovery等のDigilentハードウェア制御用SDK |
 | **[GLFW](https://www.glfw.org/)** | OpenGLウィンドウ作成および入力処理 |
