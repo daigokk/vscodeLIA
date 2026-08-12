@@ -51,6 +51,22 @@ public:
     void wavegen(const double frequency = 100e3, const double amplitude = 1.0, int channel = 1, FUNC function = Function::sine, std::vector<double> data = std::vector<double>());
     void scope(const double sample_rate = 100e6, const int buffer_size = 10000, const double offset = 0.0, const double range = 5.0);
 
+    class Dio {
+    public:
+         static void set_mode(wf::Device::Data* device_data, unsigned int fsOutputEnable=0xFFFF) {
+            /*
+                set a DIO line as input, or as output
+                parameters: - device data
+                            - True means output, False means input
+            */
+            FDwfDigitalIOOutputEnableSet(device_data->handle, fsOutputEnable);
+        }
+        static void set_state(wf::Device::Data* device_data, unsigned int fsOutput) {
+            FDwfDigitalIOOutputSet(device_data->handle, fsOutput);// 設定
+            FDwfDigitalIOConfigure(device_data->handle);// 反映
+        }
+    };
+
 private:
     static constexpr double DefaultVoltage = 5.0;
 
