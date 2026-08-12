@@ -202,7 +202,7 @@ Makefile Tools のパネル内で、以下のように設定します。
 
 1. **補足:**
 
-    * **[Visual Studio](https://visualstudio.microsoft.com/)とMicrosoft C++ (MSVC) との比較:** MSVCを使用すると Makefile やデバッガの手動設定なしで開発を始められます。商業利用時は有償ではありますが、MSVCはとても素晴らしいツールです。本プロジェクトは、多少不便ではありますがオープンソースである **VS Code + GCC (MinGW-w64)** の組み合わせで開発できるように設計されています。VS Codeでももっと簡単にC++開発ができるかもしれません。
+    * **[Visual Studio](https://visualstudio.microsoft.com/)(Microsoft Visual C++) (MSVC) との比較:** MSVCを使用すると Makefile やデバッガの手動設定なしで開発を始められます。商業利用時は有償ではありますが、MSVCはとても素晴らしいツールです。本プロジェクトは、多少不便ではありますがオープンソースである **VS Code + GCC (MinGW-w64)** の組み合わせで開発できるように設計されています。VS Codeでももっと簡単にC++開発ができるかもしれません。
     * **WaveForms SDKのリンクエラーが発生する場合:** WaveFormsがデフォルトのパス（`C:\Program Files (x86)\Digilent\WaveFormsSDK` 等）にインストールされているか、`Makefile` 内のライブラリインクルードパス・リンクパスを確認してください。
 
 
