@@ -8,7 +8,7 @@
 
 ## 1. 概要
 
-**vscodeLIA** は、DAQ (Data Acquisition) を利用して動作する、C++製のシンプルなソフトウェア・ロックインアンプ(LIA)です。
+図1に示す**vscodeLIA** は、DAQ (Data Acquisition) を利用して動作する、C++製のシンプルなソフトウェア・ロックインアンプ(LIA)です。
 
 * **このプロジェクトの目的:**
 データ集録・GUI描画・信号処理を組み合わせた、以下のような使用を想定しています。
@@ -20,7 +20,7 @@
     * Digilent製DAQ([Analog Discovery](https://digilent.com/shop/analog-discovery-3/))を用いた信号の測定・集録
       * `Daq.h`と`Makefile`を書き換えることで、他のDAQ(例えばNI-DAQ)に対応させることも可能です。
     * [ImPlot](https://github.com/epezent/implot)を用いた波形のリアルタイム描画
-    * [位相敏感検波](https://www.youtube.com/watch?v=pHyuB1YW4qY)(同期検波)等による信号処理(未実装)
+    * [位相敏感検波](https://www.youtube.com/watch?v=pHyuB1YW4qY)(同期検波)等による信号処理(図2参照、未実装)
       * **※注意:** 学習を目的の一つとしているため、位相敏感検波処理は**あえて未実装**にしています。
     * オープンソースである **[Visual Studio Code](https://code.visualstudio.com/) + GCC ([MinGW-w64](https://www.mingw-w64.org/))** の組み合わせで開発できるように設計されています。
 
@@ -54,6 +54,8 @@ void psd(Cfg* pCfg){
 
 ## 2. ハードウェア
 
+* 図3、図4、及び表1は、自己誘導差動型の渦電流プローブのブリッジ・プリアンプの回路と必要な部品を示しています。ご自身のアプリケーションに合わせて設計・製作してください。
+
 | ![Schematic](./docs/images/Schematic.svg) ![Schematic_AD620](./docs/images/AD620.svg) |
 | --- |
 | 図3. 回路図 |
@@ -80,26 +82,13 @@ void psd(Cfg* pCfg){
   | (必要であれば)メスコネクタ | 多治見無線電機 PRC03-12A10-7F10.5 | 探傷器側コネクタ |
 ---
 
-## 3. 開発環境・依存ライブラリ
+## 3. 開発環境のセットアップ (Windows)
 
 本プロジェクトでは以下の先人の成果を活用させていただいています。
 
 * **エディタ / IDE:** [Visual Studio Code](https://code.visualstudio.com/)
 * **コンパイラ:** [Mingw-w64](https://github.com/niXman/mingw-builds-binaries/releases/) (GCC for Windows)
 * **対象OS:** Windows 10 / 11 (64-bit)
-
-表2. 依存ライブラリ一覧
-| ライブラリ | 概要 / 用途 |
-| --- | --- |
-| **[Digilent WaveForms SDK](https://digilent.com/reference/software/waveforms/waveforms-3/start)** | Analog Discovery等のDigilentハードウェア制御用SDK |
-| **[GLFW](https://www.glfw.org/)** | OpenGLウィンドウ作成および入力処理 |
-| **[Dear ImGui](https://github.com/ocornut/imgui)** | 軽量グラフィカルユーザーインターフェース (GUI) |
-| **[ImPlot](https://github.com/epezent/implot)** | Dear ImGui向けのリアルタイムプロット・グラフ描画拡張 |
-| **[pocketfft](https://github.com/mreineck/pocketfft)** | ヘッダーオンリーのFFT (高速フーリエ変換) ライブラリ |
-
----
-
-## 4. 開発環境のセットアップ (Windows)
 
 以下のステップ順にセットアップを行ってください。
 
@@ -149,7 +138,21 @@ void psd(Cfg* pCfg){
 
 ---
 
-## 5. プロジェクトの取得方法
+## 4. プロジェクトの取得方法
+
+このプロジェクトは表2に示すライブラリに依存しています。偉大なる先人に感謝！
+
+表2. 依存ライブラリ一覧
+| ライブラリ | 概要 / 用途 |
+| --- | --- |
+| **[Digilent WaveForms SDK](https://digilent.com/reference/software/waveforms/waveforms-3/start)** | Analog Discovery等のDigilentハードウェア制御用SDK |
+| **[GLFW](https://www.glfw.org/)** | OpenGLウィンドウ作成および入力処理 |
+| **[Dear ImGui](https://github.com/ocornut/imgui)** | 軽量グラフィカルユーザーインターフェース (GUI) |
+| **[ImPlot](https://github.com/epezent/implot)** | Dear ImGui向けのリアルタイムプロット・グラフ描画拡張 |
+| **[pocketfft](https://github.com/mreineck/pocketfft)** | ヘッダーオンリーのFFT (高速フーリエ変換) ライブラリ |
+
+---
+
 
 いずれかの方法でソースコードを取得してください。
 
@@ -176,7 +179,7 @@ void psd(Cfg* pCfg){
 ---
 
 
-## 6. ビルドおよび実行方法
+## 5. ビルドおよび実行方法
 
 * 本プロジェクトは VS Code の **Makefile Tools** 拡張機能を利用してビルド・デバッグを行うように構成されています。
 * makeを用いることで、ビルド時間が大幅に短縮されます。
@@ -207,7 +210,7 @@ Makefile Tools のパネル内で、以下のように設定します。
 
 
 ---
-## 7. 課題
+## 6. 課題
 
 * `Daq.h`に記載の`psd`関数を完成させてください。
 * (オプション) `fft`関数を完成させ、FFTを使って同様の結果を得られることを確認してみてください。様々な条件においてどちらが優れているか比較してみるのもよいでしょう。
