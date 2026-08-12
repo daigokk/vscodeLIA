@@ -105,6 +105,13 @@ GLFWwindow* Gui::Initialize(const char* title) {
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 
+    GLFWmonitor* monitor = glfwGetPrimaryMonitor();
+    int xpos, ypos, monitorWidth, monitorHeight;
+    glfwGetMonitorWorkarea(monitor, &xpos, &ypos, &monitorWidth, &monitorHeight);
+
+    // モニターのスケールを取得 (GLFW 3.3+)
+    auto monitorScale = ImGui_ImplGlfw_GetContentScaleForMonitor(monitor);
+
     const char* glsl_version = "#version 130";
     GLFWwindow* window = glfwCreateWindow(1280, 720, "codeLIA - Dear ImGui", NULL, NULL);
     if (!window) {
@@ -112,6 +119,7 @@ GLFWwindow* Gui::Initialize(const char* title) {
         glfwTerminate();
         exit(EXIT_FAILURE);
     }
+
     glfwSetWindowTitle(window, title);
     glfwSetKeyCallback(window, key_callback);
     glfwMakeContextCurrent(window);
