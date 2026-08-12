@@ -220,7 +220,7 @@ inline void Daq::wavegen(const double frequency, const double amplitude, int cha
     }
     
     // start
-    if (FDwfAnalogOutConfigure(device_data_->handle, channel, true) == 0) {
+    if (FDwfAnalogOutConfigure(device_data_->handle, -1, true) == 0) {
         check_error(device_data_);
     }
 }
