@@ -30,9 +30,11 @@ std::vector<std::string> collectNodeTypes(int nodeMask) {
 
 /* ----------------------------------------------------- */
 
-Dwf::Device::Data* Dwf::Device::open() {
+Dwf::Device::Data* Dwf::Device::open(std::string serial) {
     /*
-        open a specific device
+        open a specific device by serial number
+        parameters: - serial number of the device (empty string = first connected device)
+                    - config
         returns:    - device data
     */
 
@@ -46,27 +48,43 @@ Dwf::Device::Data* Dwf::Device::open() {
     if (device_count <= 0) {
         device_data->error.instrument = "device";
         device_data->error.function = "open";
-        device_data->error.message = "There are no connected devices";
-        
+        device_data->error.message = serial.empty() ? "There are no connected devices" : "There is no device with serial " + serial + " connected.";
         throw device_data->error;
     }
 
     // this is the device handle - it will be used by all functions to "address" the connected device
     device_data->handle = 0;
 
-    // connect to the first available device
+    // connect to the matching serial or, if empty, the first available device
     HDWF index = 0;
+    bool serial_found = false;
     while (device_data->handle == 0 && index < device_count) {
-        FDwfDeviceOpen(index, &device_data->handle);
-        index++;    // increment the index and try again if the device is busy
+        if (serial.empty()) {
+            FDwfDeviceOpen(index, &device_data->handle);
+        } else {
+            char found_serial[32] = {0};
+            if (FDwfEnumSN(index, found_serial) != 0 && serial == found_serial) {
+                serial_found = true;
+                FDwfDeviceOpen(index, &device_data->handle);
+            }
+        }
+        index++;
+    }
+
+    if (!serial.empty() && !serial_found) {
+        device_data->error.instrument = "device";
+        device_data->error.function = "open";
+        device_data->error.message = "There is no device with serial " + serial + " connected.";
+        throw device_data->error;
     }
 
     // check connected device type
     device_data->name = "";
     if (device_data->handle != 0) {
-        char deviceName[32];
-        FDwfEnumDeviceName(0, deviceName);
-        device_data->name = std::string(deviceName);
+        char deviceName[32] = {0};
+        if (FDwfEnumDeviceName(0, deviceName) != 0) {
+            device_data->name = std::string(deviceName);
+        }
     }
 
     // check for errors
