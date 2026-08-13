@@ -166,7 +166,8 @@ DAQのドライバおよびSDKを取得するためにインストールしま�
 表2. 依存ライブラリ一覧
 | ライブラリ | 概要 / 用途 |
 | --- | --- |
-| **[Digilent WaveForms SDK](https://digilent.com/reference/software/waveforms/waveforms-3/start)** | Analog Discovery等のDigilentハードウェア制御用SDK |
+| **[Digilent WaveForms SDK](https://digilent.com/reference/software/waveforms/waveforms-sdk/reference-manual)** | Analog Discovery等のDigilentハードウェア制御用SDK |
+| **[Digilent/WaveForms-SDK-Getting-Started-Cpp](https://github.com/Digilent/WaveForms-SDK-Getting-Started-Cpp)** | 上記SDKのラッパー。このラッパーを参考に`Daq.h`を作成。 |
 | **[GLFW](https://www.glfw.org/)** | OpenGLウィンドウ作成および入力処理 |
 | **[Dear ImGui](https://github.com/ocornut/imgui)** | 軽量グラフィカルユーザーインターフェース (GUI) |
 | **[ImPlot](https://github.com/epezent/implot)** | Dear ImGui向けのリアルタイムプロット・グラフ描画拡張 |
@@ -178,7 +179,7 @@ DAQのドライバおよびSDKを取得するためにインストールしま�
 ## 5. ビルドおよび実行方法
 
 * 本プロジェクトは VS Code の **Makefile Tools** 拡張機能を利用してビルド・デバッグを行うように構成されています。
-* makeを用いることで、ビルド時間が大幅に短縮されます。
+* makeを用いることで、修正していない`cpp`ファイルのビルドが除外されるので、ビルド時間が大幅に短縮されます。
 
 1. **Makefile Toolsの初回認識:**
 フォルダを開いた後、左側サイドバーに **C/C++のアイコンがついた「Makefile Tools」**（または `MAKEFILE` タブ）が表示されます。
