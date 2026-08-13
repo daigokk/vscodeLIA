@@ -82,8 +82,12 @@ Dwf::Device::Data* Dwf::Device::open(std::string serial) {
     device_data->name = "";
     if (device_data->handle != 0) {
         char deviceName[32] = {0};
-        if (FDwfEnumDeviceName(0, deviceName) != 0) {
+        if (FDwfEnumDeviceName(index-1, deviceName) != 0) {
             device_data->name = std::string(deviceName);
+        }
+        char deviceSerial[32] = {0};
+        if (FDwfEnumSN(index-1, deviceSerial) != 0) {
+            device_data->serial = std::string(deviceSerial);
         }
     }
 

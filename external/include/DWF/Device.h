@@ -111,6 +111,7 @@ public:
         HDWF handle = 0;
         std::string name = "";
         std::string version = "";
+        std::string serial = "";
         Error error;
         Warning warning;
         AnalogInfo analog;

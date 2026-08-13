@@ -34,6 +34,7 @@ public:
 
     Dwf::Scope scope;
     Dwf::Dio dio;
+    Dwf::Device::Data* device_data = nullptr;
 
     class Function {
         /* function names */
@@ -53,7 +54,6 @@ public:
     
 private:
     Config* pCfg_ = nullptr;
-    Dwf::Device::Data* device_data_ = nullptr;
     std::jthread thread_;
 
     void initializeDevice();

@@ -21,8 +21,6 @@ public:
     class Status {
     public:
         bool isRun = false;
-        char deviceName[64] = {0};
-        char serialNumber[32] = "Disconnected";
     } status;
 
     class RawData {

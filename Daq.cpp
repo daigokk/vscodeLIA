@@ -17,14 +17,12 @@ Daq::~Daq() {
 
 void Daq::initializeDevice() {
     try {
-        device_data_ = Dwf::Device::open();
+        device_data = Dwf::Device::open();
 
-        FDwfEnumDeviceName(0, pCfg_->status.deviceName);
-        FDwfEnumSN(0, pCfg_->status.serialNumber);
         // Analog input buffer size
         int buffer_size = 0;
-        if (FDwfAnalogInBufferSizeInfo(device_data_->handle, 0, &buffer_size) == 0) {
-            Dwf::Device::check_error(device_data_);
+        if (FDwfAnalogInBufferSizeInfo(device_data->handle, 0, &buffer_size) == 0) {
+            Dwf::Device::check_error(device_data);
         }
         printDeviceInfo();
         if(pCfg_->rawData.times.size() > buffer_size){
@@ -33,7 +31,7 @@ void Daq::initializeDevice() {
         }
         supplies();
         wavegen(pCfg_->excitation.frequency, pCfg_->excitation.amplitude);
-        scope.run(device_data_, 1.0 / pCfg_->rawData.dt, static_cast<int>(pCfg_->rawData.times.size()), 0.0, 5.0);
+        scope.run(device_data, 1.0 / pCfg_->rawData.dt, static_cast<int>(pCfg_->rawData.times.size()), 0.0, 5.0);
     }
     catch (const Dwf::Error& error) {
         std::cout << "WaveForms error: "
@@ -45,16 +43,16 @@ void Daq::initializeDevice() {
 }
 
 void Daq::closeDevice() {
-    if (device_data_) {
-        Dwf::Device::close(device_data_);
-        device_data_ = nullptr;
+    if (device_data) {
+        Dwf::Device::close(device_data);
+        device_data = nullptr;
     }
 }
 
 void Daq::printDeviceInfo() const {
-    std::cout << "WaveForms version: " << device_data_->version << std::endl;
-    std::cout << "Device name: " << pCfg_->status.deviceName << std::endl;
-    std::cout << "Serial number: " << pCfg_->status.serialNumber << std::endl;
+    std::cout << "WaveForms version: " << device_data->version << std::endl;
+    std::cout << "Device name: " << device_data->name << std::endl;
+    std::cout << "Serial number: " << device_data->serial << std::endl;
 }
 
 void Daq::supplies(const double voltage) {
@@ -68,18 +66,18 @@ void Daq::supplies(const double voltage) {
     // idxNode=0: Enable/Disable, idxNode=1: Voltage Level
     for(int idxChannel=0; idxChannel<2; idxChannel++) {
         if (FDwfAnalogIOChannelNodeSet(
-            device_data_->handle, idxChannel, 1, 
+            device_data->handle, idxChannel, 1, 
             (idxChannel % 2==0 ? 1 : -1)*abs_voltage
         ) == 0) {
-            Dwf::Device::check_error(device_data_);
+            Dwf::Device::check_error(device_data);
         }
-        if (FDwfAnalogIOChannelNodeSet(device_data_->handle, idxChannel, 0, flag) == 0) {
-            Dwf::Device::check_error(device_data_);
+        if (FDwfAnalogIOChannelNodeSet(device_data->handle, idxChannel, 0, flag) == 0) {
+            Dwf::Device::check_error(device_data);
         }   
     }
     // 電源のマスター有効/無効
-    if (FDwfAnalogIOEnableSet(device_data_->handle, flag) == 0) {
-        Dwf::Device::check_error(device_data_);
+    if (FDwfAnalogIOEnableSet(device_data->handle, flag) == 0) {
+        Dwf::Device::check_error(device_data);
     }
 }
 
@@ -95,53 +93,53 @@ void Daq::wavegen(const double frequency, const double amplitude, int channel, F
     double offset = 0;
     // enable channel
     channel--;
-    if (FDwfAnalogOutNodeEnableSet(device_data_->handle, channel, AnalogOutNodeCarrier, true) == 0) {
-        Dwf::Device::check_error(device_data_);
+    if (FDwfAnalogOutNodeEnableSet(device_data->handle, channel, AnalogOutNodeCarrier, true) == 0) {
+        Dwf::Device::check_error(device_data);
     }
     
     // set function type
-    if (FDwfAnalogOutNodeFunctionSet(device_data_->handle, channel, AnalogOutNodeCarrier, function) == 0) {
-        Dwf::Device::check_error(device_data_);
+    if (FDwfAnalogOutNodeFunctionSet(device_data->handle, channel, AnalogOutNodeCarrier, function) == 0) {
+        Dwf::Device::check_error(device_data);
     }
     
     // load data if the function type is custom
     if (function == funcCustom) {
-        if (FDwfAnalogOutNodeDataSet(device_data_->handle, channel, AnalogOutNodeCarrier, data.data(), data.size()) == 0) {
-            Dwf::Device::check_error(device_data_);
+        if (FDwfAnalogOutNodeDataSet(device_data->handle, channel, AnalogOutNodeCarrier, data.data(), data.size()) == 0) {
+            Dwf::Device::check_error(device_data);
         }
     }
     
     // set frequency
-    if (FDwfAnalogOutNodeFrequencySet(device_data_->handle, channel, AnalogOutNodeCarrier, frequency) == 0) {
-        Dwf::Device::check_error(device_data_);
+    if (FDwfAnalogOutNodeFrequencySet(device_data->handle, channel, AnalogOutNodeCarrier, frequency) == 0) {
+        Dwf::Device::check_error(device_data);
     }
     
     // set amplitude or DC voltage
-    if (FDwfAnalogOutNodeAmplitudeSet(device_data_->handle, channel, AnalogOutNodeCarrier, amplitude) == 0) {
-        Dwf::Device::check_error(device_data_);
+    if (FDwfAnalogOutNodeAmplitudeSet(device_data->handle, channel, AnalogOutNodeCarrier, amplitude) == 0) {
+        Dwf::Device::check_error(device_data);
     }
     
     // set offset
-    if (FDwfAnalogOutNodeOffsetSet(device_data_->handle, channel, AnalogOutNodeCarrier, offset) == 0) {
-        Dwf::Device::check_error(device_data_);
+    if (FDwfAnalogOutNodeOffsetSet(device_data->handle, channel, AnalogOutNodeCarrier, offset) == 0) {
+        Dwf::Device::check_error(device_data);
     }
 
     // set trigger W1に同期させる。しかしながら、FDwfDeviceTriggerSetの有無によって結果は変わらないようにみえる。
     if (channel != 0) {
-        if (FDwfDeviceTriggerSet(device_data_->handle, channel, trigsrcAnalogOut1) == 0) {
-            Dwf::Device::check_error(device_data_);
+        if (FDwfDeviceTriggerSet(device_data->handle, channel, trigsrcAnalogOut1) == 0) {
+            Dwf::Device::check_error(device_data);
         }
     }
     
     // start
-    if (FDwfAnalogOutConfigure(device_data_->handle, -1, true) == 0) {
-        Dwf::Device::check_error(device_data_);
+    if (FDwfAnalogOutConfigure(device_data->handle, -1, true) == 0) {
+        Dwf::Device::check_error(device_data);
     }
 }
 
 void Daq::start() {
     thread_ = std::jthread([this](std::stop_token st) {
-        if (device_data_) {
+        if (device_data) {
             run(st);
         } else {
             runWithoutDaq(st);
@@ -165,11 +163,11 @@ void Daq::run(std::stop_token st) {
     while (!st.stop_requested()) {
         STS sts;
         do {
-            FDwfAnalogInStatus(device_data_->handle, true, &sts);
+            FDwfAnalogInStatus(device_data->handle, true, &sts);
         } while (sts != stsDone);
 
-        FDwfAnalogInStatusData(device_data_->handle, 0, pCfg_->rawData.ch1.data(), pCfg_->rawData.ch1.size());
-        FDwfAnalogInStatusData(device_data_->handle, 1, pCfg_->rawData.ch2.data(), pCfg_->rawData.ch2.size());
+        FDwfAnalogInStatusData(device_data->handle, 0, pCfg_->rawData.ch1.data(), pCfg_->rawData.ch1.size());
+        FDwfAnalogInStatusData(device_data->handle, 1, pCfg_->rawData.ch2.data(), pCfg_->rawData.ch2.size());
         psd(pCfg_);
 
         next_time += loop_period;
