@@ -95,7 +95,7 @@ void psd(Cfg* pCfg){
 
 ### 1. Digilent WaveForms のインストール
 
-計測用ドライバおよびSDKを取得するためにインストールします。
+DAQのドライバおよびSDKを取得するためにインストールします。
 
 1. [WaveForms 過去バージョン / ダウンロードページ](https://digilent.com/reference/software/waveforms/waveforms-3/previous-versions) にアクセスします。
 1. Windows用のインストーラー（例: `digilent.waveforms_vX.X.X_64bit.exe`）をダウンロードして実行します。
