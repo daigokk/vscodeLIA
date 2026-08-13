@@ -1,6 +1,7 @@
 #pragma once
 
 #include <WF_SDK/WF_SDK.h>
+//#include "xDevice.h"
 #include <dwf.h>
 #include <chrono>
 #include <cmath>
@@ -20,21 +21,6 @@ inline void psd(Config* pCfg) {
     // TODO: ここに位相敏感検波のコードを入力
 }
 
-class Function {
-    /* function names */
-    public:
-        static const FUNC custom = funcCustom;
-        static const FUNC sine = funcSine;
-        static const FUNC square = funcSquare;
-        static const FUNC triangle = funcTriangle;
-        static const FUNC noise = funcNoise;
-        static const FUNC dc = funcDC;
-        static const FUNC pulse = funcPulse;
-        static const FUNC trapezium = funcTrapezium;
-        static const FUNC sine_power = funcSinePower;
-        static const FUNC ramp_up = funcRampUp;
-        static const FUNC ramp_down = funcRampDown;
-};
 
 class Daq {
 public:
@@ -51,43 +37,51 @@ public:
 
     void supplies(const double voltage = 5.0);
     void wavegen(const double frequency = 100e3, const double amplitude = 1.0, int channel = 1, FUNC function = Function::sine, std::vector<double> data = std::vector<double>());
-    void scope(const double sample_rate = 100e6, const int buffer_size = 10000, const double offset = 0.0, const double range = 5.0);
+    
+    class Function {
+        /* function names */
+        public:
+            static const FUNC custom = funcCustom;
+            static const FUNC sine = funcSine;
+            static const FUNC square = funcSquare;
+            static const FUNC triangle = funcTriangle;
+            static const FUNC noise = funcNoise;
+            static const FUNC dc = funcDC;
+            static const FUNC pulse = funcPulse;
+            static const FUNC trapezium = funcTrapezium;
+            static const FUNC sine_power = funcSinePower;
+            static const FUNC ramp_up = funcRampUp;
+            static const FUNC ramp_down = funcRampDown;
+    };
+    
+    class Scope {
+    private:
+        class Data {
+            public:
+                int sampling_frequency = 100e06;
+                int buffer_size = 0;
+                int max_buffer_size = 0;
+                Data& operator=(const Data &data) {
+                    if (this != &data) {
+                        sampling_frequency = data.sampling_frequency;
+                        buffer_size = data.buffer_size;
+                        max_buffer_size = data.max_buffer_size;
+                    }
+                    return *this;
+                }
+        } data;
+        void open(wf::Device::Data *device_data, double sampling_frequency = 100e06, int buffer_size = 0, double offset = 0, double amplitude_range = 5);
+        void trigger(wf::Device::Data *device_data, bool enable, const TRIGSRC source = trigsrcNone, int channel = 1, double timeout = 0, bool edge_rising = true, double level = 0);
+    
+    public:
+        void run(wf::Device::Data *device_data, const double sample_rate = 100e6, const int buffer_size = 10000, const double offset = 0.0, const double range = 5.0);
+    } scope;
 
     class Dio {
     public:
-         static void set_mode(wf::Device::Data* device_data, unsigned int fsOutputEnable=0xFFFF) {
-            /*
-                set a DIO line as input, or as output
-                parameters: - device data
-                            - True means output, False means input
-            */
-           if (FDwfDigitalIOOutputEnableSet(device_data->handle, fsOutputEnable) == 0) {
-                Daq::check_error(device_data);
-            }
-        }
-        static void set_state(wf::Device::Data* device_data, unsigned int fsOutput) {
-            // 設定
-            if (FDwfDigitalIOOutputSet(device_data->handle, fsOutput) == 0) {
-                Daq::check_error(device_data);
-            }
-            // 反映
-            if (FDwfDigitalIOConfigure(device_data->handle) == 0) {
-                Daq::check_error(device_data);
-            }
-        }
-        static unsigned int get_state(wf::Device::Data *device_data){
-            // load internal buffer with current state of the pins
-            if (FDwfDigitalIOStatus(device_data->handle) == 0) {
-                Daq::check_error(device_data);
-            }
-            
-            // get the current state of the pins
-            unsigned int data = 0;  // variable for this current state
-            if (FDwfDigitalIOInputStatus(device_data->handle, &data) == 0) {
-                Daq::check_error(device_data);
-            }
-            return data;
-        }
+        void set_mode(wf::Device::Data* device_data, unsigned int fsOutputEnable=0xFFFF);
+        void set_state(wf::Device::Data* device_data, unsigned int fsOutput);
+        unsigned int get_state(wf::Device::Data *device_data);
     } dio;
 
 private:
@@ -161,7 +155,7 @@ inline void Daq::initializeDevice() {
         }
         supplies();
         wavegen(pCfg_->excitation.frequency, pCfg_->excitation.amplitude);
-        scope(1.0 / pCfg_->rawData.dt, static_cast<int>(pCfg_->rawData.times.size()), 0.0, 5.0);
+        scope.run(device_data_, 1.0 / pCfg_->rawData.dt, static_cast<int>(pCfg_->rawData.times.size()), 0.0, 5.0);
     }
     catch (const wf::Error& error) {
         std::cout << "WaveForms error: "
@@ -253,6 +247,13 @@ inline void Daq::wavegen(const double frequency, const double amplitude, int cha
     if (FDwfAnalogOutNodeOffsetSet(device_data_->handle, channel, AnalogOutNodeCarrier, offset) == 0) {
         check_error(device_data_);
     }
+
+    // set trigger W1に同期させる。しかしながら、FDwfDeviceTriggerSetの有無によって結果は変わらないようにみえる。
+    if (channel != 0) {
+        if (FDwfDeviceTriggerSet(device_data_->handle, channel, trigsrcAnalogOut1) == 0) {
+            check_error(device_data_);
+        }
+    }
     
     // start
     if (FDwfAnalogOutConfigure(device_data_->handle, -1, true) == 0) {
@@ -260,7 +261,119 @@ inline void Daq::wavegen(const double frequency, const double amplitude, int cha
     }
 }
 
-inline void Daq::scope(const double sample_rate, const int buffer_size, const double offset, const double range) {
+inline void Daq::Scope::open(wf::Device::Data *device_data, double sampling_frequency, int buffer_size, double offset, double amplitude_range){
+    /*
+        initialize the oscilloscope
+
+        parameters: - device data
+                    - sampling frequency in Hz, default is 20MHz
+                    - buffer size, default is 0 (maximum)
+                    - offset voltage in Volts, default is 0V
+                    - amplitude range in Volts, default is ±5V
+    */
+    // set global variables
+    data.sampling_frequency = sampling_frequency;
+    data.max_buffer_size = device_data->analog.input.max_buffer_size;
+    // enable all channels
+    if (FDwfAnalogInChannelEnableSet(device_data->handle, -1, true) == 0) {
+        Daq::check_error(device_data);
+    }
+    
+    // set offset voltage (in Volts)
+    if (FDwfAnalogInChannelOffsetSet(device_data->handle, -1, offset) == 0) {
+        Daq::check_error(device_data);
+    }
+    
+    // set range (maximum signal amplitude in Volts)
+    if (FDwfAnalogInChannelRangeSet(device_data->handle, -1, amplitude_range) == 0) {
+        Daq::check_error(device_data);
+    }
+    
+    // set the buffer size (data point in a recording)
+    if (buffer_size == 0 || buffer_size > data.max_buffer_size) {
+        buffer_size = data.max_buffer_size;
+    }
+    data.buffer_size = buffer_size;
+    if (FDwfAnalogInBufferSizeSet(device_data->handle, buffer_size) == 0) {
+        Daq::check_error(device_data);
+    }
+    
+    // set the acquisition frequency (in Hz)
+    if (FDwfAnalogInFrequencySet(device_data->handle, sampling_frequency) == 0) {
+        Daq::check_error(device_data);
+    }
+    
+    // disable averaging (for more info check the documentation)
+    if (FDwfAnalogInChannelFilterSet(device_data->handle, -1, filterDecimate) == 0) {
+        Daq::check_error(device_data);
+    }
+    return;
+}
+
+inline void Daq::Scope::trigger(wf::Device::Data *device_data, bool enable, const TRIGSRC source, int channel, double timeout, bool edge_rising, double level) {
+    /*
+        set up triggering
+
+        parameters: - device handle
+                    - enable / disable triggering with True/False
+                    - trigger source - possible: none, analog, digital, external[1-4]
+                    - trigger channel - possible options: 1-4 for analog, or 0-15 for digital
+                    - auto trigger timeout in seconds, default is 0
+                    - trigger edge rising - True means rising, False means falling, default is rising
+                    - trigger level in Volts, default is 0V
+    */
+    if (enable && source != trigsrcNone) {
+        // enable/disable auto triggering
+        if (FDwfAnalogInTriggerAutoTimeoutSet(device_data->handle, timeout) == 0) {
+            Daq::check_error(device_data);
+        }
+
+        // set trigger source
+        if (FDwfAnalogInTriggerSourceSet(device_data->handle, source) == 0) {
+            Daq::check_error(device_data);
+        }
+
+        // set trigger channel
+        if (source == trigsrcDetectorAnalogIn) {
+            channel--;  // decrement analog channel index
+        }
+        if (FDwfAnalogInTriggerChannelSet(device_data->handle, channel) == 0) {
+            Daq::check_error(device_data);
+        }
+
+        // set trigger type
+        if (FDwfAnalogInTriggerTypeSet(device_data->handle, trigtypeEdge) == 0) {
+            Daq::check_error(device_data);
+        }
+
+        // set trigger level
+        if (FDwfAnalogInTriggerLevelSet(device_data->handle, level) == 0) {
+            Daq::check_error(device_data);
+        }
+
+        // set trigger edge
+        if (edge_rising) {
+            // rising edge
+            if (FDwfAnalogInTriggerConditionSet(device_data->handle, trigcondRisingPositive) == 0) {
+                Daq::check_error(device_data);
+            }
+        }
+        else {
+            // falling edge
+            if (FDwfAnalogInTriggerConditionSet(device_data->handle, trigcondFallingNegative) == 0) {
+                Daq::check_error(device_data);
+            }
+        }
+    }
+    else {
+        // turn off the trigger
+        if (FDwfAnalogInTriggerSourceSet(device_data->handle, trigsrcNone) == 0) {
+            Daq::check_error(device_data);
+        }
+    }
+    return;
+}
+inline void Daq::Scope::run(wf::Device::Data *device_data, const double sample_rate, const int buffer_size, const double offset, const double range) {
     /**
     * @brief スコープを設定する
     * @param sample_rate サンプルレート
@@ -268,12 +381,50 @@ inline void Daq::scope(const double sample_rate, const int buffer_size, const do
     * @param offset オフセット
     * @param range ダイナミックレンジ (5: ±2.5V, 50: ±25V)
     */
-    wf::scope.open(device_data_, sample_rate, buffer_size, offset, range);
-    wf::scope.trigger(device_data_, true, trigsrcAnalogOut1, 1, 0);
-    if (FDwfAnalogInConfigure(device_data_->handle, true, true) == 0) {
-        check_error(device_data_);
+    open(device_data, sample_rate, buffer_size, offset, range);
+    trigger(device_data, true, trigsrcAnalogOut1, 1, 0);
+    if (FDwfAnalogInConfigure(device_data->handle, true, true) == 0) {
+        check_error(device_data);
     }
 }
+
+
+inline void Daq::Dio::set_mode(wf::Device::Data* device_data, unsigned int fsOutputEnable) {
+    /*
+        set a DIO line as input, or as output
+        parameters: - device data
+                    - True means output, False means input
+    */
+    if (FDwfDigitalIOOutputEnableSet(device_data->handle, fsOutputEnable) == 0) {
+        Daq::check_error(device_data);
+    }
+}
+
+inline void Daq::Dio::set_state(wf::Device::Data* device_data, unsigned int fsOutput) {
+    // 設定
+    if (FDwfDigitalIOOutputSet(device_data->handle, fsOutput) == 0) {
+        Daq::check_error(device_data);
+    }
+    // 反映
+    if (FDwfDigitalIOConfigure(device_data->handle) == 0) {
+        Daq::check_error(device_data);
+    }
+}
+
+inline unsigned int Daq::Dio::get_state(wf::Device::Data *device_data){
+    // load internal buffer with current state of the pins
+    if (FDwfDigitalIOStatus(device_data->handle) == 0) {
+        Daq::check_error(device_data);
+    }
+    
+    // get the current state of the pins
+    unsigned int data = 0;  // variable for this current state
+    if (FDwfDigitalIOInputStatus(device_data->handle, &data) == 0) {
+        Daq::check_error(device_data);
+    }
+    return data;
+}
+
 
 inline void Daq::start() {
     thread_ = std::jthread([this](std::stop_token st) {
