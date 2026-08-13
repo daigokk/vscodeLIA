@@ -167,6 +167,7 @@ DAQのドライバおよびSDKを取得するためにインストールしま�
 | ライブラリ | 概要 / 用途 |
 | --- | --- |
 | **[Digilent WaveForms SDK](https://digilent.com/reference/software/waveforms/waveforms-3/start)** | Analog Discovery等のDigilentハードウェア制御用SDK |
+| **[Digilent/WaveForms-SDK-Getting-Started-Cpp](https://github.com/Digilent/WaveForms-SDK-Getting-Started-Cpp)** | 上記SDKのラッパー。このラッパーを参考に`Daq.h`を作成。 |
 | **[GLFW](https://www.glfw.org/)** | OpenGLウィンドウ作成および入力処理 |
 | **[Dear ImGui](https://github.com/ocornut/imgui)** | 軽量グラフィカルユーザーインターフェース (GUI) |
 | **[ImPlot](https://github.com/epezent/implot)** | Dear ImGui向けのリアルタイムプロット・グラフ描画拡張 |
