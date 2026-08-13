@@ -84,17 +84,18 @@ void psd(Cfg* pCfg){
 
 ## 3. 開発環境のセットアップ (Windows)
 
-本プロジェクトでは以下の先人の成果を活用させていただいています。
+本プロジェクトでは開発環境として以下を使用します。
 
-* **エディタ / IDE:** [Visual Studio Code](https://code.visualstudio.com/)
+* **DAQ:** [Digilent Analog Discovery 3](https://digilent.com/shop/analog-discovery-3/)
 * **コンパイラ:** [Mingw-w64](https://github.com/niXman/mingw-builds-binaries/releases/) (GCC for Windows)
+* **エディタ / IDE:** [Visual Studio Code](https://code.visualstudio.com/)
 * **対象OS:** Windows 10 / 11 (64-bit)
 
 以下を参考にセットアップを行ってください。
 
 ### 1. Digilent WaveForms のインストール
 
-計測用ドライバおよびSDKを取得するためにインストールします。
+DAQのドライバおよびSDKを取得するためにインストールします。
 
 1. [WaveForms 過去バージョン / ダウンロードページ](https://digilent.com/reference/software/waveforms/waveforms-3/previous-versions) にアクセスします。
 1. Windows用のインストーラー（例: `digilent.waveforms_vX.X.X_64bit.exe`）をダウンロードして実行します。
