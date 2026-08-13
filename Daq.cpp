@@ -6,6 +6,15 @@
 #include <iostream>
 #include <thread>
 
+
+inline void fft(Config* pCfg) {
+    // TODO: ここにフーリエ変換のコードを入力
+}
+
+inline void psd(Config* pCfg) {
+    // TODO: ここに位相敏感検波のコードを入力
+}
+
 Daq::Daq(Config* cfg) : pCfg_(cfg) {
     initializeDevice();
 }

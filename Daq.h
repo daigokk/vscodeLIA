@@ -9,15 +9,6 @@
 #include <pocketfft_hdronly.h>
 
 
-inline void fft(Config* pCfg) {
-    // TODO: ここにフーリエ変換のコードを入力
-}
-
-inline void psd(Config* pCfg) {
-    // TODO: ここに位相敏感検波のコードを入力
-}
-
-
 class Daq {
 public:
     explicit Daq(Config* cfg);
