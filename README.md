@@ -88,7 +88,7 @@ void psd(Cfg* pCfg){
 
 * **DAQ:** [Digilent Analog Discovery 3](https://digilent.com/shop/analog-discovery-3/)
 * **コンパイラ:** [Mingw-w64](https://github.com/niXman/mingw-builds-binaries/releases/) (GCC for Windows)
-* **エディタ / IDE:** [Visual Studio Code](https://code.visualstudio.com/)
+* **エディタ / IDE:** [Visual Studio Code, VS Code](https://code.visualstudio.com/)
 * **対象OS:** Windows 10 / 11 (64-bit)
 
 以下を参考にセットアップを行ってください。
@@ -128,7 +128,7 @@ DAQのドライバおよびSDKを取得するためにインストールしま�
     ```
 
 
-### 📝 Visual Studio Code のセットアップ
+### 📝 VS Code のセットアップ
 
 1. [VS Code 公式サイト](https://code.visualstudio.com/download) からインストーラーを取得し、インストールします。
 1. VS Codeを起動し、左側の拡張機能タブ（`Ctrl + Shift + X`）を開き、以下の拡張機能を検索してインストールします。
@@ -161,7 +161,7 @@ DAQのドライバおよびSDKを取得するためにインストールしま�
 1. 保存先のフォルダを選択し、クローン完了後に表示されるダイアログで **「開く」** を選択します。
 
 
-* このプロジェクトは表2に示すライブラリに依存しています。偉大なる先人に感謝！なお、以下のライブラリはプロジェクトに含まれているため新たにダウンロードする必要はありません。
+* このプロジェクトは表2に示すライブラリに依存しています。偉大なる先人に感謝！なお、これらのライブラリはプロジェクトに含まれているため新たにダウンロードする必要はありません。
 
 表2. 依存ライブラリ一覧
 | ライブラリ | 概要 / 用途 |
