@@ -166,7 +166,7 @@ DAQのドライバおよびSDKを取得するためにインストールしま�
 表2. 依存ライブラリ一覧
 | ライブラリ | 概要 / 用途 |
 | --- | --- |
-| **[Digilent WaveForms SDK](https://digilent.com/reference/software/waveforms/waveforms-3/start)** | Analog Discovery等のDigilentハードウェア制御用SDK |
+| **[Digilent WaveForms SDK](https://digilent.com/reference/software/waveforms/waveforms-sdk/reference-manual)** | Analog Discovery等のDigilentハードウェア制御用SDK |
 | **[Digilent/WaveForms-SDK-Getting-Started-Cpp](https://github.com/Digilent/WaveForms-SDK-Getting-Started-Cpp)** | 上記SDKのラッパー。このラッパーを参考に`Daq.h`を作成。 |
 | **[GLFW](https://www.glfw.org/)** | OpenGLウィンドウ作成および入力処理 |
 | **[Dear ImGui](https://github.com/ocornut/imgui)** | 軽量グラフィカルユーザーインターフェース (GUI) |
