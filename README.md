@@ -93,7 +93,7 @@ void psd(Cfg* pCfg){
 
 以下を参考にセットアップを行ってください。
 
-### 1. Digilent WaveForms のインストール
+### ⚡ Digilent WaveForms のインストール
 
 DAQのドライバおよびSDKを取得するためにインストールします。
 
@@ -101,7 +101,7 @@ DAQのドライバおよびSDKを取得するためにインストールしま�
 1. Windows用のインストーラー（例: `digilent.waveforms_vX.X.X_64bit.exe`）をダウンロードして実行します。
 1. インストール時の設定はデフォルトでよいです。
 
-### 2. Mingw-w64 (C++コンパイラ) の配置とパス設定
+### 🔄 Mingw-w64 (C++コンパイラ) の配置とパス設定
 
 1. [niXman/mingw-builds-binaries](https://github.com/niXman/mingw-builds-binaries/releases/)にアクセスします。
 1. Mingw-w64 のアーカイブ(例: `x86_64-16.1.0-release-win32-seh-ucrt-rt_v14-rev1.7z`)をダウンロードします。
@@ -128,7 +128,7 @@ DAQのドライバおよびSDKを取得するためにインストールしま�
     ```
 
 
-### 3. Visual Studio Code のセットアップ
+### 📝 Visual Studio Code のセットアップ
 
 1. [VS Code 公式サイト](https://code.visualstudio.com/download) からインストーラーを取得し、インストールします。
 1. VS Codeを起動し、左側の拡張機能タブ（`Ctrl + Shift + X`）を開き、以下の拡張機能を検索してインストールします。
