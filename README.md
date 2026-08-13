@@ -192,8 +192,8 @@ Makefile Tools のパネル内で、以下のように設定します。
     * **構成 (Configuration):** `Default`
     * **ターゲットのビルド (Build target):** `all`
     * **起動ターゲット (Launch target):** `vscodeLIA.exe`
-    * **Makefile:** `Makefile`
-    * **Make メイク:** `mingw32-make.exe`
+    * **Makefile Path:** `Makefile`
+    * **Make Path:** `mingw32-make.exe`
 
 1. **ビルドと実行:**
     * **実行 (Run):** Makefile Tools パネルの上部にある **再生ボタン（右三角 ▶）** をクリックします。自動的に `mingw32-make` が呼び出されてコンパイル・ビルドが実行され、完了後に `vscodeLIA.exe` が起動します。
