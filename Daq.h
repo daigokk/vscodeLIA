@@ -53,7 +53,7 @@ public:
             static const FUNC ramp_up = funcRampUp;
             static const FUNC ramp_down = funcRampDown;
     };
-    
+
     class Scope {
     private:
         class Data {
@@ -146,7 +146,7 @@ inline void Daq::initializeDevice() {
         // Analog input buffer size
         int buffer_size = 0;
         if (FDwfAnalogInBufferSizeInfo(device_data_->handle, 0, &buffer_size) == 0) {
-            wf::device.check_error(device_data_);
+            Daq::check_error(device_data_);
         }
         printDeviceInfo();
         if(pCfg_->rawData.times.size() > buffer_size){
