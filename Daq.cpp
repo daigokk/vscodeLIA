@@ -139,43 +139,6 @@ void Daq::wavegen(const double frequency, const double amplitude, int channel, F
     }
 }
 
-void Daq::Dio::set_mode(Dwf::Device::Data* device_data, unsigned int fsOutputEnable) {
-    /*
-        set a DIO line as input, or as output
-        parameters: - device data
-                    - True means output, False means input
-    */
-    if (FDwfDigitalIOOutputEnableSet(device_data->handle, fsOutputEnable) == 0) {
-        Dwf::Device::check_error(device_data);
-    }
-}
-
-void Daq::Dio::set_state(Dwf::Device::Data* device_data, unsigned int fsOutput) {
-    // 設定
-    if (FDwfDigitalIOOutputSet(device_data->handle, fsOutput) == 0) {
-        Dwf::Device::check_error(device_data);
-    }
-    // 反映
-    if (FDwfDigitalIOConfigure(device_data->handle) == 0) {
-        Dwf::Device::check_error(device_data);
-    }
-}
-
-unsigned int Daq::Dio::get_state(Dwf::Device::Data *device_data){
-    // load internal buffer with current state of the pins
-    if (FDwfDigitalIOStatus(device_data->handle) == 0) {
-        Dwf::Device::check_error(device_data);
-    }
-    
-    // get the current state of the pins
-    unsigned int data = 0;  // variable for this current state
-    if (FDwfDigitalIOInputStatus(device_data->handle, &data) == 0) {
-        Dwf::Device::check_error(device_data);
-    }
-    return data;
-}
-
-
 void Daq::start() {
     thread_ = std::jthread([this](std::stop_token st) {
         if (device_data_) {

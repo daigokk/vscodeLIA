@@ -2,6 +2,7 @@
 
 #include <DWF/Device.h>
 #include <DWF/Scope.h>
+#include <DWF/Dio.h>
 #include <dwf.h>
 
 #include "Config.h"
@@ -30,7 +31,10 @@ public:
 
     void supplies(const double voltage = 5.0);
     void wavegen(const double frequency = 100e3, const double amplitude = 1.0, int channel = 1, FUNC function = Function::sine, std::vector<double> data = std::vector<double>());
-    
+
+    Dwf::Scope scope;
+    Dwf::Dio dio;
+
     class Function {
         /* function names */
         public:
@@ -46,16 +50,7 @@ public:
             static const FUNC ramp_up = funcRampUp;
             static const FUNC ramp_down = funcRampDown;
     };
-
-    Dwf::Scope scope;
-
-    class Dio {
-    public:
-        void set_mode(Dwf::Device::Data* device_data, unsigned int fsOutputEnable=0xFFFF);
-        void set_state(Dwf::Device::Data* device_data, unsigned int fsOutput);
-        unsigned int get_state(Dwf::Device::Data *device_data);
-    } dio;
-
+    
 private:
     Config* pCfg_ = nullptr;
     Dwf::Device::Data* device_data_ = nullptr;
