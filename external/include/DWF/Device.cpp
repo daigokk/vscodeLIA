@@ -30,11 +30,12 @@ std::vector<std::string> collectNodeTypes(int nodeMask) {
 
 /* ----------------------------------------------------- */
 
-Dwf::Device::Data* Dwf::Device::open(std::string serial) {
+Dwf::Device::Data* Dwf::Device::open(const std::string serial, const int config) {
     /*
         open a specific device by serial number
         parameters: - serial number of the device (empty string = first connected device)
-                    - config
+                    - config 0: Normal, 1: Large analog input buffer, 2: Large digital input buffer
+                                AD2はconfig=0のみ
         returns:    - device data
     */
 
@@ -60,12 +61,12 @@ Dwf::Device::Data* Dwf::Device::open(std::string serial) {
     bool serial_found = false;
     while (device_data->handle == 0 && index < device_count) {
         if (serial.empty()) {
-            FDwfDeviceOpen(index, &device_data->handle);
+            FDwfDeviceConfigOpen(index, config, &device_data->handle);
         } else {
             char found_serial[32] = {0};
             if (FDwfEnumSN(index, found_serial) != 0 && serial == found_serial) {
                 serial_found = true;
-                FDwfDeviceOpen(index, &device_data->handle);
+                FDwfDeviceConfigOpen(index, config, &device_data->handle);
             }
         }
         index++;

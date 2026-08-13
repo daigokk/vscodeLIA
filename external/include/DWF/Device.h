@@ -126,7 +126,7 @@ private:
 
     // public function definitions
 public:
-    static Data* open(std::string serial = "");
+    static Data* open(const std::string serial = "", const int config = 0);
     static void check_error(Data *device_data, const char *caller = __builtin_FUNCTION(), const char *file = __FILE__);
     static void close(Data *device_data);
     static double temperature(Data *device_data);
