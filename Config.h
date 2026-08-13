@@ -21,6 +21,7 @@ public:
     class Status {
     public:
         bool isRun = false;
+        std::string deviceSerial = "No connected";
     } status;
 
     class RawData {

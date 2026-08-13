@@ -16,18 +16,9 @@ inline void psd(Config* pCfg) {
 }
 
 Daq::Daq(Config* cfg) : pCfg_(cfg) {
-    initializeDevice();
-}
-
-Daq::~Daq() {
-    stop();
-    closeDevice();
-}
-
-void Daq::initializeDevice() {
     try {
         device_data = Dwf::Device::open();
-
+        pCfg_->status.deviceSerial = device_data->serial;
         // Analog input buffer size
         int buffer_size = 0;
         if (FDwfAnalogInBufferSizeInfo(device_data->handle, 0, &buffer_size) == 0) {
@@ -49,6 +40,11 @@ void Daq::initializeDevice() {
                   << error.message << std::endl;
         closeDevice();
     }
+}
+
+Daq::~Daq() {
+    stop();
+    closeDevice();
 }
 
 void Daq::closeDevice() {

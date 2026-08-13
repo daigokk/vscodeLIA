@@ -11,7 +11,7 @@ int main() {
     Daq daq(&cfg);
     daq.start();
     auto window = Gui::Initialize(
-        std::format("codeLIA - {}", daq.device_data->serial).c_str()
+        std::format("codeLIA - {}", cfg.status.deviceSerial).c_str()
     );
     
     while (!glfwWindowShouldClose(window)) {

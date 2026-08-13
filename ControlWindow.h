@@ -8,7 +8,7 @@
 
 void ControlWindow(Config& cfg, Daq& daq) {
     ImGui::Begin("Control");
-    ImGui::Text("%s", daq.device_data->serial.data());
+    ImGui::Text("%s", cfg.status.deviceSerial.c_str());
     if(ImGui::SliderFloat("Frequency", &cfg.excitation.frequency, 1e3f, 100e3f)) {
         daq.wavegen(cfg.excitation.frequency, cfg.excitation.amplitude);
     }
