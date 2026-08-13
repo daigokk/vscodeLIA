@@ -11,7 +11,7 @@ IMGUI_DIR     := $(WORKSPACE_DIR)/external/include/IMGUI
 DAQ_DIR       := $(WORKSPACE_DIR)/external/include/DWF
 
 # コンパイルオプション
-CXXFLAGS := -O2 -std=c++20 -g -fdiagnostics-color=always
+CXXFLAGS := -std=c++20 -g -fdiagnostics-color=always
 DEPFLAGS := -MMD -MP
 INCLUDES := -I$(WORKSPACE_DIR)/external/include
 
