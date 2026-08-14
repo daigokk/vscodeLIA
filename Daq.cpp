@@ -160,27 +160,38 @@ void Daq::stop() {
 }
 
 void Daq::run(std::stop_token st) {
-    pCfg_->status.isRun = true;
-    auto next_time = std::chrono::steady_clock::now();
-    const auto loop_period = std::chrono::duration_cast<std::chrono::steady_clock::duration>(
-        std::chrono::duration<double>(pCfg_->buffer.dt));
+    try{
+        pCfg_->status.isRun = true;
+        auto next_time = std::chrono::steady_clock::now();
+        const auto loop_period = std::chrono::duration_cast<std::chrono::steady_clock::duration>(
+            std::chrono::duration<double>(pCfg_->buffer.dt));
 
-    while (!st.stop_requested()) {
-        STS sts;
-        do {
-            FDwfAnalogInStatus(device_data->handle, true, &sts);
-        } while (sts != stsDone);
+        while (!st.stop_requested()) {
+            STS sts;
+            do {
+                if (FDwfAnalogInStatus(device_data->handle, true, &sts) == 0) {
+                    Dwf::Device::check_error(device_data);
+                }
+            } while (sts != stsDone);
 
-        FDwfAnalogInStatusData(device_data->handle, 0, pCfg_->rawData.ch1.data(), pCfg_->rawData.ch1.size());
-        FDwfAnalogInStatusData(device_data->handle, 1, pCfg_->rawData.ch2.data(), pCfg_->rawData.ch2.size());
-        psd(pCfg_);
+            FDwfAnalogInStatusData(device_data->handle, 0, pCfg_->rawData.ch1.data(), pCfg_->rawData.ch1.size());
+            FDwfAnalogInStatusData(device_data->handle, 1, pCfg_->rawData.ch2.data(), pCfg_->rawData.ch2.size());
+            psd(pCfg_);
 
-        next_time += loop_period;
-        std::this_thread::sleep_until(next_time);
+            next_time += loop_period;
+            std::this_thread::sleep_until(next_time);
+        }
+        closeDevice();
+        pCfg_->status.isRun = false;
     }
-
-    closeDevice();
-    pCfg_->status.isRun = false;
+    catch (const Dwf::Error& error) {
+        std::cout << "WaveForms error: "
+                  << error.instrument << " -> "
+                  << error.function << " -> "
+                  << error.message << std::endl;
+        closeDevice();
+        pCfg_->status.isRun = false;
+    }
 }
 
 void Daq::runWithoutDaq(std::stop_token st) {
@@ -208,6 +219,5 @@ void Daq::runWithoutDaq(std::stop_token st) {
         next_time += loop_period;
         std::this_thread::sleep_until(next_time);
     }
-
     pCfg_->status.isRun = false;
 }

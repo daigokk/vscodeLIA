@@ -6,11 +6,12 @@
 #include "Config.h"
 
 void RawWindow(Config& cfg) {
-    ImGui::Begin("Raw");
-    if (ImPlot::BeginPlot("##Raw")) {
-        ImPlot::PlotLine("Ch1", cfg.rawData.times.data(), cfg.rawData.ch1.data(), cfg.rawData.times.size());
-        ImPlot::PlotLine("Ch2", cfg.rawData.times.data(), cfg.rawData.ch2.data(), cfg.rawData.times.size());
-        ImPlot::EndPlot();
+    if(ImGui::Begin("Raw")){
+        if (ImPlot::BeginPlot("##Raw")) {
+            ImPlot::PlotLine("Ch1", cfg.rawData.times.data(), cfg.rawData.ch1.data(), cfg.rawData.times.size());
+            ImPlot::PlotLine("Ch2", cfg.rawData.times.data(), cfg.rawData.ch2.data(), cfg.rawData.times.size());
+            ImPlot::EndPlot();
+        }
     }
     ImGui::End();
 }
