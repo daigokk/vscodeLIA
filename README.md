@@ -88,7 +88,7 @@ void psd(Cfg* pCfg){
 
 * **DAQ:** [Digilent Analog Discovery 3](https://digilent.com/shop/analog-discovery-3/)
 * **コンパイラ:** [Mingw-w64](https://github.com/niXman/mingw-builds-binaries/releases/) (GCC for Windows)
-* **エディタ / IDE:** [Visual Studio Code, VS Code](https://code.visualstudio.com/)
+* **エディタ / IDE:** [Visual Studio Code (VS Code)](https://code.visualstudio.com/)
 * **対象OS:** Windows 10 / 11 (64-bit)
 
 以下を参考にセットアップを行ってください。
