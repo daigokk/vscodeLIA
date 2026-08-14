@@ -11,7 +11,7 @@ int main() {
     Config cfg;
     // DAQの制御をするクラス
     Daq daq(&cfg);
-    // `daq.stop();`するまでDAQは波形を測定し続けます。
+    // `daq.stop();`するまでDAQは波形を測定し続ける
     daq.start();
     // `Gui`: GLFW、ImGUI、ImPlotの初期設定等を行うクラス
     auto window = Gui::Initialize(
