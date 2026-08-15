@@ -8,7 +8,7 @@
 #include "Config.h"
 #include <pocketfft_hdronly.h>
 
-
+// DAQの制御をするクラス
 class Daq {
 public:
     explicit Daq(Config* cfg);
