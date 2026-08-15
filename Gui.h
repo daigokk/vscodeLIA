@@ -1,7 +1,7 @@
 #pragma once
 #include <GLFW/glfw3.h>
 
-
+// 親ウィンドウを描画するGLFW、ウィンドウ上にボタンやチャートなどのウィジェットを描画するImGui、ImPlotの初期設定等を行うクラス
 class Gui {
 public:
     // GLFWwindow の初期化と ImGui のセットアップを行う関数。ループ開始前に呼び出す必要がある
