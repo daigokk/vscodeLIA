@@ -5,6 +5,7 @@
 #include <IMGUI/implot.h>
 #include "Config.h"
 
+// 位相敏感検波した値を複素平面上に表示する
 void XyWindow(Config& cfg) {
     if(ImGui::Begin("XY")){
         if (ImPlot::BeginPlot("##XY")) {
