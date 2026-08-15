@@ -6,6 +6,7 @@
 #include "Config.h"
 #include "Daq.h"
 
+// DAQの出力する波形(周波数、振幅)を制御する
 void ControlWindow(Config& cfg, Daq& daq) {
     if(ImGui::Begin("Control")){
         ImGui::Text("%s", cfg.status.deviceSerial.c_str());
