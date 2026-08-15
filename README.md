@@ -38,7 +38,7 @@
 * [参考] 以下のコードは図2のブロック図を具現化したものです。`Daq.cpp`に記載の`psd`関数に以下を記述すると、プローブの状態に合わせてリアルタイムにXYウィンドウの輝点が移動します。
 
 ```c++
-void psd(Cfg* pCfg){
+void psd(Config* pCfg){
     double ch1x = 0, ch1y = 0;
     for (size_t i = 0; i < pCfg->rawData.ch1.size(); ++i) {
         double wt = 2 * pCfg->PI_ * pCfg->excitation.frequency * pCfg->rawData.dt * i;
