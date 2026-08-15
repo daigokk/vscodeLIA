@@ -29,7 +29,7 @@ int main() {
             // DAQとの接続が切れたとき
             ImGui::SetNextWindowFocus();
             if(ImGui::Begin("Error", nullptr, ImGuiWindowFlags_NoSavedSettings)){
-                ImGui::Text("Daq got disconnected.");
+                ImGui::Text("Daq got disconnected. Please restart this system.");
             }
             ImGui::End();
         }
