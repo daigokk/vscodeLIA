@@ -8,7 +8,7 @@
 #define BUFFER_DT 2e-3 // 2ms
 #define BUFFER_SIZE 1
 
-
+// 測定に関する設定および測定値を保存するクラス
 class Config{
 public:
     const double PI_ = std::acos(-1.0);
