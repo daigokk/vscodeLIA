@@ -5,6 +5,7 @@
 #include <IMGUI/implot.h>
 #include "Config.h"
 
+// DAQが測定した波形を時間軸で表示する
 void RawWindow(Config& cfg) {
     if(ImGui::Begin("Raw")){
         if (ImPlot::BeginPlot("##Raw")) {
