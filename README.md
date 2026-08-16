@@ -55,7 +55,7 @@ void psd(Config* pCfg){
 ## 2. ハードウェア
 
 * 図3、図4、及び表1は、自己誘導差動型の渦電流プローブのブリッジ・プリアンプの回路と必要な部品を示しています。ご自身のアプリケーションに合わせて設計・製作してください。
-* AD3のWavegen(W1,W2)の最大出力電流は30mA程度です。Wavegenの出力電圧を上げすぎると波形がゆがみます(例えば、正弦波の山と谷が平らになる)。電圧(電力)が必要であればWavegenの出力と負荷の間に`LT1010`(最大出力電流150mA)のようなパワー・バッファを入れるとよいでしょう。なお、AD3の直流電源(Supplies)の最大出力電流は400mA程度です。AD3にACアダプターをつなぐと800mA程度まで拡大できます。
+* AD3のWavegen(W1,W2)の最大出力電流は30mA程度です。Wavegenの出力電圧を上げすぎると波形がゆがみます(例えば周波数が低い(力率が高い、つまり電圧と電流の位相が近い)場合、測定電圧の山と谷が平らになる)。電圧(電力)が必要であればWavegenの出力と負荷の間に`LT1010`(最大出力電流150mA)のようなパワー・バッファを入れるとよいでしょう。なお、パワー・バッファ(またはオペアンプ)の電源をAD3からとる場合、AD3の直流電源(Supplies)の最大出力電流は400mA程度(AD3にACアダプターをつなぐと800mA程度まで拡大可能)であることに注意してください。
 
 | ![Schematic](./docs/images/Schematic.svg) ![Schematic_AD620](./docs/images/AD620.svg) |
 | --- |
@@ -69,10 +69,10 @@ void psd(Config* pCfg){
 表1. 部品一覧
   | 部品 | 型番 | 備考 |
   | ---- | ---- | ---- |
-  | DAQ | Digilent Analog Discovery 3 | [Analog Discovery 3: 125 MS/s USB Oscilloscope, Waveform Generator, Logic Analyzer, and Variable Power Supply](https://digilent.com/reference/test-and-measurement/analog-discovery-3/start) |
+  | DAQ | Digilent Analog, Discovery 3 | [Analog Discovery 3: 125 MS/s USB Oscilloscope, Waveform Generator, Logic Analyzer, and Variable Power Supply](https://digilent.com/reference/test-and-measurement/analog-discovery-3/start) |
   | L型ピンソケット | 2×15 | https://akizukidenshi.com/catalog/g/g113419/ |
   | ブレッドボード |  47×36mm  | https://akizukidenshi.com/catalog/g/g111960/ |
-  | 計装アンプ | Analog Devices AD620ANZ | https://akizukidenshi.com/catalog/g/g113693/ |
+  | 計装アンプ | Analog Devices, AD620ANZ | https://akizukidenshi.com/catalog/g/g113693/ |
   | ゲイン設定用抵抗(40dB) | 510Ω | [See "Gain Selection" on page 15 of the AD620 datasheet.](https://www.analog.com/media/en/technical-documentation/data-sheets/AD620.pdf) |
   | コンデンサ | 0.1uF×2 | https://akizukidenshi.com/catalog/g/g110149/ |
   | (表面実装コンデンサ) | 0.1uF×2 | https://akizukidenshi.com/catalog/g/g116143/ |
@@ -80,7 +80,7 @@ void psd(Config* pCfg){
   | 同軸ケーブル | 特性インピーダンス50Ω | https://akizukidenshi.com/catalog/g/g116943/|
   | $L_1$, Sensor coil| 励磁周波数で50Ω程度 | 例えば https://akizukidenshi.com/catalog/g/g116967/ |
   | $L_2$, Reference coil | 励磁周波数で50Ω程度 | 例えば https://akizukidenshi.com/catalog/g/g116967/ |
-  | (必要であれば)メスコネクタ | 多治見無線電機 PRC03-12A10-7F10.5 | 探傷器側コネクタ |
+  | (必要であれば)メスコネクタ | 多治見無線電機, PRC03-12A10-7F10.5 | 探傷器側コネクタ |
 ---
 
 ## 3. 開発環境のセットアップ (Windows)
