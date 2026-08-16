@@ -17,7 +17,7 @@
   * [職業能力開発総合大学校](https://www.uitec.jeed.go.jp/) 電気工学専攻 3年時プレゼミ([応用センシング研究室](https://www.uitec.jeed.go.jp/kenkyu/laboratory/lab039/index.html))の課題
 
 * **主な機能:**
-    * Digilent製DAQ([Analog Discovery](https://digilent.com/shop/analog-discovery-3/))を用いた信号の測定・集録
+    * Digilent製DAQ([Analog Discovery](https://digilent.com/shop/analog-discovery-3/), 以下AD3)を用いた信号の測定・集録
       * `Daq.h`、`Daq.cpp`及び`Makefile`を書き換えることで、他のDAQ(例えばNI-DAQ)に対応させることも可能です。
     * [ImPlot](https://github.com/epezent/implot)を用いた波形のリアルタイム描画
     * [位相敏感検波](https://www.youtube.com/watch?v=pHyuB1YW4qY)(同期検波)等による信号処理(図2参照、未実装)
@@ -55,6 +55,7 @@ void psd(Config* pCfg){
 ## 2. ハードウェア
 
 * 図3、図4、及び表1は、自己誘導差動型の渦電流プローブのブリッジ・プリアンプの回路と必要な部品を示しています。ご自身のアプリケーションに合わせて設計・製作してください。
+* AD3のWavegen(W1,W2)の最大出力電流は30mA程度です。Wavegenの出力電圧を上げすぎると波形がゆがみます(正弦波の山と谷が平らになる)。電圧(電力)が必要であればWavegenの出力と負荷の間に`LT1010`(最大出力電流150mA)のようなパワー・バッファを入れるとよいでしょう。なお、AD3の直流電源(Supplies)の最大出力電流は400mA程度です。AD3にACアダプターをつなぐと800mA程度まで拡大できます。
 
 | ![Schematic](./docs/images/Schematic.svg) ![Schematic_AD620](./docs/images/AD620.svg) |
 | --- |
