@@ -69,7 +69,7 @@ void psd(Config* pCfg){
 表1. 部品一覧
   | 部品 | 型番 | 備考 |
   | ---- | ---- | ---- |
-  | DAQ | Digilent Analog, Discovery 3 | [Analog Discovery 3: 125 MS/s USB Oscilloscope, Waveform Generator, Logic Analyzer, and Variable Power Supply](https://digilent.com/reference/test-and-measurement/analog-discovery-3/start) |
+  | DAQ | Digilent, Analog Discovery 3 | [Analog Discovery 3: 125 MS/s USB Oscilloscope, Waveform Generator, Logic Analyzer, and Variable Power Supply](https://digilent.com/reference/test-and-measurement/analog-discovery-3/start) |
   | L型ピンソケット | 2×15 | https://akizukidenshi.com/catalog/g/g113419/ |
   | ブレッドボード |  47×36mm  | https://akizukidenshi.com/catalog/g/g111960/ |
   | 計装アンプ | Analog Devices, AD620ANZ | https://akizukidenshi.com/catalog/g/g113693/ |
