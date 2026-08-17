@@ -104,7 +104,7 @@ DAQのドライバおよびSDKを取得するためにインストールしま�
 
 ### 🔄 Mingw-w64 (C++コンパイラ) の配置とパス設定
 
-1. [niXman/mingw-builds-binaries](https://github.com/niXman/mingw-builds-binaries/releases/)にアクセスします。
+1. [niXman/mingw-builds-binaries](https://github.com/niXman/mingw-builds-binaries/releases/)にアクセスします。なおx64以外のアーキテクチャ(ARM)にも対応している[llvm-mingw](https://github.com/mstorsjo/llvm-mingw)というものもあります。
 1. Mingw-w64 のアーカイブ(例: `x86_64-16.1.0-release-win32-seh-ucrt-rt_v14-rev1.7z`)をダウンロードします。
 1. ダウンロードした `.7z` ファイルを解凍し、中身の `mingw64` フォルダを以下のディレクトリへ移動します。
    ```text
