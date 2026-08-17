@@ -226,7 +226,7 @@ Makefile Tools のパネル内で、以下のように設定します。
 void fft(Config* pCfg) {
     const auto& in_data = pCfg->rawData.ch[0];
     const size_t N = in_data.size();
-    const size_t N_HARMONICS = pCfg->fftBuffer.numHarmonics_x.size();
+    const size_t N_HARMONICS_ = pCfg->fftBuffer.numHarmonics_x.size();
 
     // 1. pocketfft実行用の入出力形状およびストライドの設定
     pocketfft::shape_t shape = { N };
