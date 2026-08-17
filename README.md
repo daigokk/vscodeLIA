@@ -3,7 +3,7 @@
 
 | ![Hard copy](./docs/images/HardCopy.png) |
 | --- |
-| 図1. Hard copy |
+| 図1. vscodeLIA |
 ---
 
 ## 1. 概要
