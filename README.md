@@ -222,6 +222,60 @@ Makefile Tools のパネル内で、以下のように設定します。
 
 * `Daq.cpp`に記載の`psd`関数を完成させてください。
 * (オプション) `fft`関数を完成させ、FFTを使って同様の結果を得られることを確認してみてください。様々な条件においてどちらが優れているか比較してみるのもよいでしょう。
+```c++
+inline void fft(Config* pCfg) {
+    if (pCfg == nullptr) return;
+
+    const auto& in_data = pCfg->rawData.ch1;
+    const size_t N = in_data.size();
+    const size_t N_HARMONICS = pCfg->fftBuffer.numHarmonics_x.size();
+
+    // 1. pocketfft実行用の入出力形状およびストライドの設定
+    pocketfft::shape_t shape = { N };
+    pocketfft::stride_t stride_in = { sizeof(double) };
+    pocketfft::stride_t stride_out = { sizeof(std::complex<double>) };
+    pocketfft::shape_t axes = { 0 };
+
+    // Real-to-Complex FFT (r2c) の出力サイズは N/2 + 1
+    std::vector<std::complex<double>> fft_out(N / 2 + 1);
+
+    // 2. FFTの実行 (r2c: 実数入力 -> 複素数出力)
+    // 引数: shape, stride_in, stride_out, axes, forward(true), in_ptr, out_ptr, scale(1.0)
+    pocketfft::r2c(
+        shape,
+        stride_in,
+        stride_out,
+        axes,
+        pocketfft::FORWARD,
+        in_data.data(),
+        fft_out.data(),
+        1.0
+    );
+
+    // 3. 周波数分解能 df = 1 / (N * dt)
+    const double df = 1.0 / (static_cast<double>(N) * pCfg->rawData.dt);
+    const double f0 = pCfg->excitation.frequency;
+
+    // 正規化用係数（DFT結果を平均振幅に戻すため 2/N を乗算）
+    const double scale = 2.0 / static_cast<double>(N);
+
+    // 4. 各倍波に対応する周波数インデックス（ビン）を特定して格納
+    for (int i = 0; i < N_HARMONICS; ++i) {
+        // 抽出対象の高調波倍率 (1倍, 3倍, 5倍, ...)
+        const double target_freq = f0 * (i * 2 + 1);
+        
+        // 最も近い周波数ビンのインデックスを計算
+        const size_t bin_idx = static_cast<size_t>(std::round(target_freq / df));
+
+        // ナイキスト周波数（N/2）以下の範囲内にあるか確認
+        if (bin_idx < fft_out.size()) {
+            // スケーリングを適用して実部(X)と虚部(Y)を格納
+            pCfg->fftBuffer.numHarmonics_x[i] = fft_out[bin_idx].real() * scale;
+            pCfg->fftBuffer.numHarmonics_y[i] = -fft_out[bin_idx].imag() * scale;
+        }
+    }
+}
+```
 * (オプション) 初期設定では、2msごとに 10000[Sample]/100[MSample/s]=0.1[ms] 分だけAD変換しています(`Config.h`で変更可能)。2msはUSBの制限から決定しました。この方式の利点はPSDの実装が簡単(平均を使える、FFTを使える)であること、100MS/sの高速なAD変換ができること、等が挙げられます。しかしながら全体の時間の 0.1[ms]/[2ms]=5[%] しか使っていません。検出信号の95%は捨てていることを意味します。言い換えると2msの間プローブの検出信号が一定の場合は、問題ないです。この制限(95%を捨てる)は、AD変換の速度を落とすことで使えるようになる、DAQのストリーミング記録(100%使う)を用いることで解決できます。AD変換の速度を落とすことは検出周波数の最大値が下がることを意味しますが([ナイキストのサンプリング定理](https://ja.wikipedia.org/wiki/%E6%A8%99%E6%9C%AC%E5%8C%96%E5%AE%9A%E7%90%86))、AD変換の前段に[スーパーヘテロダイン](https://ja.wikipedia.org/wiki/%E3%83%98%E3%83%86%E3%83%AD%E3%83%80%E3%82%A4%E3%83%B3)を用いることでその制限も回避することができます。何を言っているのかわかったでしょうか？ご理解いただけたら、ハードウェアおよびソフトウェアを改造して、信号の取りこぼしのない、かつ100kHzの検出信号を検波できるLIAを実装してみてください。
 * (オプション) 追加したい機能はありませんか？その機能を実装してみましょう。[LIA (daigokk/LIA)](https://github.com/daigokk/LIA/) が参考になるかもしれません。
 * (オプション) C++からメモリ安全なRustに書き換えてみましょう。
