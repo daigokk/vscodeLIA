@@ -9,8 +9,9 @@
 void RawWindow(Config& cfg) {
     if(ImGui::Begin("Raw")){
         if (ImPlot::BeginPlot("##Raw")) {
-            ImPlot::PlotLine("Ch1", cfg.rawData.times.data(), cfg.rawData.ch1.data(), cfg.rawData.times.size());
-            ImPlot::PlotLine("Ch2", cfg.rawData.times.data(), cfg.rawData.ch2.data(), cfg.rawData.times.size());
+            for(int i=0; i < cfg.rawData.ch.size(); i++){
+                ImPlot::PlotLine(std::format("Ch{}", i+1).c_str(), cfg.rawData.times.data(), cfg.rawData.ch[i].data(), cfg.rawData.times.size());
+            }
             ImPlot::EndPlot();
         }
     }

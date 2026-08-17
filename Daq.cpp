@@ -174,8 +174,9 @@ void Daq::run(std::stop_token st) {
                 }
             } while (sts != stsDone);
 
-            FDwfAnalogInStatusData(device_data->handle, 0, pCfg_->rawData.ch1.data(), pCfg_->rawData.ch1.size());
-            FDwfAnalogInStatusData(device_data->handle, 1, pCfg_->rawData.ch2.data(), pCfg_->rawData.ch2.size());
+            for(int i=0; i < pCfg_->buffer.ch.size(); i++){
+                FDwfAnalogInStatusData(device_data->handle, i, pCfg_->rawData.ch[i].data(), pCfg_->rawData.ch[i].size());
+            }
             psd(pCfg_);
 
             next_time += loop_period;
@@ -212,7 +213,7 @@ void Daq::runWithoutDaq(std::stop_token st) {
 
         for (size_t i = 0; i < times.size(); ++i) {
             const double wt = 2.0 * pCfg_->PI_ * frequency * times[i];
-            pCfg_->rawData.ch1[i] = amplitude * std::sin(wt + theta);
+            pCfg_->rawData.ch[0][i] = amplitude * std::sin(wt + theta);
         }
 
         psd(pCfg_);

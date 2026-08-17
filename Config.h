@@ -7,6 +7,7 @@
 #define EXCITATION_AMPLITUDE 1.0
 #define BUFFER_DT 2e-3 // 2ms
 #define BUFFER_SIZE 1
+#define N_CHANNEL 2
 
 // 測定に関する設定および測定値を保存するクラス
 class Config{
@@ -27,7 +28,8 @@ public:
     class RawData {
     public:
         double dt = 1.0 / RAW_RATE;
-        std::vector<double> times, ch1, ch2;
+        std::vector<double> times;
+        std::vector<std::vector<double>> ch;
     } rawData;
 
     class ComplexData {
@@ -38,7 +40,7 @@ public:
     class Buffer {
     public:
         double dt = BUFFER_DT;
-        ComplexData ch1, ch2;
+        std::vector<ComplexData> ch;
     } buffer;
 
     class FFTBuffer {
@@ -48,8 +50,10 @@ public:
     
     void RawInit(const int raw_count) {
         rawData.times.resize(raw_count);
-        rawData.ch1.resize(raw_count);
-        rawData.ch2.resize(raw_count);
+        rawData.ch.resize(N_CHANNEL);
+        for(int i=0; i < rawData.ch.size(); i++){
+            rawData.ch[i].resize(raw_count);
+        }
         double wdt = 2.0 * PI_ * excitation.frequency * rawData.dt;
         for (int i = 0; i < rawData.times.size(); i++) {
             rawData.times[i] = static_cast<double>(i) * rawData.dt;
@@ -57,10 +61,11 @@ public:
     }
     explicit Config() {
         RawInit(RAW_COUNT);
-        buffer.ch1.xs.resize(BUFFER_SIZE);
-        buffer.ch1.ys.resize(BUFFER_SIZE);
-        buffer.ch2.xs.resize(BUFFER_SIZE);
-        buffer.ch2.ys.resize(BUFFER_SIZE);
+        buffer.ch.resize(N_CHANNEL);
+        for(int i=0; i < buffer.ch.size(); i++){
+            buffer.ch[i].xs.resize(BUFFER_SIZE);
+            buffer.ch[i].ys.resize(BUFFER_SIZE);
+        }
         fftBuffer.numHarmonics_x.resize(5);
         fftBuffer.numHarmonics_y.resize(5);
     }

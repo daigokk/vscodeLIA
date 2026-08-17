@@ -9,7 +9,7 @@
 void XyWindow(Config& cfg) {
     if(ImGui::Begin("XY")){
         if (ImPlot::BeginPlot("##XY")) {
-            ImPlot::PlotScatter("PSD", &(cfg.buffer.ch1.xs[0]), &(cfg.buffer.ch1.ys[0]), 1);
+            ImPlot::PlotScatter("PSD", &(cfg.buffer.ch[0].xs[0]), &(cfg.buffer.ch[0].ys[0]), 1);
             ImPlot::PlotScatter("FFT", cfg.fftBuffer.numHarmonics_x.data(), cfg.fftBuffer.numHarmonics_y.data(), cfg.fftBuffer.numHarmonics_x.size());
             ImPlot::EndPlot();
         }
