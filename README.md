@@ -223,9 +223,7 @@ Makefile Tools のパネル内で、以下のように設定します。
 * `Daq.cpp`に記載の`psd`関数を完成させてください。
 * (オプション) `fft`関数を完成させ、FFTを使って同様の結果を得られることを確認してみてください。様々な条件においてどちらが優れているか比較してみるのもよいでしょう。
 ```c++
-inline void fft(Config* pCfg) {
-    if (pCfg == nullptr) return;
-
+void fft(Config* pCfg) {
     const auto& in_data = pCfg->rawData.ch1;
     const size_t N = in_data.size();
     const size_t N_HARMONICS = pCfg->fftBuffer.numHarmonics_x.size();
