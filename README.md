@@ -39,14 +39,14 @@
 
 ```c++
 void psd(Config* pCfg){
-    double ch1x = 0, ch1y = 0;
+    double x_sum = 0, y_sum = 0;
     for (size_t i = 0; i < pCfg->rawData.ch[0].size(); ++i) {
         double wt = 2 * pCfg->PI_ * pCfg->excitation.frequency * pCfg->rawData.dt * i;
-        ch1x += pCfg->rawData.ch[0][i] * 2 * sin(wt);
-        ch1y += pCfg->rawData.ch[0][i] * 2 * cos(wt);
+        x_sum += pCfg->rawData.ch[0][i] * 2 * sin(wt);
+        y_sum += pCfg->rawData.ch[0][i] * 2 * cos(wt);
     }
-    pCfg->buffer.ch[0].xs[0] = ch1x / pCfg->rawData.ch[0].size();
-    pCfg->buffer.ch[0].ys[0] = ch1y / pCfg->rawData.ch[0].size();
+    pCfg->buffer.ch[0].xs[0] = x_sum / pCfg->rawData.ch[0].size();
+    pCfg->buffer.ch[0].ys[0] = y_sum / pCfg->rawData.ch[0].size();
 }
 ```
 
