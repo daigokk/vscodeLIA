@@ -45,8 +45,8 @@ void psd(Config* pCfg){
         ch1x += pCfg->rawData.ch[0][i] * 2 * sin(wt);
         ch1y += pCfg->rawData.ch[0][i] * 2 * cos(wt);
     }
-    pCfg->buffer.ch[0].xs[0] = ch1x / pCfg->rawData.ch1.size();
-    pCfg->buffer.ch[0].ys[0] = ch1y / pCfg->rawData.ch1.size();
+    pCfg->buffer.ch[0].xs[0] = ch1x / pCfg->rawData.ch[0].size();
+    pCfg->buffer.ch[0].ys[0] = ch1y / pCfg->rawData.ch[0].size();
 }
 ```
 
