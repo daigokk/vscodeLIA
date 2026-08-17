@@ -8,6 +8,7 @@
 #define BUFFER_DT 2e-3 // 2ms
 #define BUFFER_SIZE 1
 #define N_CHANNEL 2
+#define N_HARMONICS 5
 
 // 測定に関する設定および測定値を保存するクラス
 class Config{
@@ -50,7 +51,6 @@ public:
     
     void RawInit(const int raw_count) {
         rawData.times.resize(raw_count);
-        rawData.ch.resize(N_CHANNEL);
         for(int i=0; i < rawData.ch.size(); i++){
             rawData.ch[i].resize(raw_count);
         }
@@ -59,15 +59,21 @@ public:
             rawData.times[i] = static_cast<double>(i) * rawData.dt;
         }
     }
-    explicit Config() {
-        RawInit(RAW_COUNT);
-        buffer.ch.resize(N_CHANNEL);
+
+    void BufferInit(const int n_channel){
+        buffer.ch.resize(n_channel);
         for(int i=0; i < buffer.ch.size(); i++){
             buffer.ch[i].xs.resize(BUFFER_SIZE);
             buffer.ch[i].ys.resize(BUFFER_SIZE);
         }
-        fftBuffer.numHarmonics_x.resize(5);
-        fftBuffer.numHarmonics_y.resize(5);
+    }
+
+    explicit Config() {
+        rawData.ch.resize(N_CHANNEL);
+        RawInit(RAW_COUNT);
+        BufferInit(N_CHANNEL);
+        fftBuffer.numHarmonics_x.resize(N_HARMONICS);
+        fftBuffer.numHarmonics_y.resize(N_HARMONICS);
     }
     Config(const Config&) = delete;
     Config& operator=(const Config&) = delete;
