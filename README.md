@@ -40,13 +40,13 @@
 ```c++
 void psd(Config* pCfg){
     double ch1x = 0, ch1y = 0;
-    for (size_t i = 0; i < pCfg->rawData.ch1.size(); ++i) {
+    for (size_t i = 0; i < pCfg->rawData.ch[0].size(); ++i) {
         double wt = 2 * pCfg->PI_ * pCfg->excitation.frequency * pCfg->rawData.dt * i;
-        ch1x += pCfg->rawData.ch1[i] * 2 * sin(wt);
-        ch1y += pCfg->rawData.ch1[i] * 2 * cos(wt);
+        ch1x += pCfg->rawData.ch[0][i] * 2 * sin(wt);
+        ch1y += pCfg->rawData.ch[0][i] * 2 * cos(wt);
     }
-    pCfg->buffer.ch1.xs[0] = ch1x / pCfg->rawData.ch1.size();
-    pCfg->buffer.ch1.ys[0] = ch1y / pCfg->rawData.ch1.size();
+    pCfg->buffer.ch[0].xs[0] = ch1x / pCfg->rawData.ch1.size();
+    pCfg->buffer.ch[0].ys[0] = ch1y / pCfg->rawData.ch1.size();
 }
 ```
 
@@ -224,7 +224,7 @@ Makefile Tools のパネル内で、以下のように設定します。
 * (オプション) `fft`関数を完成させ、FFTを使って同様の結果を得られることを確認してみてください。様々な条件においてどちらが優れているか比較してみるのもよいでしょう。入力波形を矩形波にすることで、高調波成分は正弦波の時より大きくなります。この方法の利点は、一度に複数の周波数成分を得られることです。
 ```c++
 void fft(Config* pCfg) {
-    const auto& in_data = pCfg->rawData.ch1;
+    const auto& in_data = pCfg->rawData.ch[0];
     const size_t N = in_data.size();
     const size_t N_HARMONICS = pCfg->fftBuffer.numHarmonics_x.size();
 
