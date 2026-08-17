@@ -131,7 +131,7 @@ DAQのドライバおよびSDKを取得するためにインストールしま�
 
 ### 📝 VS Code のセットアップ
 
-1. [VS Code 公式サイト](https://code.visualstudio.com/download) からインストーラーを取得し、インストールします。
+1. [VS Code 公式サイト](https://code.visualstudio.com/download) からインストーラーを取得し、インストールします。なお、VS Codeからテレメトリやトラッキング機能(使用状況等をMicrosoftに自動的に送信する機能)を無効化した[VSCodium](https://vscodium.com/)というものもあります。
 1. VS Codeを起動し、左側の拡張機能タブ（`Ctrl + Shift + X`）を開き、以下の拡張機能を検索してインストールします。
    * **C/C++** (`ms-vscode.cpptools`)
    * **C/C++ Extension Pack** (`ms-vscode.cpptools-extension-pack`)
