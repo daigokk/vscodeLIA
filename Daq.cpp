@@ -164,7 +164,7 @@ void Daq::run(std::stop_token st) {
         pCfg_->status.isRun = true;
         auto next_time = std::chrono::steady_clock::now();
         const auto loop_period = std::chrono::duration_cast<std::chrono::steady_clock::duration>(
-            std::chrono::duration<double>(pCfg_->buffer.dt));
+            std::chrono::duration<double>(pCfg_->ringBuffer.dt));
 
         while (!st.stop_requested()) {
             STS sts;
@@ -174,7 +174,7 @@ void Daq::run(std::stop_token st) {
                 }
             } while (sts != stsDone);
 
-            for(int i=0; i < pCfg_->buffer.ch.size(); i++){
+            for(int i=0; i < pCfg_->ringBuffer.ch.size(); i++){
                 FDwfAnalogInStatusData(device_data->handle, i, pCfg_->rawData.ch[i].data(), pCfg_->rawData.ch[i].size());
             }
             psd(pCfg_);
@@ -199,7 +199,7 @@ void Daq::runWithoutDaq(std::stop_token st) {
     pCfg_->status.isRun = true;
     double theta = 0.0;
     const auto loop_period = std::chrono::duration_cast<std::chrono::steady_clock::duration>(
-        std::chrono::duration<double>(pCfg_->buffer.dt));
+        std::chrono::duration<double>(pCfg_->ringBuffer.dt));
     const double angular_step = (100.0 / 180.0) * pCfg_->PI_;
     const auto& times = pCfg_->rawData.times;
     const auto frequency = pCfg_->excitation.frequency;
@@ -208,7 +208,7 @@ void Daq::runWithoutDaq(std::stop_token st) {
     auto next_time = std::chrono::steady_clock::now();
 
     while (!st.stop_requested()) {
-        theta += angular_step * pCfg_->buffer.dt;
+        theta += angular_step * pCfg_->ringBuffer.dt;
         theta = std::fmod(theta, 2.0 * pCfg_->PI_);
 
         for (size_t i = 0; i < times.size(); ++i) {
