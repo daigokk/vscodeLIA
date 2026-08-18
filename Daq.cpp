@@ -219,7 +219,7 @@ void Daq::runWithoutDaq(std::stop_token st) {
         for(int i=0; i < pCfg_->ringBuffer.ch.size() / N_MULTIPLEXER_CHANNEL; ++i){
             int ch = i * N_MULTIPLEXER_CHANNEL + ch_multi;
             for (size_t j = 0; j < times.size(); ++j) {
-                const double wt = 2.0 * pCfg_->PI_ * frequency * times[j];
+                const double wt = 2.0 * pCfg_->PI_ * frequency * times[j] + ch*30.0/180.0*pCfg_->PI_;
                 pCfg_->rawData.ch[ch][j] = amplitude * std::sin(wt + theta);
             }
         }
