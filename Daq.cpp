@@ -11,7 +11,7 @@ inline void fft(Config* pCfg) {
     // TODO: ここにフーリエ変換のコードを入力
 }
 
-inline void psd(Config* pCfg) {
+inline void psd(Config* pCfg, const int ch_multi=0) {
     // TODO: ここに位相敏感検波のコードを入力
 }
 
@@ -179,10 +179,10 @@ void Daq::run(std::stop_token st) {
                 int ch = i * N_MULTIPLEXER_CHANNEL + ch_multi;
                 FDwfAnalogInStatusData(device_data->handle, i, pCfg_->rawData.ch[ch].data(), pCfg_->rawData.ch[ch].size());
             }
+            psd(pCfg_, ch_multi);
             ch_multi++;
             if(ch_multi >= N_MULTIPLEXER_CHANNEL) ch_multi = 0;
-            psd(pCfg_);
-
+            
             next_time += loop_period;
             std::this_thread::sleep_until(next_time);
         }
@@ -223,9 +223,10 @@ void Daq::runWithoutDaq(std::stop_token st) {
                 pCfg_->rawData.ch[ch][j] = amplitude * std::sin(wt + theta);
             }
         }
+        psd(pCfg_, ch_multi);
         ch_multi++;
         if(ch_multi >= N_MULTIPLEXER_CHANNEL) ch_multi = 0;
-        psd(pCfg_);
+
         next_time += loop_period;
         std::this_thread::sleep_until(next_time);
     }
