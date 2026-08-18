@@ -64,7 +64,7 @@ public:
     }
 
     void RingBufferInit(const int n_channel = N_DAQ_CHANNEL * N_MULTIPLEXER_CHANNEL){
-        ringBuffer.times.resize(n_channel);
+        ringBuffer.times.resize(RINGBUFFER_SIZE);
         ringBuffer.ch.resize(n_channel);
         for(int i=0; i < ringBuffer.ch.size(); i++){
             ringBuffer.ch[i].xs.resize(RINGBUFFER_SIZE, 0);

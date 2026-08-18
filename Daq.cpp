@@ -174,9 +174,13 @@ void Daq::run(std::stop_token st) {
                 }
             } while (sts != stsDone);
 
-            for(int i=0; i < pCfg_->ringBuffer.ch.size(); i++){
-                FDwfAnalogInStatusData(device_data->handle, i, pCfg_->rawData.ch[i].data(), pCfg_->rawData.ch[i].size());
+            static int ch_multi = 0;
+            for(int i=0; i < pCfg_->ringBuffer.ch.size() / N_MULTIPLEXER_CHANNEL; ++i){
+                int ch = i * N_MULTIPLEXER_CHANNEL + ch_multi;
+                FDwfAnalogInStatusData(device_data->handle, i, pCfg_->rawData.ch[ch].data(), pCfg_->rawData.ch[ch].size());
             }
+            ch_multi++;
+            if(ch_multi >= N_MULTIPLEXER_CHANNEL) ch_multi = 0;
             psd(pCfg_);
 
             next_time += loop_period;
@@ -211,11 +215,16 @@ void Daq::runWithoutDaq(std::stop_token st) {
         theta += angular_step * pCfg_->ringBuffer.dt;
         theta = std::fmod(theta, 2.0 * pCfg_->PI_);
 
-        for (size_t i = 0; i < times.size(); ++i) {
-            const double wt = 2.0 * pCfg_->PI_ * frequency * times[i];
-            pCfg_->rawData.ch[0][i] = amplitude * std::sin(wt + theta);
+        static int ch_multi = 0;
+        for(int i=0; i < pCfg_->ringBuffer.ch.size() / N_MULTIPLEXER_CHANNEL; ++i){
+            int ch = i * N_MULTIPLEXER_CHANNEL + ch_multi;
+            for (size_t j = 0; j < times.size(); ++j) {
+                const double wt = 2.0 * pCfg_->PI_ * frequency * times[j];
+                pCfg_->rawData.ch[ch][j] = amplitude * std::sin(wt + theta);
+            }
         }
-
+        ch_multi++;
+        if(ch_multi >= N_MULTIPLEXER_CHANNEL) ch_multi = 0;
         psd(pCfg_);
         next_time += loop_period;
         std::this_thread::sleep_until(next_time);

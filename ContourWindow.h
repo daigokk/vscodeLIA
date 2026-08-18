@@ -6,7 +6,7 @@
 #include "Config.h"
 #include "Daq.h"
 
-// マルチチャンネル対応
+// マルチプレクサ対応
 void ControlWindow(Config& cfg, Daq& daq) {
     if(ImGui::Begin("Contour Plot")){
         ImPlot::PushColormap(ImPlotColormap_Jet);
