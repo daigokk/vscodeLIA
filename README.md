@@ -45,8 +45,8 @@ void psd(Config* pCfg){
         x_sum += pCfg->rawData.ch[0][i] * 2 * sin(wt);
         y_sum += pCfg->rawData.ch[0][i] * 2 * cos(wt);
     }
-    pCfg->buffer.ch[0].xs[0] = x_sum / pCfg->rawData.ch[0].size();
-    pCfg->buffer.ch[0].ys[0] = y_sum / pCfg->rawData.ch[0].size();
+    pCfg->ringBuffer.ch[0].xs[0] = x_sum / pCfg->rawData.ch[0].size();
+    pCfg->ringBuffer.ch[0].ys[0] = y_sum / pCfg->rawData.ch[0].size();
 }
 ```
 
