@@ -6,7 +6,6 @@
 #include <dwf.h>
 
 #include "Config.h"
-#include <pocketfft_hdronly.h>
 
 // DAQの制御をするクラス
 class Daq {

@@ -11,15 +11,15 @@ void ControlWindow(Config& cfg, Daq& daq) {
     if(ImGui::Begin("Control")){
         ImGui::Text("%s", cfg.status.deviceSerial.c_str());
         if(ImGui::SliderFloat("Frequency", &cfg.excitation.frequency, 1e3f, 100e3f)) {
-            daq.wavegen(cfg.excitation.frequency, cfg.excitation.amplitude);
+            if(daq.device_data) daq.wavegen(cfg.excitation.frequency, cfg.excitation.amplitude);
         }
         if(ImGui::SliderFloat("Amplitude", &cfg.excitation.amplitude, 0.0f, 5.0f)) {    
-            daq.wavegen(cfg.excitation.frequency, cfg.excitation.amplitude);
+            if(daq.device_data) daq.wavegen(cfg.excitation.frequency, cfg.excitation.amplitude);
         }
         if(ImGui::Button("Defaults")) {
             cfg.excitation.frequency = 100e3f;
             cfg.excitation.amplitude = 1.0f;
-            daq.wavegen(cfg.excitation.frequency, cfg.excitation.amplitude);
+            if(daq.device_data) daq.wavegen(cfg.excitation.frequency, cfg.excitation.amplitude);
         }
     }
     ImGui::End();

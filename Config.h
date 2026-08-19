@@ -1,4 +1,7 @@
 #pragma once
+#include "Psd.h"
+#include <pocketfft_hdronly.h>
+
 #include <vector>
 #include <cmath>
 #define RAW_COUNT 10000
@@ -8,13 +11,16 @@
 #define RINGBUFFER_DT 2e-3 // 2ms
 #define RINGBUFFER_SIZE 1
 #define N_DAQ_CHANNEL 2
-#define N_MULTIPLEXER_CHANNEL 1
+#define N_MULTIPLEXER_CHANNEL 8
 #define N_HARMONICS 5
+
 
 // 測定に関する設定および測定値を保存するクラス
 class Config{
 public:
     const double PI_ = std::acos(-1.0);
+    int ch_multi = 0;
+    Psd psd;
     class Excitation {
     public:
         float frequency = EXCITATION_FREQUENCY;
@@ -31,7 +37,7 @@ public:
     public:
         double dt = 1.0 / RAW_RATE;
         std::vector<double> times;
-        std::vector<std::vector<double>> ch;
+        std::vector<std::vector<double>> chs;
     } rawData;
 
     class ComplexData {
@@ -43,7 +49,7 @@ public:
     public:
         double dt = RINGBUFFER_DT;
         std::vector<double> times;
-        std::vector<ComplexData> ch;
+        std::vector<ComplexData> chs;
     } ringBuffer;
 
     class FFTBuffer {
@@ -53,9 +59,9 @@ public:
     
     void RawInit(const int raw_count, const int n_channel = N_DAQ_CHANNEL * N_MULTIPLEXER_CHANNEL) {
         rawData.times.resize(raw_count);
-        rawData.ch.resize(n_channel);
-        for(int i=0; i < rawData.ch.size(); i++){
-            rawData.ch[i].resize(raw_count);
+        rawData.chs.resize(n_channel);
+        for(int i=0; i < rawData.chs.size(); i++){
+            rawData.chs[i].resize(raw_count);
         }
         double wdt = 2.0 * PI_ * excitation.frequency * rawData.dt;
         for (int i = 0; i < rawData.times.size(); i++) {
@@ -65,11 +71,24 @@ public:
 
     void RingBufferInit(const int n_channel = N_DAQ_CHANNEL * N_MULTIPLEXER_CHANNEL){
         ringBuffer.times.resize(RINGBUFFER_SIZE);
-        ringBuffer.ch.resize(n_channel);
-        for(int i=0; i < ringBuffer.ch.size(); i++){
-            ringBuffer.ch[i].xs.resize(RINGBUFFER_SIZE, 0);
-            ringBuffer.ch[i].ys.resize(RINGBUFFER_SIZE, 0);
+        ringBuffer.chs.resize(n_channel);
+        for(int i=0; i < ringBuffer.chs.size(); i++){
+            ringBuffer.chs[i].xs.resize(RINGBUFFER_SIZE, 0);
+            ringBuffer.chs[i].ys.resize(RINGBUFFER_SIZE, 0);
         }
+    }
+    void update(){
+        if(psd.frequency != excitation.frequency){
+            psd.init(rawData.times.size(), excitation.frequency, rawData.dt);
+        }
+        for(int i=0; i < ringBuffer.chs.size() / N_MULTIPLEXER_CHANNEL; ++i){
+            int ch = i + ch_multi * N_DAQ_CHANNEL;
+            auto const [x, y] = psd.calc(rawData.chs[ch].data());
+            ringBuffer.chs[ch].xs[0] = x;
+            ringBuffer.chs[ch].ys[0] = y;
+        }
+        ch_multi++;
+        if(ch_multi >= N_MULTIPLEXER_CHANNEL) ch_multi = 0;
     }
 
     explicit Config() {
@@ -77,7 +96,13 @@ public:
         RingBufferInit();
         fftBuffer.numHarmonics_x.resize(N_HARMONICS);
         fftBuffer.numHarmonics_y.resize(N_HARMONICS);
+        psd.init(rawData.times.size(), excitation.frequency, rawData.dt);
     }
     Config(const Config&) = delete;
     Config& operator=(const Config&) = delete;
 };
+
+inline void fft(Config* pCfg) {
+    // TODO: ここにフーリエ変換のコードを入力
+    
+}

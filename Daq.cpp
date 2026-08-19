@@ -7,14 +7,6 @@
 #include <thread>
 
 
-inline void fft(Config* pCfg) {
-    // TODO: ここにフーリエ変換のコードを入力
-}
-
-inline void psd(Config* pCfg, const int ch_multi=0) {
-    // TODO: ここに位相敏感検波のコードを入力
-}
-
 Daq::Daq(Config* cfg) : pCfg_(cfg) {
     try {
         device_data = Dwf::Device::open();
@@ -29,6 +21,8 @@ Daq::Daq(Config* cfg) : pCfg_(cfg) {
             std::cout << "Raw buffer size: " << pCfg_->rawData.times.size() << " => " << buffer_size << std::endl;
             pCfg_->RawInit(buffer_size);
         }
+        dio.set_mode(device_data, 0xffff);
+        dio.set_state(device_data, pCfg_->ch_multi);
         supplies();
         wavegen(pCfg_->excitation.frequency, pCfg_->excitation.amplitude);
         scope.run(device_data, 1.0 / pCfg_->rawData.dt, static_cast<int>(pCfg_->rawData.times.size()), 0.0, 5.0);
@@ -173,16 +167,15 @@ void Daq::run(std::stop_token st) {
                     Dwf::Device::check_error(device_data);
                 }
             } while (sts != stsDone);
-
-            static int ch_multi = 0;
-            for(int i=0; i < pCfg_->ringBuffer.ch.size() / N_MULTIPLEXER_CHANNEL; ++i){
-                int ch = i * N_MULTIPLEXER_CHANNEL + ch_multi;
-                FDwfAnalogInStatusData(device_data->handle, i, pCfg_->rawData.ch[ch].data(), pCfg_->rawData.ch[ch].size());
-            }
-            psd(pCfg_, ch_multi);
-            ch_multi++;
-            if(ch_multi >= N_MULTIPLEXER_CHANNEL) ch_multi = 0;
             
+            for(int i=0; i < pCfg_->ringBuffer.chs.size() / N_MULTIPLEXER_CHANNEL; ++i){
+                int ch = i + pCfg_->ch_multi * N_DAQ_CHANNEL;
+                FDwfAnalogInStatusData(device_data->handle, i, pCfg_->rawData.chs[ch].data(), pCfg_->rawData.chs[ch].size());
+            }
+            
+            pCfg_->update();
+            // マルチプレクサのチャンネル更新
+            dio.set_state(device_data, pCfg_->ch_multi);
             next_time += loop_period;
             std::this_thread::sleep_until(next_time);
         }
@@ -206,26 +199,24 @@ void Daq::runWithoutDaq(std::stop_token st) {
         std::chrono::duration<double>(pCfg_->ringBuffer.dt));
     const double angular_step = (100.0 / 180.0) * pCfg_->PI_;
     const auto& times = pCfg_->rawData.times;
-    const auto frequency = pCfg_->excitation.frequency;
-    const auto amplitude = pCfg_->excitation.amplitude;
-
+    
     auto next_time = std::chrono::steady_clock::now();
 
     while (!st.stop_requested()) {
+        const auto frequency = pCfg_->excitation.frequency;
+        const auto amplitude = pCfg_->excitation.amplitude;
         theta += angular_step * pCfg_->ringBuffer.dt;
         theta = std::fmod(theta, 2.0 * pCfg_->PI_);
 
-        static int ch_multi = 0;
-        for(int i=0; i < pCfg_->ringBuffer.ch.size() / N_MULTIPLEXER_CHANNEL; ++i){
-            int ch = i * N_MULTIPLEXER_CHANNEL + ch_multi;
+        for(int i=0; i < pCfg_->ringBuffer.chs.size() / N_MULTIPLEXER_CHANNEL; ++i){
+            int ch = i + pCfg_->ch_multi * N_DAQ_CHANNEL;
             for (size_t j = 0; j < times.size(); ++j) {
-                const double wt = 2.0 * pCfg_->PI_ * frequency * times[j] + ch*30.0/180.0*pCfg_->PI_;
-                pCfg_->rawData.ch[ch][j] = amplitude * std::sin(wt + theta);
+                const double wt = 2.0 * pCfg_->PI_ * frequency * times[j] - 360.0/(N_DAQ_CHANNEL*N_MULTIPLEXER_CHANNEL)*ch/180.0*pCfg_->PI_;
+                pCfg_->rawData.chs[ch][j] = amplitude * std::sin(wt + theta);
             }
         }
-        psd(pCfg_, ch_multi);
-        ch_multi++;
-        if(ch_multi >= N_MULTIPLEXER_CHANNEL) ch_multi = 0;
+
+        pCfg_->update();
 
         next_time += loop_period;
         std::this_thread::sleep_until(next_time);
