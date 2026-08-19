@@ -53,7 +53,7 @@ inline std::pair<double, double> Psd::calc(const double* inData){
     double xSum = 0.0;
     double ySum = 0.0;
     // TODO: ここに位相敏感検波のコードを入力
-    
+
     // ここまで
     return {xSum / N, ySum / N};
 }

@@ -50,6 +50,16 @@ public:
         double dt = RINGBUFFER_DT;
         std::vector<double> times;
         std::vector<ComplexData> chs;
+        int idxWrite = 0, idxCurrent = 0;;
+        void pop(const double xs[], const double ys[]){
+            for(int ch = 0; ch < chs.size(); ++ch){
+                chs[ch].xs[idxWrite] = xs[ch];
+                chs[ch].ys[idxWrite] = ys[ch];
+            }
+            idxCurrent = idxWrite;
+            idxWrite++;
+            if(idxWrite >= times.size()) {idxWrite = 0;}
+        }
     } ringBuffer;
 
     class FFTBuffer {
@@ -81,12 +91,15 @@ public:
         if(psd.frequency != excitation.frequency){
             psd.init(rawData.times.size(), excitation.frequency, rawData.dt);
         }
+        static double xs[N_DAQ_CHANNEL*N_MULTIPLEXER_CHANNEL];
+        static double ys[N_DAQ_CHANNEL*N_MULTIPLEXER_CHANNEL];
         for(int i=0; i < ringBuffer.chs.size() / N_MULTIPLEXER_CHANNEL; ++i){
             int ch = i + ch_multi * N_DAQ_CHANNEL;
             auto const [x, y] = psd.calc(rawData.chs[ch].data());
-            ringBuffer.chs[ch].xs[0] = x;
-            ringBuffer.chs[ch].ys[0] = y;
+            xs[ch] = x;
+            ys[ch] = y;
         }
+        ringBuffer.pop(xs, ys);
         ch_multi++;
         if(ch_multi >= N_MULTIPLEXER_CHANNEL) ch_multi = 0;
     }
