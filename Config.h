@@ -5,7 +5,7 @@
 #include <vector>
 #include <cmath>
 #include <chrono>
-#include <iostream>
+
 #define RAW_COUNT 10000
 #define RAW_RATE 100e6
 #define EXCITATION_FREQUENCY 100e3
