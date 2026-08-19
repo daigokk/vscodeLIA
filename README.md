@@ -35,18 +35,23 @@
 | --- |
 | 図2. 位相敏感検波のブロック図 |
 
-* [参考] 以下のコードは図2のブロック図を具現化したものです。`Daq.cpp`に記載の`psd`関数に以下を記述すると、プローブの状態に合わせてリアルタイムにXYウィンドウの輝点が移動します。
+* [参考] 以下のコードは図2のブロック図を具現化したものです。`Psd.h`に記載の`Psd::calc`関数に以下を記述すると、プローブの状態に合わせてリアルタイムにXYウィンドウの輝点が移動します。
 
 ```c++
-void psd(Config* pCfg){
-    double x_sum = 0, y_sum = 0;
-    for (size_t i = 0; i < pCfg->rawData.ch[0].size(); ++i) {
-        double wt = 2 * pCfg->PI_ * pCfg->excitation.frequency * pCfg->rawData.dt * i;
-        x_sum += pCfg->rawData.ch[0][i] * 2 * sin(wt);
-        y_sum += pCfg->rawData.ch[0][i] * 2 * cos(wt);
+inline std::pair<double, double> Psd::calc(const double* inData){
+    const size_t N = this->sampleCount;
+    const double DT = this->dt;
+    const double FREQ = this->frequency;
+    double xSum = 0.0;
+    double ySum = 0.0;
+    // TODO: ここに位相敏感検波のコードを入力
+    for (std::size_t i = 0; i < N; ++i) {
+        double wt = 2.0 * acos(-1) * FREQ * DT * i;
+        xSum += inData[i] * 2 * sin(wt);
+        ySum += inData[i] * 2 * cos(wt);
     }
-    pCfg->buffer.ch[0].xs[0] = x_sum / pCfg->rawData.ch[0].size();
-    pCfg->buffer.ch[0].ys[0] = y_sum / pCfg->rawData.ch[0].size();
+    // ここまで
+    return {xSum / N, ySum / N};
 }
 ```
 
@@ -216,8 +221,8 @@ DAQのドライバおよびSDKを取得するためにインストールしま�
 ---
 ## 6. 課題
 
-* `Daq.cpp`に記載の`psd`関数を完成させてください。
-* (オプション) `fft`関数を完成させ、FFTを使って同様の結果を得られることを確認してみてください。様々な条件においてどちらが優れているか比較してみるのもよいでしょう。入力波形を矩形波にすることで、高調波成分は正弦波の時より大きくなります。この方法の利点は、一度に複数の周波数成分を得られることです。
+* `Psd.h`に記載の`Psd::calc`関数を完成させてください。
+* (オプション) `Config.h`に記載の`fft`関数を完成させ、FFTを使ってPSDと同様の結果を得られることを確認してみてください。`fft`関数をどこから呼び出すかも考えてみてください。様々な条件においてどちらが優れているか比較してみるのもよいでしょう。入力波形を矩形波にすることで、高調波成分は正弦波の時より大きくなります。この方法の利点は、一度に複数の周波数成分を得られることです。
 ```c++
 void fft(Config* pCfg) {
     const auto& in_data = pCfg->rawData.ch[0];
