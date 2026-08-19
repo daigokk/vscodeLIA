@@ -47,8 +47,8 @@ inline std::pair<double, double> Psd::calc(const double* inData){
     // TODO: ここに位相敏感検波のコードを入力
     for (std::size_t i = 0; i < N; ++i) {
         double wt = 2.0 * acos(-1) * FREQ * DT * i;
-        xSum += inData[i] * sin(wt);
-        ySum += inData[i] * cos(wt);
+        xSum += inData[i] * 2 * sin(wt);
+        ySum += inData[i] * 2 * cos(wt);
     }
     // ここまで
     return {xSum / N, ySum / N};
