@@ -3,6 +3,7 @@
 #include "RawWindow.h"
 #include "XyWindow.h"
 #include "ControlWindow.h"
+#include "MultichannelWindow.h"
 #include "Config.h"
 #include "Daq.h"
 
@@ -24,7 +25,7 @@ int main() {
         RawWindow(cfg); // DAQが測定した波形を時間軸で表示する
         XyWindow(cfg); // 位相敏感検波した値を複素平面上に表示する
         ControlWindow(cfg, daq); // DAQの出力する波形(周波数、振幅)を制御する
-        
+
         if(!cfg.status.isRun){
             // DAQとの接続が切れたとき
             ImGui::SetNextWindowFocus();

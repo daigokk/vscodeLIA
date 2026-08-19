@@ -156,10 +156,10 @@ void Daq::stop() {
 void Daq::run(std::stop_token st) {
     try{
         pCfg_->status.isRun = true;
-        auto next_time = std::chrono::steady_clock::now();
         const auto loop_period = std::chrono::duration_cast<std::chrono::steady_clock::duration>(
             std::chrono::duration<double>(pCfg_->ringBuffer.dt));
-
+        
+        auto next_time = std::chrono::steady_clock::now();
         while (!st.stop_requested()) {
             STS sts;
             do {
@@ -201,7 +201,6 @@ void Daq::runWithoutDaq(std::stop_token st) {
     const auto& times = pCfg_->rawData.times;
     
     auto next_time = std::chrono::steady_clock::now();
-
     while (!st.stop_requested()) {
         const auto frequency = pCfg_->excitation.frequency;
         const auto amplitude = pCfg_->excitation.amplitude;
