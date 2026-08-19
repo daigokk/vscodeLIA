@@ -11,7 +11,7 @@
 #define RINGBUFFER_DT 2e-3 // 2ms
 #define RINGBUFFER_SIZE 1
 #define N_DAQ_CHANNEL 2
-#define N_MULTIPLEXER_CHANNEL 8
+#define N_MULTIPLEXER_CHANNEL 1
 #define N_HARMONICS 5
 
 
