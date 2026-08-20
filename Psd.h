@@ -57,7 +57,7 @@ inline std::pair<double, double> Psd::calc(const double* inData){
     // ここまで
     return {xSum / N, ySum / N};
 }
-/*
+/*/
 inline std::pair<double, double> Psd::calc(const double* inData){
     double xSum = 0.0;
     double ySum = 0.0;
@@ -70,7 +70,7 @@ inline std::pair<double, double> Psd::calc(const double* inData){
     }
     return {xSum * inverseSampleCount, ySum * inverseSampleCount};
 }
-*/
+/*/
 inline std::pair<double, double> Psd::rotate(const double phase_deg, const double* pInX, const double* pInY){
     const double theta = phase_deg * (std::acos(-1.0) / 180.0);
     const double sin_t = std::sin(theta);

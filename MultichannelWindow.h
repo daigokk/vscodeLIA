@@ -9,10 +9,11 @@
 // マルチプレクサ対応
 void MultichannelWindow(Config& cfg) {
     if(ImGui::Begin("Multi channel plot")){
-        ImPlot::PushColormap(ImPlotColormap_Jet);
         static double scale_limit = 1;
-        if (ImPlot::BeginPlot("##Contour Plot")) {
+        ImPlot::PushColormap(ImPlotColormap_Jet);
+        if (ImPlot::BeginPlot("##Contour Plot", ImVec2(ImGui::GetWindowWidth()-100, -1))) {
 			
+            // 全チャンネルのy成分をコンター表示
             ImPlot::PlotHeatmap(
                 "##heatmap",
                 cfg.ringBuffer.matrix.data(),
@@ -21,18 +22,16 @@ void MultichannelWindow(Config& cfg) {
                 -scale_limit, scale_limit, nullptr, ImPlotPoint(0, 0),
                 ImPlotPoint(cfg.ringBuffer.scheduleTime[cfg.ringBuffer.scheduleTime.size()-1], cfg.ringBuffer.chs.size())
             );
-            
+            // 現在値を示す縦線
             const double t = cfg.ringBuffer.scheduleTime[cfg.ringBuffer.idxCurrent];
             const ImPlotRect limits = ImPlot::GetPlotLimits();
             const double x_line[] = { t, t }, y_line[] = {limits.Y.Min, limits.Y.Max};
-            ImPlot::PlotLine("##vline", x_line, y_line, 2);
+            ImPlot::PlotLine("##Time line", x_line, y_line, 2);
             ImPlot::EndPlot();
 		}
         ImGui::SameLine();
-        ImPlot::ColormapScale("Scale", -scale_limit, scale_limit, ImVec2(60, -1), "%g");
+        ImPlot::ColormapScale("y (V)", -scale_limit, scale_limit, ImVec2(75, -1), "%g");
         ImPlot::PopColormap();
     }
     ImGui::End();
 }
-
-

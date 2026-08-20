@@ -11,7 +11,7 @@
 #define EXCITATION_FREQUENCY 100e3
 #define EXCITATION_AMPLITUDE 1.0
 #define RINGBUFFER_DT 2e-3 // 2ms
-#define RINGBUFFER_SIZE 10000
+#define RINGBUFFER_SIZE 1000
 #define N_DAQ_CHANNEL 2
 #define N_MULTIPLEXER_CHANNEL 1
 #define N_HARMONICS 5
@@ -23,6 +23,7 @@ public:
     const double PI_ = std::acos(-1.0);
     int ch_multi = 0;
     Psd psd;
+    
     class Excitation {
     public:
         float frequency = EXCITATION_FREQUENCY;
@@ -37,36 +38,51 @@ public:
 
     class RawData {
     public:
-        double dt = 1.0 / RAW_RATE;
+        double dt = 0;
         std::vector<double> times;
         std::vector<std::vector<double>> chs;
+        void init(const double newDt, const int raw_count, const int n_channel) {
+            dt = newDt;
+            times.resize(raw_count);
+            chs.resize(n_channel);
+            for(int i=0; i < chs.size(); i++){
+                chs[i].resize(raw_count);
+            }
+            for (int i = 0; i < times.size(); i++) {
+                times[i] = static_cast<double>(i) * dt;
+            }
+        }
     } rawData;
 
-    class ComplexData {
-    public:
-        std::vector<double> xs, ys;
-    };
-    
     class RingBuffer {
+    private:
+        class ComplexData {
+        public:
+            std::vector<double> xs, ys;
+        };
     public:
-        double dt = RINGBUFFER_DT;
+        double dt = 0;
+        int idxWrite = 0, idxCurrent = 0;
         std::vector<double> times, scheduleTime;
         std::vector<ComplexData> chs;
         std::vector<double> matrix;
-        int idxWrite = 0, idxCurrent = 0;
-        void init(const int n_channel = N_DAQ_CHANNEL * N_MULTIPLEXER_CHANNEL){
-            times.resize(RINGBUFFER_SIZE);
-            scheduleTime.resize(RINGBUFFER_SIZE);
+        
+        void init(const double newDt, const int ringbuffer_size, const int n_channel){
+            dt = newDt;
+            idxWrite = 0; idxCurrent = 0;
+            times.resize(ringbuffer_size);
+            scheduleTime.resize(ringbuffer_size);
             for (int i = 0; i < scheduleTime.size(); ++i){
                 scheduleTime[i] = i * dt * n_channel;
             }
             chs.resize(n_channel);
-            matrix.resize(n_channel * RINGBUFFER_SIZE);
+            matrix.resize(n_channel * ringbuffer_size);
             for(int i=0; i < chs.size(); ++i){
-                chs[i].xs.resize(RINGBUFFER_SIZE, 0);
-                chs[i].ys.resize(RINGBUFFER_SIZE, 0);
+                chs[i].xs.resize(ringbuffer_size, 0);
+                chs[i].ys.resize(ringbuffer_size, 0);
             }
         }
+        
         void pop(const double xs[], const double ys[]){
             static std::chrono::steady_clock::time_point start_time = std::chrono::steady_clock::now();
             times[idxWrite] = std::chrono::duration<double>(
@@ -89,20 +105,7 @@ public:
         std::vector<double> numHarmonics_x, numHarmonics_y;
     } fftBuffer;
     
-    void RawInit(const int raw_count, const int n_channel = N_DAQ_CHANNEL * N_MULTIPLEXER_CHANNEL) {
-        rawData.times.resize(raw_count);
-        rawData.chs.resize(n_channel);
-        for(int i=0; i < rawData.chs.size(); i++){
-            rawData.chs[i].resize(raw_count);
-        }
-        double wdt = 2.0 * PI_ * excitation.frequency * rawData.dt;
-        for (int i = 0; i < rawData.times.size(); i++) {
-            rawData.times[i] = static_cast<double>(i) * rawData.dt;
-        }
-    }
-    
     void update(){
-        static double t = 0;
         if(psd.frequency != excitation.frequency){
             psd.init(rawData.times.size(), excitation.frequency, rawData.dt);
         }
@@ -121,12 +124,16 @@ public:
         }
     }
 
-    explicit Config() {
-        RawInit(RAW_COUNT);
-        ringBuffer.init();
+    void init(){
+        rawData.init(1.0 / RAW_RATE, RAW_COUNT, N_DAQ_CHANNEL * N_MULTIPLEXER_CHANNEL);
+        ringBuffer.init(RINGBUFFER_DT, RINGBUFFER_SIZE, N_DAQ_CHANNEL * N_MULTIPLEXER_CHANNEL);
         fftBuffer.numHarmonics_x.resize(N_HARMONICS);
         fftBuffer.numHarmonics_y.resize(N_HARMONICS);
         psd.init(rawData.times.size(), excitation.frequency, rawData.dt);
+    }
+
+    explicit Config() {
+        init();
     }
     Config(const Config&) = delete;
     Config& operator=(const Config&) = delete;

@@ -19,7 +19,7 @@ Daq::Daq(Config* cfg) : pCfg_(cfg) {
         printDeviceInfo();
         if(pCfg_->rawData.times.size() > buffer_size){
             std::cout << "Raw buffer size: " << pCfg_->rawData.times.size() << " => " << buffer_size << std::endl;
-            pCfg_->RawInit(buffer_size);
+            pCfg_->rawData.init(pCfg_->rawData.dt, buffer_size, pCfg_->rawData.chs.size());
         }
         dio.set_mode(device_data, 0xffff);
         dio.set_state(device_data, pCfg_->ch_multi);
