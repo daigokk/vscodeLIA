@@ -21,18 +21,19 @@ int main() {
     
     while (!glfwWindowShouldClose(window)) {
         Gui::BeginFrame(window);
-
         RawWindow(cfg); // DAQが測定した波形を時間軸で表示する
         XyWindow(cfg); // 位相敏感検波した値を複素平面上に表示する
         ControlWindow(cfg, daq); // DAQの出力する波形(周波数、振幅)を制御する
-
+        
         if(!cfg.status.isRun){
             // DAQとの接続が切れたとき
             ImGui::SetNextWindowFocus();
+            ImGui::PushStyleColor(ImGuiCol_::ImGuiCol_Border, ImVec4(1.0f, 0.0f, 0.0f, 1.0f)); // 赤
             if(ImGui::Begin("Error", nullptr, ImGuiWindowFlags_NoSavedSettings)){
                 ImGui::Text("Daq got disconnected. Please restart this program.");
             }
             ImGui::End();
+            ImGui::PopStyleColor();
         }
         Gui::EndFrame(window);
     }
