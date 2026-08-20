@@ -72,7 +72,7 @@ inline std::pair<double, double> Psd::calc(const double* inData){
 }
 /*/
 inline std::pair<double, double> Psd::rotate(const double phase_deg, const double* pInX, const double* pInY){
-    const double theta = phase_deg * (std::acos(-1.0) / 180.0);
+    const double theta = phase_deg * (PI / 180.0);
     const double sin_t = std::sin(theta);
     const double cos_t = std::cos(theta);
     

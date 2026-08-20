@@ -30,18 +30,18 @@ public:
 
     class RawData {
     public:
-        double dt = 0;
+        double rawDt = 0;
         std::vector<double> times;
         std::vector<std::vector<double>> chs;
         void init(const double newDt, const int raw_count, const int n_channel) {
-            dt = newDt;
+            rawDt = newDt;
             times.resize(raw_count);
             chs.resize(n_channel);
             for(int i=0; i < chs.size(); i++){
                 chs[i].resize(raw_count);
             }
             for (int i = 0; i < times.size(); i++) {
-                times[i] = static_cast<double>(i) * dt;
+                times[i] = static_cast<double>(i) * rawDt;
             }
         }
     } rawData;
@@ -67,7 +67,7 @@ public:
         Excitation excitation;
         Psd psd;
 
-        void init(const double newDt, const int ringbuffer_size, const int n_channel){
+        void init(const double rawDt, const double newDt, const int ringbuffer_size, const int n_channel){
             dt = newDt;
             idxWrite = 0; idxCurrent = 0;
             times.resize(ringbuffer_size);
@@ -81,7 +81,7 @@ public:
                 chs[i].xs.resize(ringbuffer_size, 0);
                 chs[i].ys.resize(ringbuffer_size, 0);
             }
-            psd.init(times.size(), excitation.frequency, dt);
+            psd.init(ringbuffer_size, excitation.frequency, rawDt);
         }
         
         void pop(const double xs[], const double ys[]){
@@ -100,9 +100,9 @@ public:
             if(idxWrite >= times.size()) {idxWrite = 0;}
         }
 
-        void update(std::vector<std::vector<double>>& rawChs){
+        void update(const std::vector<std::vector<double>>& rawChs, const double rawDt){
             if(psd.frequency != excitation.frequency){
-                psd.init(times.size(), excitation.frequency, dt);
+                psd.init(times.size(), excitation.frequency, rawDt);
             }
             static double xs[N_DAQ_CHANNEL*N_MULTIPLEXER_CHANNEL];
             static double ys[N_DAQ_CHANNEL*N_MULTIPLEXER_CHANNEL];
@@ -127,7 +127,7 @@ public:
 
     void init(){
         rawData.init(1.0 / RAW_RATE, RAW_COUNT, N_DAQ_CHANNEL * N_MULTIPLEXER_CHANNEL);
-        ringBuffer.init(RINGBUFFER_DT, RINGBUFFER_SIZE, N_DAQ_CHANNEL * N_MULTIPLEXER_CHANNEL);
+        ringBuffer.init(rawData.rawDt, RINGBUFFER_DT, RINGBUFFER_SIZE, N_DAQ_CHANNEL * N_MULTIPLEXER_CHANNEL);
         fftBuffer.numHarmonics_x.resize(N_HARMONICS);
         fftBuffer.numHarmonics_y.resize(N_HARMONICS);
     }
