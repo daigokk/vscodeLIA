@@ -22,9 +22,9 @@ Daq::Daq(Config* cfg) : pCfg_(cfg) {
             pCfg_->rawData.init(pCfg_->rawData.dt, buffer_size, pCfg_->rawData.chs.size());
         }
         dio.set_mode(device_data, 0xffff);
-        dio.set_state(device_data, pCfg_->ch_multi);
+        dio.set_state(device_data, pCfg_->ringBuffer.ch_multi);
         supplies();
-        wavegen(pCfg_->excitation.frequency, pCfg_->excitation.amplitude);
+        wavegen(pCfg_->ringBuffer.excitation.frequency, pCfg_->ringBuffer.excitation.amplitude);
         scope.run(device_data, 1.0 / pCfg_->rawData.dt, static_cast<int>(pCfg_->rawData.times.size()), 0.0, 5.0);
     }
     catch (const Dwf::Error& error) {
@@ -169,13 +169,13 @@ void Daq::run(std::stop_token st) {
             } while (sts != stsDone);
             
             for(int i=0; i < pCfg_->ringBuffer.chs.size() / N_MULTIPLEXER_CHANNEL; ++i){
-                int ch = i + pCfg_->ch_multi * N_DAQ_CHANNEL;
+                int ch = i + pCfg_->ringBuffer.ch_multi * N_DAQ_CHANNEL;
                 FDwfAnalogInStatusData(device_data->handle, i, pCfg_->rawData.chs[ch].data(), pCfg_->rawData.chs[ch].size());
             }
             
-            pCfg_->update();
+            pCfg_->ringBuffer.update(pCfg_->rawData.chs);
             // マルチプレクサのチャンネル更新
-            dio.set_state(device_data, pCfg_->ch_multi);
+            dio.set_state(device_data, pCfg_->ringBuffer.ch_multi);
             next_time += loop_period;
             std::this_thread::sleep_until(next_time);
         }
@@ -202,20 +202,20 @@ void Daq::runWithoutDaq(std::stop_token st) {
     
     auto next_time = std::chrono::steady_clock::now();
     while (!st.stop_requested()) {
-        const auto frequency = pCfg_->excitation.frequency;
-        const auto amplitude = pCfg_->excitation.amplitude;
+        const auto frequency = pCfg_->ringBuffer.excitation.frequency;
+        const auto amplitude = pCfg_->ringBuffer.excitation.amplitude;
         theta += angular_step * pCfg_->ringBuffer.dt;
         theta = std::fmod(theta, 2.0 * pCfg_->PI_);
 
         for(int i=0; i < pCfg_->ringBuffer.chs.size() / N_MULTIPLEXER_CHANNEL; ++i){
-            int ch = i + pCfg_->ch_multi * N_DAQ_CHANNEL;
+            int ch = i + pCfg_->ringBuffer.ch_multi * N_DAQ_CHANNEL;
             for (size_t j = 0; j < times.size(); ++j) {
                 const double wt = 2.0 * pCfg_->PI_ * frequency * times[j] - 360.0/(N_DAQ_CHANNEL*N_MULTIPLEXER_CHANNEL)*ch/180.0*pCfg_->PI_;
                 pCfg_->rawData.chs[ch][j] = amplitude * std::sin(wt + theta);
             }
         }
 
-        pCfg_->update();
+        pCfg_->ringBuffer.update(pCfg_->rawData.chs);
 
         next_time += loop_period;
         std::this_thread::sleep_until(next_time);

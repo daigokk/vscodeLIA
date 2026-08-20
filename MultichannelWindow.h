@@ -12,7 +12,8 @@ void MultichannelWindow(Config& cfg) {
         static double scale_limit = 1;
         ImPlot::PushColormap(ImPlotColormap_Jet);
         if (ImPlot::BeginPlot("##Contour Plot", ImVec2(ImGui::GetWindowWidth()-100, -1))) {
-			
+			ImPlot::SetupAxis(ImAxis_X1, "Time (s)");
+            ImPlot::SetupAxis(ImAxis_Y1, "Ch");
             // 全チャンネルのy成分をコンター表示
             ImPlot::PlotHeatmap(
                 "##heatmap",

@@ -21,15 +21,7 @@
 class Config{
 public:
     const double PI_ = std::acos(-1.0);
-    int ch_multi = 0;
-    Psd psd;
     
-    class Excitation {
-    public:
-        float frequency = EXCITATION_FREQUENCY;
-        float amplitude = EXCITATION_AMPLITUDE;
-    } excitation;
-
     class Status {
     public:
         bool isRun = false;
@@ -60,13 +52,21 @@ public:
         public:
             std::vector<double> xs, ys;
         };
+        class Excitation {
+        public:
+            float frequency = EXCITATION_FREQUENCY;
+            float amplitude = EXCITATION_AMPLITUDE;
+        };
     public:
         double dt = 0;
         int idxWrite = 0, idxCurrent = 0;
+        int ch_multi = 0;
         std::vector<double> times, scheduleTime;
         std::vector<ComplexData> chs;
         std::vector<double> matrix;
-        
+        Excitation excitation;
+        Psd psd;
+
         void init(const double newDt, const int ringbuffer_size, const int n_channel){
             dt = newDt;
             idxWrite = 0; idxCurrent = 0;
@@ -81,6 +81,7 @@ public:
                 chs[i].xs.resize(ringbuffer_size, 0);
                 chs[i].ys.resize(ringbuffer_size, 0);
             }
+            psd.init(times.size(), excitation.frequency, dt);
         }
         
         void pop(const double xs[], const double ys[]){
@@ -98,38 +99,37 @@ public:
             idxWrite++;
             if(idxWrite >= times.size()) {idxWrite = 0;}
         }
+
+        void update(std::vector<std::vector<double>>& rawChs){
+            if(psd.frequency != excitation.frequency){
+                psd.init(times.size(), excitation.frequency, dt);
+            }
+            static double xs[N_DAQ_CHANNEL*N_MULTIPLEXER_CHANNEL];
+            static double ys[N_DAQ_CHANNEL*N_MULTIPLEXER_CHANNEL];
+            for(int i = 0; i < chs.size() / N_MULTIPLEXER_CHANNEL; ++i){
+                const int ch = i + ch_multi * N_DAQ_CHANNEL;
+                auto const [x, y] = psd.calc(rawChs[ch].data());
+                xs[ch] = x;
+                ys[ch] = y;
+            }
+            ch_multi++;
+            if(ch_multi >= N_MULTIPLEXER_CHANNEL){
+                pop(xs, ys);
+                ch_multi = 0;
+            }
+        }
     } ringBuffer;
 
     class FFTBuffer {
     public:
         std::vector<double> numHarmonics_x, numHarmonics_y;
     } fftBuffer;
-    
-    void update(){
-        if(psd.frequency != excitation.frequency){
-            psd.init(rawData.times.size(), excitation.frequency, rawData.dt);
-        }
-        static double xs[N_DAQ_CHANNEL*N_MULTIPLEXER_CHANNEL];
-        static double ys[N_DAQ_CHANNEL*N_MULTIPLEXER_CHANNEL];
-        for(int i = 0; i < ringBuffer.chs.size() / N_MULTIPLEXER_CHANNEL; ++i){
-            const int ch = i + ch_multi * N_DAQ_CHANNEL;
-            auto const [x, y] = psd.calc(rawData.chs[ch].data());
-            xs[ch] = x;
-            ys[ch] = y;
-        }
-        ch_multi++;
-        if(ch_multi >= N_MULTIPLEXER_CHANNEL){
-            ringBuffer.pop(xs, ys);
-            ch_multi = 0;
-        }
-    }
 
     void init(){
         rawData.init(1.0 / RAW_RATE, RAW_COUNT, N_DAQ_CHANNEL * N_MULTIPLEXER_CHANNEL);
         ringBuffer.init(RINGBUFFER_DT, RINGBUFFER_SIZE, N_DAQ_CHANNEL * N_MULTIPLEXER_CHANNEL);
         fftBuffer.numHarmonics_x.resize(N_HARMONICS);
         fftBuffer.numHarmonics_y.resize(N_HARMONICS);
-        psd.init(rawData.times.size(), excitation.frequency, rawData.dt);
     }
 
     explicit Config() {

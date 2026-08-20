@@ -10,16 +10,16 @@
 void ControlWindow(Config& cfg, Daq& daq) {
     if(ImGui::Begin("Control")){
         ImGui::Text("%s", cfg.status.deviceSerial.c_str());
-        if(ImGui::SliderFloat("Frequency", &cfg.excitation.frequency, 1e3f, 100e3f)) {
-            if(daq.device_data) daq.wavegen(cfg.excitation.frequency, cfg.excitation.amplitude);
+        if(ImGui::SliderFloat("Frequency", &cfg.ringBuffer.excitation.frequency, 1e3f, 100e3f)) {
+            if(daq.device_data) daq.wavegen(cfg.ringBuffer.excitation.frequency, cfg.ringBuffer.excitation.amplitude);
         }
-        if(ImGui::SliderFloat("Amplitude", &cfg.excitation.amplitude, 0.0f, 5.0f)) {    
-            if(daq.device_data) daq.wavegen(cfg.excitation.frequency, cfg.excitation.amplitude);
+        if(ImGui::SliderFloat("Amplitude", &cfg.ringBuffer.excitation.amplitude, 0.0f, 5.0f)) {    
+            if(daq.device_data) daq.wavegen(cfg.ringBuffer.excitation.frequency, cfg.ringBuffer.excitation.amplitude);
         }
         if(ImGui::Button("Defaults")) {
-            cfg.excitation.frequency = 100e3f;
-            cfg.excitation.amplitude = 1.0f;
-            if(daq.device_data) daq.wavegen(cfg.excitation.frequency, cfg.excitation.amplitude);
+            cfg.ringBuffer.excitation.frequency = 100e3f;
+            cfg.ringBuffer.excitation.amplitude = 1.0f;
+            if(daq.device_data) daq.wavegen(cfg.ringBuffer.excitation.frequency, cfg.ringBuffer.excitation.amplitude);
         }
     }
     ImGui::End();
