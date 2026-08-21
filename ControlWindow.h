@@ -34,6 +34,17 @@ void ControlWindow(Config& cfg, Daq& daq) {
             cfg.ringBuffer.excitation.amplitude = 1.0f;
             if(daq.device_data) daq.wavegen(cfg.ringBuffer.excitation.frequency, cfg.ringBuffer.excitation.amplitude);
         }
+        ImGui::Separator();
+        if(ImGui::Button("Auto offset")) {
+            cfg.ringBuffer.offsets.flag = true;
+        }
+        ImGui::SameLine();
+        if(ImGui::Button("Off")) {
+            for(int ch = 0; ch < cfg.ringBuffer.offsets.chs.size(); ++ch){
+                cfg.ringBuffer.offsets.chs[ch].real(0);
+                cfg.ringBuffer.offsets.chs[ch].imag(0);
+            }
+        }
     }
     ImGui::End();
     if(!cfg.status.isRun){

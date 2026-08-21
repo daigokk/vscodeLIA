@@ -3,17 +3,18 @@
 #include <pocketfft_hdronly.h>
 
 #include <vector>
+#include <complex>
 #include <cmath>
 #include <chrono>
 
 #define RAW_COUNT 10000
 #define RAW_RATE 100e6
-#define EXCITATION_FREQUENCY 100e3
+#define EXCITATION_FREQUENCY 10e3
 #define EXCITATION_AMPLITUDE 1.0
 #define RINGBUFFER_DT 2e-3 // 2ms
 #define RINGBUFFER_SIZE 1000
 #define N_DAQ_CHANNEL 2
-#define N_MULTIPLEXER_CHANNEL 1
+#define N_MULTIPLEXER_CHANNEL 8
 #define N_HARMONICS 5
 
 
@@ -48,9 +49,14 @@ public:
 
     class RingBuffer {
     private:
-        class ComplexData {
+        class ComplexVector {
         public:
             std::vector<double> xs, ys;
+        };
+        class Offsets {
+        public:
+            std::vector<std::complex<float>> chs;
+            bool flag = false;
         };
         class Excitation {
         public:
@@ -62,12 +68,13 @@ public:
         int idxWrite = 0, idxCurrent = 0;
         int ch_multi = 0;
         std::vector<double> times, scheduleTime;
-        std::vector<ComplexData> chs;
+        std::vector<ComplexVector> chs;
         std::vector<double> matrix;
+        Offsets offsets;
         Excitation excitation;
         Psd psd;
 
-        void init(const double rawDt, const double newDt, const int ringbuffer_size, const int n_channel){
+        void init(const double rawSize, const double rawDt, const double newDt, const int ringbuffer_size, const int n_channel){
             dt = newDt;
             idxWrite = 0; idxCurrent = 0;
             times.resize(ringbuffer_size);
@@ -76,12 +83,13 @@ public:
                 scheduleTime[i] = i * dt * n_channel;
             }
             chs.resize(n_channel);
-            matrix.resize(n_channel * ringbuffer_size);
             for(int i=0; i < chs.size(); ++i){
                 chs[i].xs.resize(ringbuffer_size, 0);
                 chs[i].ys.resize(ringbuffer_size, 0);
             }
-            psd.init(ringbuffer_size, excitation.frequency, rawDt);
+            matrix.resize(n_channel * ringbuffer_size);
+            offsets.chs.resize(n_channel, 0);
+            psd.init(rawSize, excitation.frequency, rawDt);
         }
         
         void pop(const double xs[], const double ys[]){
@@ -89,9 +97,16 @@ public:
             times[idxWrite] = std::chrono::duration<double>(
                 std::chrono::steady_clock::now() - start_time
             ).count();
+            if (offsets.flag){
+                for(int ch = 0; ch < chs.size(); ++ch){
+                    offsets.chs[ch].real(xs[ch]);
+                    offsets.chs[ch].imag(ys[ch]);
+                }
+                offsets.flag = false;
+            }
             for(int ch = 0; ch < chs.size(); ++ch){
-                chs[ch].xs[idxWrite] = xs[ch];
-                chs[ch].ys[idxWrite] = ys[ch];
+                chs[ch].xs[idxWrite] = xs[ch] - offsets.chs[ch].real();
+                chs[ch].ys[idxWrite] = ys[ch] - offsets.chs[ch].imag();
                 const int idx = ch * times.size() + idxWrite;
                 matrix[idx] = ys[ch];
             }
@@ -102,7 +117,7 @@ public:
 
         void update(const std::vector<std::vector<double>>& rawChs, const double rawDt){
             if(psd.frequency != excitation.frequency){
-                psd.init(times.size(), excitation.frequency, rawDt);
+                psd.init(rawChs[0].size(), excitation.frequency, rawDt);
             }
             static double xs[N_DAQ_CHANNEL*N_MULTIPLEXER_CHANNEL];
             static double ys[N_DAQ_CHANNEL*N_MULTIPLEXER_CHANNEL];
@@ -127,7 +142,7 @@ public:
 
     void init(){
         rawData.init(1.0 / RAW_RATE, RAW_COUNT, N_DAQ_CHANNEL * N_MULTIPLEXER_CHANNEL);
-        ringBuffer.init(rawData.rawDt, RINGBUFFER_DT, RINGBUFFER_SIZE, N_DAQ_CHANNEL * N_MULTIPLEXER_CHANNEL);
+        ringBuffer.init(rawData.times.size(), rawData.rawDt, RINGBUFFER_DT, RINGBUFFER_SIZE, N_DAQ_CHANNEL * N_MULTIPLEXER_CHANNEL);
         fftBuffer.numHarmonics_x.resize(N_HARMONICS);
         fftBuffer.numHarmonics_y.resize(N_HARMONICS);
     }

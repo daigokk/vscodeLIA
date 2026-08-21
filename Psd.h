@@ -33,8 +33,8 @@ inline void Psd::init(const int N, const double newFrequency, const double newDt
     sampleCount = N;
 
     // 積分範囲`sampleCount`を半周期の整数倍とする
-    // const size_t halfPeriodSamples = static_cast<size_t>(0.5 / (frequency * dt));
-    // sampleCount = halfPeriodSamples * (N / halfPeriodSamples);
+    const size_t halfPeriodSamples = static_cast<size_t>(0.5 / (frequency * dt));
+    sampleCount = halfPeriodSamples * (N / halfPeriodSamples);
     
     inverseSampleCount = 1.0 / static_cast<double>(sampleCount);
 
