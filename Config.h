@@ -56,6 +56,7 @@ public:
         class Offsets {
         public:
             std::vector<std::complex<float>> chs;
+            std::vector<float> phases_deg;
             bool flag = false;
         };
         class Excitation {
@@ -89,6 +90,7 @@ public:
             }
             matrix.resize(n_channel * ringbuffer_size);
             offsets.chs.resize(n_channel, 0);
+            offsets.phases_deg.resize(n_channel, 0);
             psd.init(rawSize, excitation.frequency, rawDt);
         }
         
@@ -105,10 +107,15 @@ public:
                 offsets.flag = false;
             }
             for(int ch = 0; ch < chs.size(); ++ch){
-                chs[ch].xs[idxWrite] = xs[ch] - offsets.chs[ch].real();
-                chs[ch].ys[idxWrite] = ys[ch] - offsets.chs[ch].imag();
+                auto [x, y] = psd.rotate(
+                    offsets.phases_deg[ch],
+                    xs[ch] - offsets.chs[ch].real(),
+                    ys[ch] - offsets.chs[ch].imag()
+                );
+                chs[ch].xs[idxWrite] = x;
+                chs[ch].ys[idxWrite] = y;
                 const int idx = ch * times.size() + idxWrite;
-                matrix[idx] = ys[ch];
+                matrix[idx] = chs[ch].ys[idxWrite];
             }
             idxCurrent = idxWrite;
             idxWrite++;

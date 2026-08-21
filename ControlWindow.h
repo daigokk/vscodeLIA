@@ -23,28 +23,50 @@ void ControlWindow(Config& cfg, Daq& daq) {
         else{
             ImGui::Text("%s", cfg.status.deviceSerial.c_str());
         }
-        if(ImGui::SliderFloat("Frequency", &cfg.ringBuffer.excitation.frequency, 1e3f, 100e3f)) {
-            if(daq.device_data) daq.wavegen(cfg.ringBuffer.excitation.frequency, cfg.ringBuffer.excitation.amplitude);
-        }
-        if(ImGui::SliderFloat("Amplitude", &cfg.ringBuffer.excitation.amplitude, 0.0f, 5.0f)) {    
-            if(daq.device_data) daq.wavegen(cfg.ringBuffer.excitation.frequency, cfg.ringBuffer.excitation.amplitude);
-        }
-        if(ImGui::Button("Defaults")) {
-            cfg.ringBuffer.excitation.frequency = 100e3f;
-            cfg.ringBuffer.excitation.amplitude = 1.0f;
-            if(daq.device_data) daq.wavegen(cfg.ringBuffer.excitation.frequency, cfg.ringBuffer.excitation.amplitude);
+        ImGui::Separator();
+        if(ImGui::BeginTabBar("Wavegen")){
+            if(ImGui::BeginTabItem("W1")){
+                if(ImGui::SliderFloat("Frequency", &cfg.ringBuffer.excitation.frequency, 10e3f, 100e3f)) {
+                    if(daq.device_data) daq.wavegen(cfg.ringBuffer.excitation.frequency, cfg.ringBuffer.excitation.amplitude);
+                }
+                if(ImGui::SliderFloat("Amplitude", &cfg.ringBuffer.excitation.amplitude, 0.1f, 5.0f)) {    
+                    if(daq.device_data) daq.wavegen(cfg.ringBuffer.excitation.frequency, cfg.ringBuffer.excitation.amplitude);
+                }
+                if(ImGui::Button("Defaults")) {
+                    cfg.ringBuffer.excitation.frequency = EXCITATION_FREQUENCY;
+                    cfg.ringBuffer.excitation.amplitude = EXCITATION_AMPLITUDE;
+                    if(daq.device_data) daq.wavegen(cfg.ringBuffer.excitation.frequency, cfg.ringBuffer.excitation.amplitude);
+                }
+                ImGui::EndTabItem();
+            }
+            ImGui::EndTabBar();
         }
         ImGui::Separator();
-        if(ImGui::Button("Auto offset")) {
-            cfg.ringBuffer.offsets.flag = true;
-        }
-        ImGui::SameLine();
-        if(ImGui::Button("Off")) {
-            for(int ch = 0; ch < cfg.ringBuffer.offsets.chs.size(); ++ch){
-                cfg.ringBuffer.offsets.chs[ch].real(0);
-                cfg.ringBuffer.offsets.chs[ch].imag(0);
+        if(ImGui::BeginTabBar("Settings")){
+            if(ImGui::BeginTabItem("Offset")){
+                if(ImGui::Button("Auto offset")) {
+                    cfg.ringBuffer.offsets.flag = true;
+                }
+                ImGui::SameLine();
+                if(ImGui::Button("Off")) {
+                    for(int ch = 0; ch < cfg.ringBuffer.offsets.chs.size(); ++ch){
+                        cfg.ringBuffer.offsets.chs[ch].real(0);
+                        cfg.ringBuffer.offsets.chs[ch].imag(0);
+                    }
+                }
+                if (ImGui::TreeNode("Phase (Deg.)")) {
+                    for(int ch = 0; ch < cfg.ringBuffer.offsets.phases_deg.size(); ++ch) {
+                        if(ImGui::InputFloat(std::format("Ch{}", ch+1).c_str(), &cfg.ringBuffer.offsets.phases_deg[ch], 0.0f, 0.0f, "%.0f")) {
+                            
+                        }
+                    }
+                    ImGui::TreePop();
+                }
+                ImGui::EndTabItem();
             }
+            ImGui::EndTabBar();
         }
+        ImGui::Separator();
     }
     ImGui::End();
     if(!cfg.status.isRun){
