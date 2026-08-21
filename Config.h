@@ -15,7 +15,7 @@
 #define N_MULTIPLEXER_CHANNEL 8
 #define N_HARMONICS 5
 #define RINGBUFFER_DT 2e-3 // 2ms
-#define RINGBUFFER_SIZE (60 / RINGBUFFER_DT / N_MULTIPLEXER_CHANNEL) // 60s
+#define RINGBUFFER_SIZE (10 / RINGBUFFER_DT / N_MULTIPLEXER_CHANNEL) // 10s
 
 // 測定に関する設定および測定値を保存するクラス
 class Config{
