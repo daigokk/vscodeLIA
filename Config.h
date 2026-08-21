@@ -11,12 +11,11 @@
 #define RAW_RATE 100e6
 #define EXCITATION_FREQUENCY 10e3
 #define EXCITATION_AMPLITUDE 1.0
-#define RINGBUFFER_DT 2e-3 // 2ms
-#define RINGBUFFER_SIZE 1000
 #define N_DAQ_CHANNEL 2
 #define N_MULTIPLEXER_CHANNEL 8
 #define N_HARMONICS 5
-
+#define RINGBUFFER_DT 2e-3 // 2ms
+#define RINGBUFFER_SIZE (60 / RINGBUFFER_DT / N_MULTIPLEXER_CHANNEL)
 
 // 測定に関する設定および測定値を保存するクラス
 class Config{
@@ -75,22 +74,22 @@ public:
         Excitation excitation;
         Psd psd;
 
-        void init(const double rawSize, const double rawDt, const double newDt, const int ringbuffer_size, const int n_channel){
+        void init(const double rawSize, const double rawDt, const double newDt, const int ringbuffer_size, const int n_daq_channel, const int n_multiplexer_channel){
             dt = newDt;
             idxWrite = 0; idxCurrent = 0;
             times.resize(ringbuffer_size);
             scheduleTime.resize(ringbuffer_size);
             for (int i = 0; i < scheduleTime.size(); ++i){
-                scheduleTime[i] = i * dt * n_channel;
+                scheduleTime[i] = i * dt * n_multiplexer_channel;
             }
-            chs.resize(n_channel);
+            chs.resize(n_daq_channel * n_multiplexer_channel);
             for(int i=0; i < chs.size(); ++i){
                 chs[i].xs.resize(ringbuffer_size, 0);
                 chs[i].ys.resize(ringbuffer_size, 0);
             }
-            matrix.resize(n_channel * ringbuffer_size);
-            offsets.chs.resize(n_channel, 0);
-            offsets.phases_deg.resize(n_channel, 0);
+            matrix.resize(n_daq_channel * n_multiplexer_channel * ringbuffer_size);
+            offsets.chs.resize(n_daq_channel * n_multiplexer_channel, 0);
+            offsets.phases_deg.resize(n_daq_channel * n_multiplexer_channel, 0);
             psd.init(rawSize, excitation.frequency, rawDt);
         }
         
@@ -128,7 +127,7 @@ public:
             }
             static double xs[N_DAQ_CHANNEL*N_MULTIPLEXER_CHANNEL];
             static double ys[N_DAQ_CHANNEL*N_MULTIPLEXER_CHANNEL];
-            for(int i = 0; i < chs.size() / N_MULTIPLEXER_CHANNEL; ++i){
+            for(int i = 0; i < N_DAQ_CHANNEL; ++i){
                 const int ch = i + ch_multi * N_DAQ_CHANNEL;
                 auto const [x, y] = psd.calc(rawChs[ch].data());
                 xs[ch] = x;
@@ -149,7 +148,7 @@ public:
 
     void init(){
         rawData.init(1.0 / RAW_RATE, RAW_COUNT, N_DAQ_CHANNEL * N_MULTIPLEXER_CHANNEL);
-        ringBuffer.init(rawData.times.size(), rawData.rawDt, RINGBUFFER_DT, RINGBUFFER_SIZE, N_DAQ_CHANNEL * N_MULTIPLEXER_CHANNEL);
+        ringBuffer.init(rawData.times.size(), rawData.rawDt, RINGBUFFER_DT, RINGBUFFER_SIZE, N_DAQ_CHANNEL, N_MULTIPLEXER_CHANNEL);
         fftBuffer.numHarmonics_x.resize(N_HARMONICS);
         fftBuffer.numHarmonics_y.resize(N_HARMONICS);
     }
