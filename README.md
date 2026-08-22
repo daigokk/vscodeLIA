@@ -1,6 +1,6 @@
 
 
-https://github.com/user-attachments/assets/82d80d7d-aa7a-41a0-967f-187cdc8ed578
+
 
 
 
@@ -9,7 +9,7 @@ https://github.com/user-attachments/assets/82d80d7d-aa7a-41a0-967f-187cdc8ed578
 # vscodeLIA (Template of Simple Software Lock-in Amplifier)
 
 
-| ![Hard copy](https://github.com/user-attachments/assets/bb9e8169-3728-450e-9c0a-5ca01f317e13) |
+| https://github.com/user-attachments/assets/82d80d7d-aa7a-41a0-967f-187cdc8ed578 |
 | --- |
 | 図1. vscodeLIA |
 ---
