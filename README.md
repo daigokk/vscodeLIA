@@ -7,7 +7,7 @@ https://github.com/user-attachments/assets/82d80d7d-aa7a-41a0-967f-187cdc8ed578
 
 ## 1. 概要
 
-図1に示す**vscodeLIA** は、Data Acquisition Device (データ収集装置、以下DAQ) を利用して動作する、C++製のシンプルなソフトウェア・ロックインアンプ(LIA)です。
+**vscodeLIA** は、Data Acquisition Device (データ収集装置、以下DAQ) を利用して動作する、C++製のシンプルなソフトウェア・ロックインアンプ(LIA)です。
 
 * **このプロジェクトの目的:**
 データ集録・GUI描画・信号処理を組み合わせた、以下のような使用を想定しています。
@@ -19,20 +19,16 @@ https://github.com/user-attachments/assets/82d80d7d-aa7a-41a0-967f-187cdc8ed578
     * Digilent製DAQ([Analog Discovery](https://digilent.com/shop/analog-discovery-3/), 以下AD3)を用いた信号の測定・集録
       * `Daq.h`、`Daq.cpp`及び`Makefile`を書き換えることで、他のDAQ(例えばNI-DAQ)に対応させることも可能です。
     * [ImPlot](https://github.com/epezent/implot)を用いた波形のリアルタイム描画
-    * [位相敏感検波](https://www.youtube.com/watch?v=pHyuB1YW4qY)(同期検波)等による信号処理(図2参照、未実装)
+    * [位相敏感検波](https://www.youtube.com/watch?v=pHyuB1YW4qY)(同期検波)等による信号処理(図1参照、未実装)
       * **※注意:** 学習を目的の一つとしているため、位相敏感検波処理は**あえて未実装**にしています。
     * オープンソースである **[Visual Studio Code](https://code.visualstudio.com/) + GCC ([MinGW-w64](https://www.mingw-w64.org/))** の組み合わせで開発できるように設計されています。
 
 * **このプロジェクトの発展形:**
 より実用的なフル機能のソフトウェア・ロックインアンプをお探しの場合は、[LIA (daigokk/LIA)](https://github.com/daigokk/LIA/) をご参照ください。
 
-
-
-
-
 | ![Phase sensitive detection](./docs/images/PSD.svg) |
 | --- |
-| 図2. 位相敏感検波のブロック図 |
+| 図1. 位相敏感検波のブロック図 |
 
 * [参考] 以下のコードは図2のブロック図を具現化したものです。`Psd.h`に記載の`Psd::calc`関数に以下を記述すると、プローブの状態に合わせてリアルタイムにXYウィンドウの輝点が移動します。
 
@@ -58,17 +54,17 @@ inline std::pair<double, double> Psd::calc(const double* inData){
 
 ## 2. ハードウェア
 
-* 図3、図4、及び表1は、自己誘導差動型の渦電流プローブのブリッジ・プリアンプの回路と必要な部品を示しています。ご自身のアプリケーションに合わせて設計・製作してください。
+* 図2、図3、及び表1は、自己誘導差動型の渦電流プローブのブリッジ・プリアンプの回路と必要な部品を示しています。ご自身のアプリケーションに合わせて設計・製作してください。
 * AD3のWavegen(W1,W2)の最大出力電流は30mA程度です。Wavegenの出力電圧を上げすぎると波形がゆがみます(例えば周波数が低い(力率が高い、つまり電圧と電流の位相が近い)場合、測定電圧の山と谷が平らになる)。電圧(電力)が必要であればWavegenの出力と負荷の間に`LT1010`(最大出力電流150mA)のようなパワー・バッファを入れるとよいでしょう。なお、パワー・バッファ(またはオペアンプ)の電源をAD3からとる場合、AD3の直流電源(Supplies)の最大出力電流は400mA程度(AD3にACアダプターをつなぐと800mA程度まで拡大可能)であることに注意してください。
 
 | ![Schematic](./docs/images/Schematic.svg) ![Schematic_AD620](./docs/images/AD620.svg) |
 | --- |
-| 図3. 回路図 |
+| 図2. 回路図 |
 
 | ![Front of circuit board](./docs/images/CircuitBoard_front.jpg) | ![Back of circuit board](./docs/images/CircuitBoard_back.jpg) |
 | --- | --- |
 | (a) 表 | (b) 裏 |
-| 図4. 電子回路基板 |  |
+| 図3. 電子回路基板 |  |
 
 表1. 部品一覧
   | 部品 | 型番 | 備考 |
@@ -277,7 +273,7 @@ void fft(Config* pCfg) {
 * AD3はアナログ入力が2チャンネルしかありません。8:1のマルチプレクサを使って2×8=16チャンネルにしてみてください。
   | ![Multi plexer](./docs/images/Multi.svg) |
   | --- |
-  | 図5. マルチプレクサを用いた相互誘導検出部の多チャンネル回路 |
+  | 図4. マルチプレクサを用いた相互誘導検出部の多チャンネル回路 |
 * (オプション) 初期設定では、2msごとに 10000[Sample]/100[MSample/s]=0.1[ms] 分だけAD変換しています(`Config.h`で変更可能)。2msはUSBの制限から決定しました。この方式の利点はPSDの実装が簡単(平均を使える、FFTを使える)であること、100MS/sの高速なAD変換ができること、等が挙げられます。しかしながら全体の時間の 0.1[ms]/[2ms]=5[%] しか使っていません。検出信号の95%は捨てていることを意味します。言い換えると2msの間プローブの検出信号が一定の場合は、問題ないです。この制限(95%を捨てる)は、AD変換の速度を落とすことで使えるようになる、DAQのストリーミング記録(100%使う)を用いることで解決できます。AD変換の速度を落とすことは検出周波数の最大値が下がることを意味しますが([ナイキストのサンプリング定理](https://ja.wikipedia.org/wiki/%E6%A8%99%E6%9C%AC%E5%8C%96%E5%AE%9A%E7%90%86))、AD変換の前段に[スーパーヘテロダイン](https://ja.wikipedia.org/wiki/%E3%83%98%E3%83%86%E3%83%AD%E3%83%80%E3%82%A4%E3%83%B3)を用いることでその制限も回避することができます。何を言っているのかわかったでしょうか？ご理解いただけたら、ハードウェアおよびソフトウェアを改造して、信号の取りこぼしのない、かつ100kHzの検出信号を検波できるLIAを実装してみてください。
 * (オプション) 追加したい機能はありませんか？その機能を実装してみましょう。[LIA (daigokk/LIA)](https://github.com/daigokk/LIA/) が参考になるかもしれません。
 * (オプション) C++からメモリ安全なRustに書き換えてみましょう。
