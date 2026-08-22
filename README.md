@@ -1,11 +1,3 @@
-
-
-
-
-
-
-
-
 # vscodeLIA (Template of Simple Software Lock-in Amplifier)
 
 
