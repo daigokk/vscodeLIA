@@ -6,7 +6,7 @@
 #include "Config.h"
 
 // 位相敏感検波した値を複素平面上に表示する
-void XyWindow(Config& cfg) {
+void XyWindow(GuiConfig& guiCfg, Config& cfg) {
     if(ImGui::Begin("XY")){
         if (ImPlot::BeginPlot("##XY")) {
             for(int ch=0; ch<cfg.ringBuffer.chs.size(); ch++){

@@ -96,7 +96,8 @@ void RegisterGLFWWindowSettingsHandler(GLFWwindow* window)
     ImGui::AddSettingsHandler(&ini_handler);
 }
 
-GLFWwindow* Gui::Initialize(const char* title) {
+GuiConfig Gui::Initialize(const char* title) {
+    GuiConfig guiConfg;
     if (!glfwInit()) {
         std::cerr << "Failed to initialize GLFW" << std::endl;
         exit(EXIT_FAILURE);
@@ -110,19 +111,19 @@ GLFWwindow* Gui::Initialize(const char* title) {
     glfwGetMonitorWorkarea(monitor, &xpos, &ypos, &monitorWidth, &monitorHeight);
 
     // モニターのスケールを取得 (GLFW 3.3+)
-    auto monitorScale = ImGui_ImplGlfw_GetContentScaleForMonitor(monitor);
+    guiConfg.monitorScale = ImGui_ImplGlfw_GetContentScaleForMonitor(monitor);
 
     const char* glsl_version = "#version 130";
-    GLFWwindow* window = glfwCreateWindow(1280, 720, "codeLIA - Dear ImGui", NULL, NULL);
-    if (!window) {
+    guiConfg.window = glfwCreateWindow(1280, 720, "codeLIA - Dear ImGui", NULL, NULL);
+    if (!guiConfg.window) {
         std::cerr << "Failed to create GLFW window" << std::endl;
         glfwTerminate();
         exit(EXIT_FAILURE);
     }
 
-    glfwSetWindowTitle(window, title);
-    glfwSetKeyCallback(window, key_callback);
-    glfwMakeContextCurrent(window);
+    glfwSetWindowTitle(guiConfg.window, title);
+    glfwSetKeyCallback(guiConfg.window, key_callback);
+    glfwMakeContextCurrent(guiConfg.window);
     glfwSwapInterval(1);
 
     IMGUI_CHECKVERSION();
@@ -130,10 +131,10 @@ GLFWwindow* Gui::Initialize(const char* title) {
     ImPlot::CreateContext();
     ImGuiIO& io = ImGui::GetIO(); (void)io;
     ImGui::StyleColorsDark();
-    ImGui_ImplGlfw_InitForOpenGL(window, true);
+    ImGui_ImplGlfw_InitForOpenGL(guiConfg.window, true);
     ImGui_ImplOpenGL3_Init(glsl_version);
-    RegisterGLFWWindowSettingsHandler(window);
-    return window;
+    RegisterGLFWWindowSettingsHandler(guiConfg.window);
+    return guiConfg;
 }
 
 void Gui::Shutdown(GLFWwindow* window){ 

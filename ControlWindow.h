@@ -7,7 +7,7 @@
 #include "Daq.h"
 
 // DAQの出力する波形(周波数、振幅)を制御する
-void ControlWindow(Config& cfg, Daq& daq) {
+void ControlWindow(GuiConfig& guiCfg, Config& cfg, Daq& daq) {
     if(!cfg.status.isRun){
         // DAQとの接続が切れたとき
         ImGui::SetNextWindowFocus();

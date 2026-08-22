@@ -6,7 +6,7 @@
 #include "Config.h"
 
 // DAQが測定した波形を時間軸で表示する
-void RawWindow(Config& cfg) {
+void RawWindow(GuiConfig& guiCfg, Config& cfg) {
     if(ImGui::Begin("Raw")){
         if (ImPlot::BeginPlot("##Raw")) {
             for(int i=0; i < cfg.rawData.chs.size(); i++){

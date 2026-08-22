@@ -7,12 +7,13 @@
 #include "Daq.h"
 
 // マルチプレクサ対応
-void MultichannelWindow(Config& cfg) {
+void MultichannelWindow(GuiConfig& guiCfg, Config& cfg) {
     if(ImGui::Begin("Multi channel plot")){
         static float scale_limit = 1;
         ImGui::SliderFloat("y (V)", &scale_limit, 0.01, 5, "%.2f");
         
         if (ImPlot::BeginPlot("##Line Plot", ImVec2(ImGui::GetWindowWidth()-100, ImGui::GetWindowHeight()/2))) {
+            ImPlot::SetupAxis(ImAxis_Y1, "y (V)");
             ImPlot::SetupLegend(ImPlotLocation_East, true);
             ImPlot::SetupAxisLimits(ImAxis_Y1, -scale_limit, scale_limit, ImGuiCond_Always);
             for(int ch = 0; ch < cfg.ringBuffer.chs.size(); ++ch){

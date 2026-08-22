@@ -15,22 +15,22 @@ int main() {
     // `daq.stop();`するまでDAQは波形を測定し続ける
     daq.start();
     // `Gui`: GLFW、ImGUI、ImPlotの初期設定等を行うクラス
-    auto window = Gui::Initialize(
+    auto guiCfg = Gui::Initialize(
         std::format("codeLIA - {}", cfg.status.deviceSerial).c_str()
     );
     
-    while (!glfwWindowShouldClose(window)) {
-        Gui::BeginFrame(window);
+    while (!glfwWindowShouldClose(guiCfg.window)) {
+        Gui::BeginFrame(guiCfg.window);
         
-        RawWindow(cfg); // DAQが測定した波形を時間軸で表示する
-        XyWindow(cfg); // 位相敏感検波した値を複素平面上に表示する
-        ControlWindow(cfg, daq); // DAQの出力する波形(周波数、振幅)を制御する
-        MultichannelWindow(cfg);
+        RawWindow(guiCfg, cfg); // DAQが測定した波形を時間軸で表示する
+        XyWindow(guiCfg, cfg); // 位相敏感検波した値を複素平面上に表示する
+        ControlWindow(guiCfg, cfg, daq); // DAQの出力する波形(周波数、振幅)を制御する
+        MultichannelWindow(guiCfg, cfg);
         
-        Gui::EndFrame(window);
+        Gui::EndFrame(guiCfg.window);
     }
 
-    Gui::Shutdown(window);
+    Gui::Shutdown(guiCfg.window);
     daq.stop();
 
     return 0;
