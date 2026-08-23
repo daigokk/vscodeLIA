@@ -111,7 +111,7 @@ GuiConfig Gui::Initialize(const char* title) {
     glfwGetMonitorWorkarea(monitor, &xpos, &ypos, &monitorWidth, &monitorHeight);
 
     // モニターのスケールを取得 (GLFW 3.3+)
-    guiConfg.monitorScale = ImGui_ImplGlfw_GetContentScaleForMonitor(monitor);
+    guiConfg.dpi_scale = ImGui_ImplGlfw_GetContentScaleForMonitor(monitor);
 
     const char* glsl_version = "#version 130";
     guiConfg.window = glfwCreateWindow(1280, 720, "codeLIA - Dear ImGui", NULL, NULL);
@@ -129,7 +129,12 @@ GuiConfig Gui::Initialize(const char* title) {
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
     ImPlot::CreateContext();
-    ImGuiIO& io = ImGui::GetIO(); (void)io;
+    ImGuiIO& io = ImGui::GetIO();
+    float font_size = 16.0f * guiConfg.dpi_scale; // 基本サイズ × DPIスケール
+    io.Fonts->AddFontFromFileTTF("C:/Windows/Fonts/Verdana.ttf", font_size);
+    ImGuiStyle& style = ImGui::GetStyle();
+    style.ScaleAllSizes(guiConfg.dpi_scale); // ボタンの幅、パディング、枠線などを一括拡大
+
     ImGui::StyleColorsDark();
     ImGui_ImplGlfw_InitForOpenGL(guiConfg.window, true);
     ImGui_ImplOpenGL3_Init(glsl_version);

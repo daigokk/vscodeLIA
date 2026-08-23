@@ -5,7 +5,7 @@
 class GuiConfig {
 public:
     GLFWwindow* window = nullptr;
-    float monitorScale = 1.0f;
+    float dpi_scale = 1.0f;
 };
 
 // 親ウィンドウを描画するGLFW、ウィンドウ上にボタンやチャートなどのウィジェットを描画するImGui、ImPlotの初期設定等を行うクラス
