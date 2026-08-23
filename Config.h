@@ -6,8 +6,9 @@
 #include <complex>
 #include <cmath>
 #include <chrono>
+#include <fstream>
 
-#define RAW_COUNT 10000
+#define RAW_SIZE 10000
 #define RAW_RATE 100e6
 #define EXCITATION_FREQUENCY 10e3
 #define EXCITATION_AMPLITUDE 1.0
@@ -65,7 +66,7 @@ public:
         };
     public:
         double dt = 0;
-        int idxWrite = 0, idxCurrent = 0;
+        int idxWrite = 0, idxCurrent = 0, nMeasurements = 0;
         int ch_multi = 0;
         std::vector<double> times, scheduleTime;
         std::vector<ComplexVector> chs;
@@ -76,7 +77,7 @@ public:
 
         void init(const double rawSize, const double rawDt, const double newDt, const int ringbuffer_size, const int n_daq_channel, const int n_multiplexer_channel){
             dt = newDt;
-            idxWrite = 0; idxCurrent = 0;
+            idxWrite = 0; idxCurrent = 0; nMeasurements = 0;
             times.resize(ringbuffer_size);
             scheduleTime.resize(ringbuffer_size);
             for (int i = 0; i < scheduleTime.size(); ++i){
@@ -117,7 +118,7 @@ public:
                 matrix[idx] = chs[ch].ys[idxWrite];
             }
             idxCurrent = idxWrite;
-            idxWrite++;
+            idxWrite++; nMeasurements++;
             if(idxWrite >= times.size()) {idxWrite = 0;}
         }
 
@@ -146,9 +147,13 @@ public:
         std::vector<double> numHarmonics_x, numHarmonics_y;
     } fftBuffer;
 
-    void init(){
-        rawData.init(1.0 / RAW_RATE, RAW_COUNT, N_DAQ_CHANNEL * N_MULTIPLEXER_CHANNEL);
-        ringBuffer.init(rawData.times.size(), rawData.rawDt, RINGBUFFER_DT, RINGBUFFER_SIZE, N_DAQ_CHANNEL, N_MULTIPLEXER_CHANNEL);
+    void init(
+        const double rawRate=RAW_RATE, const int rawSize=RAW_SIZE,
+        const int nDaqChannel=N_DAQ_CHANNEL, const int nMultiplexerChannel=N_MULTIPLEXER_CHANNEL,
+        const double ringBufferDt=RINGBUFFER_DT, const int ringBufferSize=RINGBUFFER_SIZE
+    ){
+        rawData.init(1.0 / rawRate, rawSize, nDaqChannel * nMultiplexerChannel);
+        ringBuffer.init(rawData.times.size(), rawData.rawDt, ringBufferDt, ringBufferSize, nDaqChannel, nMultiplexerChannel);
         fftBuffer.numHarmonics_x.resize(N_HARMONICS);
         fftBuffer.numHarmonics_y.resize(N_HARMONICS);
     }
@@ -158,6 +163,29 @@ public:
     }
     Config(const Config&) = delete;
     Config& operator=(const Config&) = delete;
+
+    ~Config(){
+        std::ofstream outFile("ect.txt");
+        if (outFile.is_open()) {
+            // ファイルヘッダー
+            outFile << "t(s)";
+            for(int ch = 0; ch < ringBuffer.chs.size(); ++ch){
+                outFile << std::format("\tch{0}x\tch{0}y", ch+1);
+            }
+            outFile << std::endl;
+            // 測定値
+            const int size = ringBuffer.times.size() < ringBuffer.nMeasurements ? ringBuffer.times.size() : ringBuffer.nMeasurements;
+            for(int i = 0; i < size; ++i){
+                int idx = (ringBuffer.idxCurrent + i) % ringBuffer.times.size();
+                outFile << std::format("{:e}", ringBuffer.times[i]);
+                for(int ch = 0; ch < ringBuffer.chs.size(); ++ch){
+                    outFile << std::format("\t{:e}\t{:e}", ringBuffer.chs[ch].xs[idx], ringBuffer.chs[ch].ys[idx]);
+                }
+                outFile << std::endl;
+            }
+            outFile.close();
+        }
+    }
 };
 
 inline void fft(Config* pCfg) {
