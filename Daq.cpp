@@ -25,7 +25,7 @@ Daq::Daq(Config* cfg) : pCfg_(cfg) {
         dio.set_state(device_data, pCfg_->ringBuffer.ch_multi);
         supplies();
         wavegen(pCfg_->ringBuffer.excitation.frequency, pCfg_->ringBuffer.excitation.amplitude);
-        scope.run(device_data, 1.0 / pCfg_->rawData.rawDt, static_cast<int>(pCfg_->rawData.times.size()), 0.0, 5.0);
+        scope.run(device_data, 1.0 / pCfg_->rawData.rawDt, static_cast<int>(pCfg_->rawData.times.size()), 0.0, pCfg_->rawData.range);
     }
     catch (const Dwf::Error& error) {
         std::cout << "WaveForms error: "
@@ -161,6 +161,13 @@ void Daq::run(std::stop_token st) {
         
         auto next_time = std::chrono::steady_clock::now();
         while (!st.stop_requested()) {
+            // 一時停止
+            if (pCfg_->ringBuffer.pauseFlag){
+                next_time += loop_period;
+                std::this_thread::sleep_until(next_time);
+                continue;
+            }
+            // AD変換
             STS sts;
             do {
                 if (FDwfAnalogInStatus(device_data->handle, true, &sts) == 0) {
@@ -172,7 +179,7 @@ void Daq::run(std::stop_token st) {
                 int ch = i + pCfg_->ringBuffer.ch_multi * N_DAQ_CHANNEL;
                 FDwfAnalogInStatusData(device_data->handle, i, pCfg_->rawData.chs[ch].data(), pCfg_->rawData.chs[ch].size());
             }
-            
+            // 測定値の保存
             pCfg_->ringBuffer.update(pCfg_->rawData.chs, pCfg_->rawData.rawDt);
             // マルチプレクサのチャンネル更新
             dio.set_state(device_data, pCfg_->ringBuffer.ch_multi);
@@ -203,6 +210,12 @@ void Daq::runWithoutDaq(std::stop_token st) {
 
     auto next_time = std::chrono::steady_clock::now();
     while (!st.stop_requested()) {
+        // 一時停止
+        if (pCfg_->ringBuffer.pauseFlag){
+            next_time += loop_period;
+            std::this_thread::sleep_until(next_time);
+            continue;
+        }
         const auto frequency = pCfg_->ringBuffer.excitation.frequency;
         const auto amplitude = pCfg_->ringBuffer.excitation.amplitude;
         theta += angular_step * pCfg_->ringBuffer.dt;

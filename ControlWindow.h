@@ -42,29 +42,34 @@ void ControlWindow(GuiConfig& guiCfg, Config& cfg, Daq& daq) {
             ImGui::EndTabBar();
         }
         ImGui::Separator();
-        if(ImGui::BeginTabBar("Settings")){
-            if(ImGui::BeginTabItem("Offset")){
-                if(ImGui::Button("Auto offset")) {
-                    cfg.ringBuffer.offsets.flag = true;
-                }
-                ImGui::SameLine();
-                if(ImGui::Button("Off")) {
-                    for(int ch = 0; ch < cfg.ringBuffer.offsets.chs.size(); ++ch){
-                        cfg.ringBuffer.offsets.chs[ch].real(0);
-                        cfg.ringBuffer.offsets.chs[ch].imag(0);
-                    }
-                }
-                if (ImGui::TreeNode("Phase (Deg.)")) {
-                    for(int ch = 0; ch < cfg.ringBuffer.offsets.phases_deg.size(); ++ch) {
-                        if(ImGui::InputFloat(std::format("Ch{}", ch+1).c_str(), &cfg.ringBuffer.offsets.phases_deg[ch], 0.0f, 0.0f, "%.0f")) {
-                            
-                        }
-                    }
-                    ImGui::TreePop();
-                }
-                ImGui::EndTabItem();
+        if(ImGui::Button("Auto offset")) {
+            cfg.ringBuffer.offsets.flag = true;
+        }
+        ImGui::SameLine();
+        if(ImGui::Button("Off")) {
+            for(int ch = 0; ch < cfg.ringBuffer.offsets.chs.size(); ++ch){
+                cfg.ringBuffer.offsets.chs[ch].real(0);
+                cfg.ringBuffer.offsets.chs[ch].imag(0);
             }
-            ImGui::EndTabBar();
+        }
+        ImGui::SameLine();
+        if(ImGui::Button(cfg.ringBuffer.pauseFlag ? "Run" : "Pause")) {
+            if(cfg.ringBuffer.pauseFlag){
+                // Runボタンが押されたとき
+                cfg.buttonRun();
+            }
+            else{
+                // Pauseボタンが押されたとき
+                cfg.buttonPause();
+            }
+        }
+        if (ImGui::TreeNode("Phase (Deg.)")) {
+            for(int ch = 0; ch < cfg.ringBuffer.offsets.phases_deg.size(); ++ch) {
+                if(ImGui::InputFloat(std::format("Ch{}", ch+1).c_str(), &cfg.ringBuffer.offsets.phases_deg[ch], 0.0f, 0.0f, "%.0f")) {
+                    
+                }
+            }
+            ImGui::TreePop();
         }
         ImGui::Separator();
     }

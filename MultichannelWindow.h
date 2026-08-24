@@ -10,8 +10,9 @@
 void MultichannelWindow(GuiConfig& guiCfg, Config& cfg) {
     if(ImGui::Begin("Multi channel plot")){
         static float scale_limit = 1;
-        ImGui::SliderFloat("y (V)", &scale_limit, 0.01, 5, "%.2f");
-        
+        ImGui::SliderFloat("y (V)", &scale_limit, 0.01, cfg.rawData.range, "%.2f");
+        ImGui::SameLine();
+        ImGui::Checkbox(cfg.ringBuffer.trigger.readyFlag ? (cfg.ringBuffer.trigger.countFlag ? "On" : "Ready") : "Trigger", &cfg.ringBuffer.trigger.flag);
         if (ImPlot::BeginPlot("##Line Plot", ImVec2(ImGui::GetWindowWidth()-100, ImGui::GetWindowHeight()/2))) {
             ImPlot::SetupAxis(ImAxis_Y1, "y (V)");
             ImPlot::SetupLegend(ImPlotLocation_East, true);
@@ -23,9 +24,29 @@ void MultichannelWindow(GuiConfig& guiCfg, Config& cfg) {
             const double t = cfg.ringBuffer.scheduleTime[cfg.ringBuffer.idxCurrent];
             const double x_line[] = { t, t }, y_line[] = {-scale_limit, scale_limit};
             ImPlot::PlotLine("##Time line", x_line, y_line, 2);
+            
+            // Trigger level
+            if(cfg.ringBuffer.trigger.flag){
+                const ImPlotRect limits = ImPlot::GetPlotLimits();
+                const double x_line[] = { limits.X.Min, limits.X.Max }, y_line[] = {cfg.ringBuffer.trigger.level, cfg.ringBuffer.trigger.level};
+                ImPlotSpec specLine;
+                specLine.LineColor = ImVec4(1, 0, 0, 1); // Red
+                ImPlot::PlotLine("Trigger", x_line, y_line, 2, specLine);
+            }
+            
+            // Events
+            if (ImPlot::IsPlotHovered() && ImGui::IsMouseClicked(ImGuiMouseButton_Left)) {
+                // plot内をクリックしたとき
+                ImPlotPoint mousePos = ImPlot::GetPlotMousePos();
+                if (cfg.ringBuffer.trigger.flag) {
+                    cfg.ringBuffer.trigger.level = mousePos.y;
+                    cfg.ringBuffer.trigger.readyFlag = false;
+                    cfg.ringBuffer.trigger.countFlag = false;
+                    cfg.ringBuffer.trigger.nofm = 0;
+                }
+            }
             ImPlot::EndPlot();
         }
-
         // 全チャンネルのy成分をコンター表示
         ImPlot::PushColormap(ImPlotColormap_Jet);
         if (ImPlot::BeginPlot("##Contour Plot", ImVec2(ImGui::GetWindowWidth()-100, -1))) {
