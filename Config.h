@@ -264,8 +264,8 @@ public:
             // 測定値
             const int size = ringBuffer.times.size() < ringBuffer.nofm ? ringBuffer.times.size() : ringBuffer.nofm;
             for(int i = 0; i < size; ++i){
-                int idx = (ringBuffer.idxCurrent + i) % ringBuffer.times.size();
-                outFile << std::format("{:e}", ringBuffer.times[i]);
+                int idx = (ringBuffer.idxWrite + i) % ringBuffer.times.size();
+                outFile << std::format("{:e}", ringBuffer.times[idx]);
                 for(int ch = 0; ch < ringBuffer.chs.size(); ++ch){
                     outFile << std::format("{0}{1:e}{0}{2:e}", delimiter, ringBuffer.chs[ch].xs[idx], ringBuffer.chs[ch].ys[idx]);
                 }
