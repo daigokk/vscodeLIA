@@ -46,7 +46,7 @@ void MultichannelWindow(GuiConfig& guiCfg, Config& cfg) {
                     std::format("Ch{}", ch+1).c_str(),
                     cfg.ringBuffer.scheduleTime.data(),
                     cfg.ringBuffer.chs[ch].ys.data(),
-                    cfg.ringBuffer.scheduleTime.size()
+                    cfg.ringBuffer.scheduleTime.size() < cfg.ringBuffer.nofm ? cfg.ringBuffer.scheduleTime.size() : cfg.ringBuffer.nofm
                 );
             }
             // 現在値を示す縦線
