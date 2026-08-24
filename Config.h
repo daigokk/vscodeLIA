@@ -252,12 +252,13 @@ public:
     Config& operator=(const Config&) = delete;
 
     ~Config(){
-        std::ofstream outFile("ect.txt");
+        std::ofstream outFile("ect.csv");
         if (outFile.is_open()) {
+            const char delimiter = ',';
             // ファイルヘッダー
             outFile << "t(s)";
             for(int ch = 0; ch < ringBuffer.chs.size(); ++ch){
-                outFile << std::format("\tch{0}x\tch{0}y", ch+1);
+                outFile << std::format("{0}ch{1}x{0}ch{1}y", delimiter, ch+1);
             }
             outFile << std::endl;
             // 測定値
@@ -266,7 +267,7 @@ public:
                 int idx = (ringBuffer.idxCurrent + i) % ringBuffer.times.size();
                 outFile << std::format("{:e}", ringBuffer.times[i]);
                 for(int ch = 0; ch < ringBuffer.chs.size(); ++ch){
-                    outFile << std::format("\t{:e}\t{:e}", ringBuffer.chs[ch].xs[idx], ringBuffer.chs[ch].ys[idx]);
+                    outFile << std::format("{0}{1:e}{0}{2:e}", delimiter, ringBuffer.chs[ch].xs[idx], ringBuffer.chs[ch].ys[idx]);
                 }
                 outFile << std::endl;
             }
