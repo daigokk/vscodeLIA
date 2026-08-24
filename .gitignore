@@ -24,6 +24,9 @@
 # Configuration files
 *.ini
 
+# Measurement resutls
+*.csv
+
 # Build directories
 build/
 bin/
