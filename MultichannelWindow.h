@@ -10,21 +10,41 @@
 void MultichannelWindow(GuiConfig& guiCfg, Config& cfg) {
     if(ImGui::Begin("Multi channel plot")){
         static float scale_limit = 1;
+        ImGui::SetNextItemWidth(guiCfg.dpi_scale * 100);
         ImGui::SliderFloat("y (V)", &scale_limit, 0.01, cfg.rawData.range, "%.2f");
         ImGui::SameLine();
         ImGui::Checkbox(cfg.ringBuffer.trigger.readyFlag ? (cfg.ringBuffer.trigger.countFlag ? "On" : "Ready") : "Trigger", &cfg.ringBuffer.trigger.flag);
+        ImGui::SameLine();
+        if(ImGui::Button(cfg.ringBuffer.pauseFlag ? "Run" : "Pause")) {
+            if(cfg.ringBuffer.pauseFlag){
+                // Runボタンが押されたとき
+                cfg.buttonRun();
+            }
+            else{
+                // Pauseボタンが押されたとき
+                cfg.buttonPause();
+            }
+        }
         if (ImPlot::BeginPlot("##Line Plot", ImVec2(ImGui::GetWindowWidth()-100, ImGui::GetWindowHeight()/2))) {
             ImPlot::SetupAxis(ImAxis_Y1, "y (V)");
-            ImPlot::SetupLegend(ImPlotLocation_East, true);
+            //ImPlot::SetupLegend(ImPlotLocation_East, true);
+            const double t_current = cfg.ringBuffer.scheduleTime[cfg.ringBuffer.scheduleTime.size()-1];
+            const double t_start = cfg.ringBuffer.scheduleTime[0];
+            ImPlot::SetupAxisLimits(ImAxis_X1, t_start, t_current, ImGuiCond_Always);
             ImPlot::SetupAxisLimits(ImAxis_Y1, -scale_limit, scale_limit, ImGuiCond_Always);
             for(int ch = 0; ch < cfg.ringBuffer.chs.size(); ++ch){
-                ImPlot::PlotLine(std::format("Ch{}", ch+1).c_str(), cfg.ringBuffer.scheduleTime.data(), cfg.ringBuffer.chs[ch].ys.data(), cfg.ringBuffer.scheduleTime.size());
+                ImPlot::PlotLine(
+                    std::format("Ch{}", ch+1).c_str(),
+                    cfg.ringBuffer.scheduleTime.data(),
+                    cfg.ringBuffer.chs[ch].ys.data(),
+                    cfg.ringBuffer.scheduleTime.size()
+                );
             }
             // 現在値を示す縦線
             const double t = cfg.ringBuffer.scheduleTime[cfg.ringBuffer.idxCurrent];
-            const double x_line[] = { t, t }, y_line[] = {-scale_limit, scale_limit};
+            const double x_line[] = { t, t }, y_line[] = { -scale_limit, scale_limit };
             ImPlot::PlotLine("##Time line", x_line, y_line, 2);
-            
+
             // Trigger level
             if(cfg.ringBuffer.trigger.flag){
                 const ImPlotRect limits = ImPlot::GetPlotLimits();
@@ -52,6 +72,10 @@ void MultichannelWindow(GuiConfig& guiCfg, Config& cfg) {
         if (ImPlot::BeginPlot("##Contour Plot", ImVec2(ImGui::GetWindowWidth()-100, -1))) {
 			ImPlot::SetupAxis(ImAxis_X1, "Time (s)");
             ImPlot::SetupAxis(ImAxis_Y1, "Ch");
+            const double t_current = cfg.ringBuffer.scheduleTime[cfg.ringBuffer.scheduleTime.size()-1];
+            const double t_start = cfg.ringBuffer.scheduleTime[0];
+            ImPlot::SetupAxisLimits(ImAxis_X1, t_start, t_current, ImGuiCond_Always);
+            ImPlot::SetupAxisLimits(ImAxis_Y1, 0, cfg.ringBuffer.chs.size(), ImGuiCond_Always);
             ImPlot::PlotHeatmap(
                 "##heatmap",
                 cfg.ringBuffer.matrix.data(),
