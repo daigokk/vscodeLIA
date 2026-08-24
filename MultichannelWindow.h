@@ -13,7 +13,16 @@ void MultichannelWindow(GuiConfig& guiCfg, Config& cfg) {
         ImGui::SetNextItemWidth(guiCfg.dpi_scale * 100);
         ImGui::SliderFloat("y (V)", &scale_limit, 0.01, cfg.rawData.range, "%.2f");
         ImGui::SameLine();
-        ImGui::Checkbox(cfg.ringBuffer.trigger.readyFlag ? (cfg.ringBuffer.trigger.countFlag ? "On" : "Ready") : "Trigger", &cfg.ringBuffer.trigger.flag);
+        ImGui::Checkbox(
+            cfg.ringBuffer.trigger.flag ?
+                (cfg.ringBuffer.trigger.readyFlag ?
+                    (cfg.ringBuffer.trigger.countFlag ?
+                        "On" : "Ready")
+                    : (cfg.ringBuffer.pauseFlag ?
+                        "Trigger" : "Wait"))
+                : "Trigger",
+            &cfg.ringBuffer.trigger.flag
+        );
         ImGui::SameLine();
         if(ImGui::Button(cfg.ringBuffer.pauseFlag ? "Run" : "Pause")) {
             if(cfg.ringBuffer.pauseFlag){
