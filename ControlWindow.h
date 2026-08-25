@@ -26,9 +26,11 @@ void ControlWindow(GuiConfig& guiCfg, Config& cfg, Daq& daq) {
         ImGui::Separator();
         if(ImGui::BeginTabBar("Wavegen")){
             if(ImGui::BeginTabItem("W1")){
+                ImGui::SetNextItemWidth(guiCfg.dpi_scale * 100);
                 if(ImGui::SliderFloat("Frequency", &cfg.ringBuffer.sourceChs[0].frequency, 10e3f, 100e3f)) {
                     if(daq.device_data) daq.wavegen(0, cfg.ringBuffer.sourceChs[0].frequency, cfg.ringBuffer.sourceChs[0].amplitude, 0);
                 }
+                ImGui::SetNextItemWidth(guiCfg.dpi_scale * 100);
                 if(ImGui::SliderFloat("Amplitude", &cfg.ringBuffer.sourceChs[0].amplitude, 0.1f, 5.0f)) {    
                     if(daq.device_data) daq.wavegen(0, cfg.ringBuffer.sourceChs[0].frequency, cfg.ringBuffer.sourceChs[0].amplitude, 0);
                 }
@@ -36,10 +38,12 @@ void ControlWindow(GuiConfig& guiCfg, Config& cfg, Daq& daq) {
             }
             if(ImGui::BeginTabItem("W2")){
                 ImGui::BeginDisabled();
+                ImGui::SetNextItemWidth(guiCfg.dpi_scale * 100);
                 if(ImGui::SliderFloat("Frequency", &cfg.ringBuffer.sourceChs[1].frequency, 10e3f, 100e3f)) {
                     if(daq.device_data) daq.wavegen(1, cfg.ringBuffer.sourceChs[1].frequency, cfg.ringBuffer.sourceChs[1].amplitude, 0);
                 }
                 ImGui::EndDisabled();
+                ImGui::SetNextItemWidth(guiCfg.dpi_scale * 100);
                 if(ImGui::SliderFloat("Amplitude", &cfg.ringBuffer.sourceChs[1].amplitude, 0.1f, 5.0f)) {    
                     if(daq.device_data) daq.wavegen(1, cfg.ringBuffer.sourceChs[1].frequency, cfg.ringBuffer.sourceChs[1].amplitude, 0);
                 }
@@ -71,6 +75,7 @@ void ControlWindow(GuiConfig& guiCfg, Config& cfg, Daq& daq) {
         }
         if (ImGui::TreeNode("Phase (Deg.)")) {
             for(int ch = 0; ch < cfg.ringBuffer.offsets.phases_deg.size(); ++ch) {
+                ImGui::SetNextItemWidth(guiCfg.dpi_scale * 100);
                 if(ImGui::InputFloat(std::format("Ch{}", ch+1).c_str(), &cfg.ringBuffer.offsets.phases_deg[ch], 0.0f, 0.0f, "%.0f")) {
                     
                 }
