@@ -34,7 +34,7 @@ void MultichannelWindow(GuiConfig& guiCfg, Config& cfg) {
                 cfg.buttonPause();
             }
         }
-        if (ImPlot::BeginPlot("##Line Plot", ImVec2(ImGui::GetWindowWidth()-100, ImGui::GetWindowHeight()/2))) {
+        if (ImPlot::BeginPlot("##Line Plot", ImVec2(ImGui::GetWindowWidth()-100, ImGui::GetWindowHeight()/3))) {
             ImPlot::SetupAxis(ImAxis_Y1, "y (V)");
             //ImPlot::SetupLegend(ImPlotLocation_East, true);
             const double t_current = cfg.ringBuffer.scheduleTime[cfg.ringBuffer.scheduleTime.size()-1];
@@ -78,31 +78,65 @@ void MultichannelWindow(GuiConfig& guiCfg, Config& cfg) {
         }
         // 全チャンネルのy成分をコンター表示
         ImPlot::PushColormap(ImPlotColormap_Jet);
-        if (ImPlot::BeginPlot("##Contour Plot", ImVec2(ImGui::GetWindowWidth()-100, -1))) {
-			ImPlot::SetupAxis(ImAxis_X1, "Time (s)");
-            ImPlot::SetupAxis(ImAxis_Y1, "Ch");
-            const double t_current = cfg.ringBuffer.scheduleTime[cfg.ringBuffer.scheduleTime.size()-1];
-            const double t_start = cfg.ringBuffer.scheduleTime[0];
-            ImPlot::SetupAxisLimits(ImAxis_X1, t_start, t_current, ImGuiCond_Always);
-            ImPlot::SetupAxisLimits(ImAxis_Y1, 0, cfg.ringBuffer.chs.size(), ImGuiCond_Always);
-            ImPlot::PlotHeatmap(
-                "##heatmap",
-                cfg.ringBuffer.matrix.data(),
-                cfg.ringBuffer.chs.size(),
-                cfg.ringBuffer.scheduleTime.size(),
-                -scale_limit, scale_limit, nullptr,
-                ImPlotPoint(0, cfg.ringBuffer.chs.size()),
-                ImPlotPoint(cfg.ringBuffer.scheduleTime[cfg.ringBuffer.scheduleTime.size()-1], 0)
-            );
-            // 現在値を示す縦線
-            const double t = cfg.ringBuffer.scheduleTime[cfg.ringBuffer.idxCurrent];
-            const ImPlotRect limits = ImPlot::GetPlotLimits();
-            const double x_line[] = { t, t }, y_line[] = {limits.Y.Min, limits.Y.Max};
-            ImPlot::PlotLine("##Time line", x_line, y_line, 2);
-            ImPlot::EndPlot();
-		}
-        ImGui::SameLine();
-        ImPlot::ColormapScale("y (V)", -scale_limit, scale_limit, ImVec2(75, -1), "%g");
+        if(ImGui::BeginTabBar("Contour")){
+            if(ImGui::BeginTabItem("Original")){
+                if (ImPlot::BeginPlot("##Contour Plot", ImVec2(ImGui::GetWindowWidth()-100, -1))) {
+                    ImPlot::SetupAxis(ImAxis_X1, "Time (s)");
+                    ImPlot::SetupAxis(ImAxis_Y1, "Ch");
+                    const double t_current = cfg.ringBuffer.scheduleTime[cfg.ringBuffer.scheduleTime.size()-1];
+                    const double t_start = cfg.ringBuffer.scheduleTime[0];
+                    ImPlot::SetupAxisLimits(ImAxis_X1, t_start, t_current, ImGuiCond_Always);
+                    ImPlot::SetupAxisLimits(ImAxis_Y1, 0, cfg.ringBuffer.chs.size(), ImGuiCond_Always);
+                    ImPlot::PlotHeatmap(
+                        "##heatmap",
+                        cfg.ringBuffer.matrix.data(),
+                        cfg.ringBuffer.chs.size(),
+                        cfg.ringBuffer.scheduleTime.size(),
+                        -scale_limit, scale_limit, nullptr,
+                        ImPlotPoint(0, cfg.ringBuffer.chs.size()),
+                        ImPlotPoint(cfg.ringBuffer.scheduleTime[cfg.ringBuffer.scheduleTime.size()-1], 0)
+                    );
+                    // 現在値を示す縦線
+                    const double t = cfg.ringBuffer.scheduleTime[cfg.ringBuffer.idxCurrent];
+                    const ImPlotRect limits = ImPlot::GetPlotLimits();
+                    const double x_line[] = { t, t }, y_line[] = {limits.Y.Min, limits.Y.Max};
+                    ImPlot::PlotLine("##Time line", x_line, y_line, 2);
+                    ImPlot::EndPlot();
+                }
+                ImGui::SameLine();
+                ImPlot::ColormapScale("y (V)", -scale_limit, scale_limit, ImVec2(75, -1), "%g");
+                ImGui::EndTabItem();
+            }
+            if(ImGui::BeginTabItem("Interpolation")){
+                if (ImPlot::BeginPlot("##Interpolation", ImVec2(ImGui::GetWindowWidth()-100, -1))) {
+                    ImPlot::SetupAxis(ImAxis_X1, "Time (s)");
+                    ImPlot::SetupAxis(ImAxis_Y1, "Ch");
+                    const double t_current = cfg.ringBuffer.scheduleTime[cfg.ringBuffer.scheduleTime.size()-1];
+                    const double t_start = cfg.ringBuffer.scheduleTime[0];
+                    ImPlot::SetupAxisLimits(ImAxis_X1, t_start, t_current, ImGuiCond_Always);
+                    ImPlot::SetupAxisLimits(ImAxis_Y1, 0, cfg.ringBuffer.chs.size(), ImGuiCond_Always);
+                    ImPlot::PlotHeatmap(
+                        "##_heatmap",
+                        cfg.ringBuffer.matrix2.data(),
+                        cfg.ringBuffer.chs.size() * cfg.ringBuffer.RBF_K,
+                        cfg.ringBuffer.scheduleTime.size(),
+                        -scale_limit, scale_limit, nullptr,
+                        ImPlotPoint(0, cfg.ringBuffer.chs.size()),
+                        ImPlotPoint(cfg.ringBuffer.scheduleTime[cfg.ringBuffer.scheduleTime.size()-1], 0)
+                    );
+                    // 現在値を示す縦線
+                    const double t = cfg.ringBuffer.scheduleTime[cfg.ringBuffer.idxCurrent];
+                    const ImPlotRect limits = ImPlot::GetPlotLimits();
+                    const double x_line[] = { t, t }, y_line[] = {limits.Y.Min, limits.Y.Max};
+                    ImPlot::PlotLine("##Time line", x_line, y_line, 2);
+                    ImPlot::EndPlot();
+                }
+                ImGui::SameLine();
+                ImPlot::ColormapScale("y (V)", -scale_limit, scale_limit, ImVec2(75, -1), "%g");
+                ImGui::EndTabItem();
+            }
+            ImGui::EndTabBar();
+        }
         ImPlot::PopColormap();
     }
     ImGui::End();

@@ -75,6 +75,7 @@ public:
         double dt = 0;
         int idxWrite = 0, idxCurrent = 0, nofm = 0;
         int ch_multi = 0;
+        const int RBF_K = 4;
         std::vector<double> times, scheduleTime;
         std::vector<ComplexVector> chs;
         std::vector<double> matrix, matrix2;
@@ -97,7 +98,7 @@ public:
                 chs[i].ys.resize(ringbuffer_size, 0);
             }
             matrix.resize(n_daq_channel * n_multiplexer_channel * ringbuffer_size);
-            matrix2.resize(2 * n_daq_channel * n_multiplexer_channel * ringbuffer_size);
+            matrix2.resize(RBF_K * n_daq_channel * n_multiplexer_channel * ringbuffer_size);
             offsets.chs.resize(n_daq_channel * n_multiplexer_channel, 0);
             offsets.phases_deg.resize(n_daq_channel * n_multiplexer_channel, 0);
             sourceChs.resize(2);
@@ -137,8 +138,8 @@ public:
             // RBF補間 (epsilon = 0.8)
             Math::RBFInterpolation1D rbf;
             rbf.fit(x_train, y_train, 0.8, Math::RBFType::Multiquadric);
-            for (int ch = 0; ch < x_train.size() * 2; ++ch) {
-                matrix2[ch * times.size() + idxWrite] = rbf.predict(ch/2.0);
+            for (int ch = 0; ch < x_train.size() * RBF_K; ++ch) {
+                matrix2[ch * times.size() + idxWrite] = rbf.predict((double)ch/RBF_K);
             }
 
             // トリガー処理
