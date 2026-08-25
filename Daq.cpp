@@ -24,8 +24,8 @@ Daq::Daq(Config* cfg) : pCfg_(cfg) {
         dio.set_mode(device_data, 0xffff);
         dio.set_state(device_data, pCfg_->ringBuffer.ch_multi);
         supplies();
-        wavegen(0, pCfg_->ringBuffer.excitation.frequency, pCfg_->ringBuffer.excitation.amplitudeCh1, 0);
-        wavegen(1, pCfg_->ringBuffer.excitation.frequency, pCfg_->ringBuffer.excitation.amplitudeCh2, 0);
+        wavegen(0, pCfg_->ringBuffer.sourceChs[0].frequency, pCfg_->ringBuffer.sourceChs[0].amplitude, 0);
+        wavegen(1, pCfg_->ringBuffer.sourceChs[1].frequency, pCfg_->ringBuffer.sourceChs[1].amplitude, 0);
         scope.run(device_data, 1.0 / pCfg_->rawData.rawDt, static_cast<int>(pCfg_->rawData.times.size()), 0.0, pCfg_->rawData.range);
     }
     catch (const Dwf::Error& error) {
@@ -225,8 +225,8 @@ void Daq::runWithoutDaq(std::stop_token st) {
             std::this_thread::sleep_until(next_time);
             continue;
         }
-        const auto frequency = pCfg_->ringBuffer.excitation.frequency;
-        const auto amplitude = pCfg_->ringBuffer.excitation.amplitudeCh1;
+        const auto frequency = pCfg_->ringBuffer.sourceChs[0].frequency;
+        const auto amplitude = pCfg_->ringBuffer.sourceChs[0].amplitude;
         theta += angular_step * pCfg_->ringBuffer.dt;
         theta = std::fmod(theta, 2.0 * pCfg_->PI_);
 

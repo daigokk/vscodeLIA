@@ -26,22 +26,22 @@ void ControlWindow(GuiConfig& guiCfg, Config& cfg, Daq& daq) {
         ImGui::Separator();
         if(ImGui::BeginTabBar("Wavegen")){
             if(ImGui::BeginTabItem("W1")){
-                if(ImGui::SliderFloat("Frequency", &cfg.ringBuffer.excitation.frequency, 10e3f, 100e3f)) {
-                    if(daq.device_data) daq.wavegen(0, cfg.ringBuffer.excitation.frequency, cfg.ringBuffer.excitation.amplitudeCh1, 0);
+                if(ImGui::SliderFloat("Frequency", &cfg.ringBuffer.sourceChs[0].frequency, 10e3f, 100e3f)) {
+                    if(daq.device_data) daq.wavegen(0, cfg.ringBuffer.sourceChs[0].frequency, cfg.ringBuffer.sourceChs[0].amplitude, 0);
                 }
-                if(ImGui::SliderFloat("Amplitude", &cfg.ringBuffer.excitation.amplitudeCh1, 0.1f, 5.0f)) {    
-                    if(daq.device_data) daq.wavegen(0, cfg.ringBuffer.excitation.frequency, cfg.ringBuffer.excitation.amplitudeCh1, 0);
+                if(ImGui::SliderFloat("Amplitude", &cfg.ringBuffer.sourceChs[0].amplitude, 0.1f, 5.0f)) {    
+                    if(daq.device_data) daq.wavegen(0, cfg.ringBuffer.sourceChs[0].frequency, cfg.ringBuffer.sourceChs[0].amplitude, 0);
                 }
                 ImGui::EndTabItem();
             }
             if(ImGui::BeginTabItem("W2")){
                 ImGui::BeginDisabled();
-                if(ImGui::SliderFloat("Frequency", &cfg.ringBuffer.excitation.frequency, 10e3f, 100e3f)) {
-                    if(daq.device_data) daq.wavegen(1, cfg.ringBuffer.excitation.frequency, cfg.ringBuffer.excitation.amplitudeCh2, 0);
+                if(ImGui::SliderFloat("Frequency", &cfg.ringBuffer.sourceChs[1].frequency, 10e3f, 100e3f)) {
+                    if(daq.device_data) daq.wavegen(1, cfg.ringBuffer.sourceChs[1].frequency, cfg.ringBuffer.sourceChs[1].amplitude, 0);
                 }
                 ImGui::EndDisabled();
-                if(ImGui::SliderFloat("Amplitude", &cfg.ringBuffer.excitation.amplitudeCh2, 0.1f, 5.0f)) {    
-                    if(daq.device_data) daq.wavegen(1, cfg.ringBuffer.excitation.frequency, cfg.ringBuffer.excitation.amplitudeCh2, 0);
+                if(ImGui::SliderFloat("Amplitude", &cfg.ringBuffer.sourceChs[1].amplitude, 0.1f, 5.0f)) {    
+                    if(daq.device_data) daq.wavegen(1, cfg.ringBuffer.sourceChs[1].frequency, cfg.ringBuffer.sourceChs[1].amplitude, 0);
                 }
                 ImGui::EndTabItem();
             }

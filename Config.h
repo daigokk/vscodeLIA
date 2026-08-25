@@ -57,10 +57,10 @@ public:
             std::vector<float> phases_deg;
             bool flag = false;
         };
-        struct Excitation {
+        struct SourceCh{
             float frequency = EXCITATION_FREQUENCY;
-            float amplitudeCh1 = EXCITATION_AMPLITUDE;
-            float amplitudeCh2 = 0.0f;
+            float amplitude = EXCITATION_AMPLITUDE;
+            float phase = 0.0f;
         };
         struct Trigger {
             bool flag = false;
@@ -78,7 +78,7 @@ public:
         std::vector<ComplexVector> chs;
         std::vector<double> matrix;
         Offsets offsets;
-        Excitation excitation;
+        std::vector<SourceCh> sourceChs;
         Psd psd;
         Trigger trigger;
 
@@ -98,7 +98,8 @@ public:
             matrix.resize(n_daq_channel * n_multiplexer_channel * ringbuffer_size);
             offsets.chs.resize(n_daq_channel * n_multiplexer_channel, 0);
             offsets.phases_deg.resize(n_daq_channel * n_multiplexer_channel, 0);
-            psd.init(rawSize, excitation.frequency, rawDt);
+            sourceChs.resize(2);
+            psd.init(rawSize, sourceChs[0].frequency, rawDt);
         }
         
         void pop(const double xs[], const double ys[]){
@@ -192,8 +193,8 @@ public:
         }
 
         void update(const std::vector<std::vector<double>>& rawChs, const double rawDt){
-            if(psd.frequency != excitation.frequency){
-                psd.init(rawChs[0].size(), excitation.frequency, rawDt);
+            if(psd.frequency != sourceChs[0].frequency){
+                psd.init(rawChs[0].size(), sourceChs[0].frequency, rawDt);
             }
             static double xs[N_DAQ_CHANNEL*N_MULTIPLEXER_CHANNEL];
             static double ys[N_DAQ_CHANNEL*N_MULTIPLEXER_CHANNEL];
