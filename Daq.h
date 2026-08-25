@@ -20,7 +20,7 @@ public:
     void stop();
 
     void supplies(const double voltage = 5.0);
-    void wavegen(const double frequency = 100e3, const double amplitude = 1.0, int channel = 1, FUNC function = Function::sine, std::vector<double> data = std::vector<double>());
+    void wavegen(const int channel = 0, const double frequency = 100e3, const double amplitude = 1.0, const double phase = 0.0, FUNC function = Function::sine, std::vector<double> data = std::vector<double>());
 
     Dwf::Scope scope;
     Dwf::Dio dio;

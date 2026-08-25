@@ -27,15 +27,21 @@ void ControlWindow(GuiConfig& guiCfg, Config& cfg, Daq& daq) {
         if(ImGui::BeginTabBar("Wavegen")){
             if(ImGui::BeginTabItem("W1")){
                 if(ImGui::SliderFloat("Frequency", &cfg.ringBuffer.excitation.frequency, 10e3f, 100e3f)) {
-                    if(daq.device_data) daq.wavegen(cfg.ringBuffer.excitation.frequency, cfg.ringBuffer.excitation.amplitude);
+                    if(daq.device_data) daq.wavegen(0, cfg.ringBuffer.excitation.frequency, cfg.ringBuffer.excitation.amplitudeCh1, 0);
                 }
-                if(ImGui::SliderFloat("Amplitude", &cfg.ringBuffer.excitation.amplitude, 0.1f, 5.0f)) {    
-                    if(daq.device_data) daq.wavegen(cfg.ringBuffer.excitation.frequency, cfg.ringBuffer.excitation.amplitude);
+                if(ImGui::SliderFloat("Amplitude", &cfg.ringBuffer.excitation.amplitudeCh1, 0.1f, 5.0f)) {    
+                    if(daq.device_data) daq.wavegen(0, cfg.ringBuffer.excitation.frequency, cfg.ringBuffer.excitation.amplitudeCh1, 0);
                 }
-                if(ImGui::Button("Defaults")) {
-                    cfg.ringBuffer.excitation.frequency = EXCITATION_FREQUENCY;
-                    cfg.ringBuffer.excitation.amplitude = EXCITATION_AMPLITUDE;
-                    if(daq.device_data) daq.wavegen(cfg.ringBuffer.excitation.frequency, cfg.ringBuffer.excitation.amplitude);
+                ImGui::EndTabItem();
+            }
+            if(ImGui::BeginTabItem("W2")){
+                ImGui::BeginDisabled();
+                if(ImGui::SliderFloat("Frequency", &cfg.ringBuffer.excitation.frequency, 10e3f, 100e3f)) {
+                    if(daq.device_data) daq.wavegen(1, cfg.ringBuffer.excitation.frequency, cfg.ringBuffer.excitation.amplitudeCh2, 0);
+                }
+                ImGui::EndDisabled();
+                if(ImGui::SliderFloat("Amplitude", &cfg.ringBuffer.excitation.amplitudeCh2, 0.1f, 5.0f)) {    
+                    if(daq.device_data) daq.wavegen(1, cfg.ringBuffer.excitation.frequency, cfg.ringBuffer.excitation.amplitudeCh2, 0);
                 }
                 ImGui::EndTabItem();
             }

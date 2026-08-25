@@ -59,7 +59,8 @@ public:
         };
         struct Excitation {
             float frequency = EXCITATION_FREQUENCY;
-            float amplitude = EXCITATION_AMPLITUDE;
+            float amplitudeCh1 = EXCITATION_AMPLITUDE;
+            float amplitudeCh2 = 0.0f;
         };
         struct Trigger {
             bool flag = false;

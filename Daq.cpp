@@ -24,7 +24,8 @@ Daq::Daq(Config* cfg) : pCfg_(cfg) {
         dio.set_mode(device_data, 0xffff);
         dio.set_state(device_data, pCfg_->ringBuffer.ch_multi);
         supplies();
-        wavegen(pCfg_->ringBuffer.excitation.frequency, pCfg_->ringBuffer.excitation.amplitude);
+        wavegen(0, pCfg_->ringBuffer.excitation.frequency, pCfg_->ringBuffer.excitation.amplitudeCh1, 0);
+        wavegen(1, pCfg_->ringBuffer.excitation.frequency, pCfg_->ringBuffer.excitation.amplitudeCh2, 0);
         scope.run(device_data, 1.0 / pCfg_->rawData.rawDt, static_cast<int>(pCfg_->rawData.times.size()), 0.0, pCfg_->rawData.range);
     }
     catch (const Dwf::Error& error) {
@@ -80,19 +81,22 @@ void Daq::supplies(const double voltage) {
     }
 }
 
-void Daq::wavegen(const double frequency, const double amplitude, int channel, FUNC function, std::vector<double> data) {
+void Daq::wavegen(const int channel, const double frequency, const double amplitude, const double phase, FUNC function, std::vector<double> data) {
     /**
     * @brief 波形生成器を設定する
     * @param frequency 周波数
     * @param amplitude 振幅
-    * @param channel チャンネル (1 or 2)
+    * @param channel チャンネル (-1: ch1-2, 0:ch1, 1:ch2)
     * @param function 関数タイプ
     * @param data カスタムデータ
     */
     double offset = 0;
-    // enable channel
-    channel--;
-    if (FDwfAnalogOutNodeEnableSet(device_data->handle, channel, AnalogOutNodeCarrier, true) == 0) {
+    // enable ch1 and ch2
+    if (FDwfAnalogOutNodeEnableSet(device_data->handle, 0, AnalogOutNodeCarrier, true) == 0) {
+        Dwf::Device::check_error(device_data);
+    }
+
+    if (FDwfAnalogOutNodeEnableSet(device_data->handle, 1, AnalogOutNodeCarrier, true) == 0) {
         Dwf::Device::check_error(device_data);
     }
     
@@ -120,6 +124,11 @@ void Daq::wavegen(const double frequency, const double amplitude, int channel, F
     
     // set offset
     if (FDwfAnalogOutNodeOffsetSet(device_data->handle, channel, AnalogOutNodeCarrier, offset) == 0) {
+        Dwf::Device::check_error(device_data);
+    }
+
+    // set phase
+    if (FDwfAnalogOutNodePhaseSet(device_data->handle, channel, AnalogOutNodeCarrier, phase) == 0) {
         Dwf::Device::check_error(device_data);
     }
 
@@ -217,7 +226,7 @@ void Daq::runWithoutDaq(std::stop_token st) {
             continue;
         }
         const auto frequency = pCfg_->ringBuffer.excitation.frequency;
-        const auto amplitude = pCfg_->ringBuffer.excitation.amplitude;
+        const auto amplitude = pCfg_->ringBuffer.excitation.amplitudeCh1;
         theta += angular_step * pCfg_->ringBuffer.dt;
         theta = std::fmod(theta, 2.0 * pCfg_->PI_);
 
