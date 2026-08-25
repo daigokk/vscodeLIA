@@ -1,5 +1,6 @@
 #pragma once
 #include "Psd.h"
+#include "Rbf.h"
 #include <pocketfft_hdronly.h>
 
 #include <vector>
@@ -76,7 +77,7 @@ public:
         int ch_multi = 0;
         std::vector<double> times, scheduleTime;
         std::vector<ComplexVector> chs;
-        std::vector<double> matrix;
+        std::vector<double> matrix, matrix2;
         Offsets offsets;
         std::vector<SourceCh> sourceChs;
         Psd psd;
@@ -96,6 +97,7 @@ public:
                 chs[i].ys.resize(ringbuffer_size, 0);
             }
             matrix.resize(n_daq_channel * n_multiplexer_channel * ringbuffer_size);
+            matrix2.resize(2 * n_daq_channel * n_multiplexer_channel * ringbuffer_size);
             offsets.chs.resize(n_daq_channel * n_multiplexer_channel, 0);
             offsets.phases_deg.resize(n_daq_channel * n_multiplexer_channel, 0);
             sourceChs.resize(2);
@@ -114,6 +116,10 @@ public:
                 }
                 offsets.flag = false;
             }
+            // RBF補間の準備
+            std::vector<double> x_train(chs.size()), y_train(chs.size());
+
+            // 測定値のringBufferへの格納とコンター図用配列matrixの作成
             for(int ch = 0; ch < chs.size(); ++ch){
                 auto [x, y] = psd.rotate(
                     offsets.phases_deg[ch],
@@ -124,7 +130,17 @@ public:
                 chs[ch].ys[idxWrite] = y;
                 const int idx = ch * times.size() + idxWrite;
                 matrix[idx] = chs[ch].ys[idxWrite];
+                x_train[ch] = ch;
+                y_train[ch] = y;
             }
+
+            // RBF補間 (epsilon = 0.8)
+            Math::RBFInterpolation1D rbf;
+            rbf.fit(x_train, y_train, 0.8, Math::RBFType::Multiquadric);
+            for (int ch = 0; ch < x_train.size() * 2; ++ch) {
+                matrix2[ch * times.size() + idxWrite] = rbf.predict(ch/2.0);
+            }
+
             // トリガー処理
             if (trigger.flag) {
                 if (trigger.level >= 0) {
