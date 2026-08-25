@@ -193,7 +193,8 @@ void Daq::run(std::stop_token st) {
             // マルチプレクサのチャンネル更新
             dio.set_state(device_data, pCfg_->ringBuffer.ch_multi);
             next_time += loop_period;
-            std::this_thread::sleep_until(next_time);
+            while(next_time > std::chrono::steady_clock::now());
+            // std::this_thread::sleep_until(next_time);
         }
         closeDevice();
         pCfg_->status.isRun = false;
@@ -241,7 +242,8 @@ void Daq::runWithoutDaq(std::stop_token st) {
         pCfg_->ringBuffer.update(pCfg_->rawData.chs, pCfg_->rawData.rawDt);
 
         next_time += loop_period;
-        std::this_thread::sleep_until(next_time);
+        while(next_time > std::chrono::steady_clock::now());
+        // std::this_thread::sleep_until(next_time);
     }
     pCfg_->status.isRun = false;
 }

@@ -38,10 +38,10 @@ public:
             rawDt = newDt;
             times.resize(raw_count);
             chs.resize(n_channel);
-            for(int i=0; i < chs.size(); i++){
+            for(int i = 0; i < chs.size(); ++i){
                 chs[i].resize(raw_count);
             }
-            for (int i = 0; i < times.size(); i++) {
+            for (int i = 0; i < times.size(); ++i) {
                 times[i] = static_cast<double>(i) * rawDt;
             }
         }
@@ -84,7 +84,7 @@ public:
 
         void init(const double rawSize, const double rawDt, const double newDt, const int ringbuffer_size, const int n_daq_channel, const int n_multiplexer_channel){
             dt = newDt;
-            idxWrite = 0; idxCurrent = 0; nofm = 0;
+            idxWrite = 0; idxCurrent = 0; nofm = 0; ch_multi = 0;
             times.resize(ringbuffer_size);
             scheduleTime.resize(ringbuffer_size);
             for (int i = 0; i < scheduleTime.size(); ++i){
@@ -233,7 +233,7 @@ public:
     }
 
     void buttonRun(){
-        ringBuffer.pauseFlag = false;
+        ringBuffer.ch_multi = 0;
         ringBuffer.idxCurrent = 0;
         ringBuffer.idxWrite = 0;
         ringBuffer.nofm = 0;
@@ -245,6 +245,7 @@ public:
                 ringBuffer.matrix[idx] = 0.0;
             }
         }
+        ringBuffer.pauseFlag = false;
     }
 
     explicit Config() {
@@ -265,8 +266,12 @@ public:
             outFile << std::endl;
             // 測定値
             const int size = ringBuffer.times.size() < ringBuffer.nofm ? ringBuffer.times.size() : ringBuffer.nofm;
+            int startIdx = 0;
+            if(ringBuffer.nofm > ringBuffer.times.size()){
+                startIdx = ringBuffer.idxWrite;
+            }
             for(int i = 0; i < size; ++i){
-                int idx = (ringBuffer.idxWrite + i) % ringBuffer.times.size();
+                int idx = (startIdx + i) % ringBuffer.times.size();
                 outFile << std::format("{:e}", ringBuffer.times[idx]);
                 for(int ch = 0; ch < ringBuffer.chs.size(); ++ch){
                     outFile << std::format("{0}{1:e}{0}{2:e}", delimiter, ringBuffer.chs[ch].xs[idx], ringBuffer.chs[ch].ys[idx]);
