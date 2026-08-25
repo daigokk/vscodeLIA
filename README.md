@@ -30,7 +30,7 @@ https://github.com/user-attachments/assets/82d80d7d-aa7a-41a0-967f-187cdc8ed578
 | --- |
 | 図1. 位相敏感検波のブロック図 |
 
-* [参考] 以下のコードは図2のブロック図を具現化したものです。`Psd.h`に記載の`Psd::calc`関数に以下を記述すると、プローブの状態に合わせてリアルタイムにXYウィンドウの輝点が移動します。
+* [参考] 以下のコードは図1のブロック図を具現化したものです。`Psd.h`に記載の`Psd::calc`関数に以下を記述すると、プローブの状態に合わせてリアルタイムにXYウィンドウの輝点が移動します。
 
 ```c++
 inline std::pair<double, double> Psd::calc(const double* inData){
