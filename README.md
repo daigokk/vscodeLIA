@@ -219,10 +219,17 @@ DAQのドライバおよびSDKを取得するためにインストールしま�
 * `Psd.h`に記載の`Psd::calc`関数を完成させてください。
 * (オプション) `Config.h`に記載の`fft`関数を完成させ、FFTを使ってPSDと同様の結果を得られることを確認してみてください。`fft`関数をどこから呼び出すかも考えてみてください。様々な条件においてどちらが優れているか比較してみるのもよいでしょう。入力波形を矩形波にすることで、高調波成分は正弦波の時より大きくなります。この方法の利点は、一度に複数の周波数成分を得られることです。
 ```c++
-void fft(Config* pCfg) {
-    const auto& in_data = pCfg->rawData.ch[0];
+inline void fft(Config& cfg) {
+    const auto& in_data = cfg.rawData.chs[0];
     const size_t N = in_data.size();
-    const size_t N_HARMONICS_ = pCfg->fftBuffer.numHarmonics_x.size();
+    const size_t N_HARMONICS_ = cfg.fftBuffer.numHarmonics_x.size();
+    // 周波数分解能 df = 1 / (N * dt)
+    const double df = 1.0 / (static_cast<double>(N) * cfg.rawData.rawDt);
+    const double f0 = cfg.ringBuffer.sourceChs[0].frequency;
+    // 正規化用係数（DFT結果を平均振幅に戻すため 2/N を乗算）
+    const double scale = 2.0 / static_cast<double>(N);
+
+    // TODO: ここにフーリエ変換のコードを入力
 
     // 1. pocketfft実行用の入出力形状およびストライドの設定
     pocketfft::shape_t shape = { N };
@@ -245,15 +252,9 @@ void fft(Config* pCfg) {
         fft_out.data(),
         1.0
     );
-
-    // 3. 周波数分解能 df = 1 / (N * dt)
-    const double df = 1.0 / (static_cast<double>(N) * pCfg->rawData.dt);
-    const double f0 = pCfg->excitation.frequency;
-
-    // 正規化用係数（DFT結果を平均振幅に戻すため 2/N を乗算）
-    const double scale = 2.0 / static_cast<double>(N);
-
-    // 4. 各倍波に対応する周波数インデックス（ビン）を特定して格納
+    // ここまで
+    
+    // 3. 各倍波に対応する周波数インデックス（ビン）を特定して格納
     for (int i = 0; i < N_HARMONICS; ++i) {
         // 抽出対象の高調波倍率 (1倍, 3倍, 5倍, ...)
         const double target_freq = f0 * (i * 2 + 1);
@@ -264,8 +265,8 @@ void fft(Config* pCfg) {
         // ナイキスト周波数（N/2）以下の範囲内にあるか確認
         if (bin_idx < fft_out.size()) {
             // スケーリングを適用して実部(X)と虚部(Y)を格納
-            pCfg->fftBuffer.numHarmonics_x[i] = fft_out[bin_idx].real() * scale;
-            pCfg->fftBuffer.numHarmonics_y[i] = -fft_out[bin_idx].imag() * scale;
+            cfg.fftBuffer.numHarmonics_x[i] = fft_out[bin_idx].real() * scale;
+            cfg.fftBuffer.numHarmonics_y[i] = fft_out[bin_idx].imag() * scale;
         }
     }
 }
