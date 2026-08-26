@@ -74,10 +74,9 @@ void Dwf::Scope::trigger(Dwf::Device::Data *device_data, bool enable, const TRIG
 
         // set trigger channel
         if (source == trigsrcDetectorAnalogIn) {
-            channel--;  // decrement analog channel index
-        }
-        if (FDwfAnalogInTriggerChannelSet(device_data->handle, channel) == 0) {
-            Dwf::Device::check_error(device_data);
+            if (FDwfAnalogInTriggerChannelSet(device_data->handle, channel) == 0) {
+                Dwf::Device::check_error(device_data);
+            }
         }
 
         // set trigger type
@@ -122,7 +121,7 @@ void Dwf::Scope::run(Dwf::Device::Data *device_data, const double sample_rate, c
     * @param range ダイナミックレンジ (2.5: ±2.5V, 25: ±25V)
     */
     open(device_data, sample_rate, buffer_size, offset, range*2);
-    trigger(device_data, true, trigsrcAnalogOut1, 1, 0);
+    trigger(device_data, true, trigsrcAnalogOut1, 0, 0);
     if (FDwfAnalogInConfigure(device_data->handle, true, true) == 0) {
         Dwf::Device::check_error(device_data);
     }
