@@ -34,7 +34,7 @@ void MultichannelWindow(GuiConfig& guiCfg, Config& cfg) {
                 cfg.buttonPause();
             }
         }
-        if (ImPlot::BeginPlot("##Line Plot", ImVec2(ImGui::GetWindowWidth()-100, ImGui::GetWindowHeight()/3))) {
+        if (ImPlot::BeginPlot("##Line Plot", ImVec2(ImGui::GetWindowWidth() - guiCfg.dpi_scale * 100, ImGui::GetWindowHeight()/3))) {
             ImPlot::SetupAxis(ImAxis_Y1, "y (V)");
             //ImPlot::SetupLegend(ImPlotLocation_East, true);
             const double t_current = cfg.ringBuffer.scheduleTime[cfg.ringBuffer.scheduleTime.size()-1];
@@ -80,7 +80,7 @@ void MultichannelWindow(GuiConfig& guiCfg, Config& cfg) {
         ImPlot::PushColormap(ImPlotColormap_Jet);
         if(ImGui::BeginTabBar("Contour")){
             if(ImGui::BeginTabItem("Original")){
-                if (ImPlot::BeginPlot("##Contour Plot", ImVec2(ImGui::GetWindowWidth()-100, -1))) {
+                if (ImPlot::BeginPlot("##Contour Plot", ImVec2(ImGui::GetWindowWidth() - guiCfg.dpi_scale * 100, -1))) {
                     ImPlot::SetupAxis(ImAxis_X1, "Time (s)");
                     ImPlot::SetupAxis(ImAxis_Y1, "Ch");
                     const double t_current = cfg.ringBuffer.scheduleTime[cfg.ringBuffer.scheduleTime.size()-1];
