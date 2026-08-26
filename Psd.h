@@ -40,7 +40,7 @@ inline void Psd::init(const int N, const double newFrequency, const double newDt
     inverseSampleCount = 1.0 / static_cast<double>(sampleCount);
 
     const double omegaDt = 2.0 * PI * frequency * dt;
-    for (int i = 0; i < N; ++i) {
+    for (int i = 0; i < sampleCount; ++i) {
         const double wt = omegaDt * static_cast<double>(i);
         sin2[i] = 2.0 * std::sin(wt);
         cos2[i] = 2.0 * std::cos(wt);
