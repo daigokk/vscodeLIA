@@ -240,7 +240,7 @@ void Daq::runWithoutDaq(std::stop_token st) {
         }
 
         pCfg_->ringBuffer.update(pCfg_->rawData.chs, pCfg_->rawData.rawDt);
-
+        //fft(*pCfg_);
         next_time += loop_period;
         while(next_time > std::chrono::steady_clock::now()){
             //std::this_thread::sleep_for(std::chrono::microseconds(10));

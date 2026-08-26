@@ -11,6 +11,7 @@ private:
     double inverseSampleCount = 0.0;
     const double PI = std::acos(-1.0);
 public:
+    size_t getSize(){ return sin2.size(); }
     double frequency = 0.0;
     double dt = 0.0;
     void init(const int N, const double frequency, const double dt);

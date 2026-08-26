@@ -1,23 +1,20 @@
 #pragma once
-#include "Psd.h"
-#include "Rbf.h"
 #include <pocketfft_hdronly.h>
 
 #include <vector>
-#include <complex>
-#include <cmath>
-#include <chrono>
+#include <format>
 #include <fstream>
 
 #define RAW_SIZE 10000
 #define RAW_RATE 100e6
 #define EXCITATION_FREQUENCY 10e3
 #define EXCITATION_AMPLITUDE 1.0
-#define N_DAQ_CHANNEL 2
-#define N_MULTIPLEXER_CHANNEL 8
+#define N_DAQ_CHANNEL 1
+#define N_MULTIPLEXER_CHANNEL 1
 #define N_HARMONICS 5
 #define RINGBUFFER_DT 2e-3 // 2ms
 #define RINGBUFFER_SIZE (10 / RINGBUFFER_DT / N_MULTIPLEXER_CHANNEL) // 10s
+
 
 // 測定に関する設定および測定値を保存するクラス
 class Config{
@@ -81,153 +78,11 @@ public:
         std::vector<double> matrix, matrix2;
         Offsets offsets;
         std::vector<SourceCh> sourceChs;
-        Psd psd;
         Trigger trigger;
 
-        void init(const double rawSize, const double rawDt, const double newDt, const int ringbuffer_size, const int n_daq_channel, const int n_multiplexer_channel){
-            dt = newDt;
-            idxWrite = 0; idxCurrent = 0; nofm = 0; ch_multi = 0;
-            times.resize(ringbuffer_size);
-            scheduleTime.resize(ringbuffer_size);
-            for (int i = 0; i < scheduleTime.size(); ++i){
-                scheduleTime[i] = i * dt * n_multiplexer_channel;
-            }
-            chs.resize(n_daq_channel * n_multiplexer_channel);
-            for(int i=0; i < chs.size(); ++i){
-                chs[i].xs.resize(ringbuffer_size, 0);
-                chs[i].ys.resize(ringbuffer_size, 0);
-            }
-            matrix.resize(n_daq_channel * n_multiplexer_channel * ringbuffer_size);
-            matrix2.resize(RBF_K * n_daq_channel * n_multiplexer_channel * ringbuffer_size);
-            offsets.chs.resize(n_daq_channel * n_multiplexer_channel, 0);
-            offsets.phases_deg.resize(n_daq_channel * n_multiplexer_channel, 0);
-            sourceChs.resize(2);
-            sourceChs[1].amplitude = 0;
-            psd.init(rawSize, sourceChs[0].frequency, rawDt);
-        }
-        
-        void pop(const double xs[], const double ys[]){
-            static std::chrono::steady_clock::time_point start_time = std::chrono::steady_clock::now();
-            times[idxWrite] = std::chrono::duration<double>(
-                std::chrono::steady_clock::now() - start_time
-            ).count();
-            if (offsets.flag){
-                for(int ch = 0; ch < chs.size(); ++ch){
-                    offsets.chs[ch].real(xs[ch]);
-                    offsets.chs[ch].imag(ys[ch]);
-                }
-                offsets.flag = false;
-            }
-            // RBF補間の準備
-            std::vector<double> x_train(chs.size()), y_train(chs.size());
-
-            // 測定値のringBufferへの格納とコンター図用配列matrixの作成
-            for(int ch = 0; ch < chs.size(); ++ch){
-                auto [x, y] = psd.rotate(
-                    offsets.phases_deg[ch],
-                    xs[ch] - offsets.chs[ch].real(),
-                    ys[ch] - offsets.chs[ch].imag()
-                );
-                chs[ch].xs[idxWrite] = x;
-                chs[ch].ys[idxWrite] = y;
-                const int idx = ch * times.size() + idxWrite;
-                matrix[idx] = chs[ch].ys[idxWrite];
-                x_train[ch] = ch;
-                y_train[ch] = y;
-            }
-
-            // RBF補間 (epsilon = 0.8)
-            Math::RBFInterpolation1D rbf;
-            rbf.fit(x_train, y_train, 0.8, Math::RBFType::Multiquadric);
-            for (int ch = 0; ch < x_train.size() * RBF_K; ++ch) {
-                matrix2[ch * times.size() + idxWrite] = rbf.predict((double)ch/RBF_K);
-            }
-
-            // トリガー処理
-            if (trigger.flag) {
-                if (trigger.level >= 0) {
-                    // slope:+
-                    if (!trigger.readyFlag && !trigger.countFlag){
-                        bool flag = true;
-                        for(int ch = 0; ch < chs.size(); ++ch){
-                            if(chs[ch].ys[idxCurrent] > trigger.level) {
-                                flag = false;
-                            }
-                        }
-                        if(flag){ trigger.readyFlag = true; }
-                    }
-                    if (trigger.readyFlag && !trigger.countFlag){
-                        bool flag = false;
-                        for(int ch = 0; ch < chs.size(); ++ch){
-                            if(chs[ch].ys[idxCurrent] >= trigger.level) {
-                                flag = true;
-                                break;
-                            }
-                        }
-                        if(flag){ trigger.countFlag = true; }
-                    }   
-                }
-                else {
-                    // slope: -
-                    if (!trigger.readyFlag && !trigger.countFlag){
-                        bool flag = true;
-                        for(int ch = 0; ch < chs.size(); ++ch){
-                            if(chs[ch].ys[idxCurrent] < trigger.level) {
-                                flag = false;
-                            }
-                        }
-                        if(flag){ trigger.readyFlag = true; }
-                    }
-                    if (trigger.readyFlag && !trigger.countFlag){
-                        bool flag = false;
-                        for(int ch = 0; ch < chs.size(); ++ch){
-                            if(chs[ch].ys[idxCurrent] <= trigger.level) {
-                                flag = true;
-                                break;
-                            }
-                        }
-                        if(flag){ trigger.countFlag = true; }
-                    }
-                }
-                // Post trigger
-                if(trigger.readyFlag && trigger.countFlag && trigger.countFlag){
-                    if (trigger.nofm == 0) {
-                        trigger.nofm = nofm;
-                    }
-                    else if (trigger.nofm + times.size() / 2 <= nofm) {
-                        pauseFlag = true;
-                        trigger.nofm = 0;
-                        trigger.readyFlag = false;
-                        trigger.countFlag = false;
-                    }
-                } 
-            }
-            else {
-                trigger.nofm = 0;
-            }
-            idxCurrent = idxWrite;
-            idxWrite++; nofm++;
-            if(idxWrite >= times.size()) {idxWrite = 0;}
-        }
-
-        void update(const std::vector<std::vector<double>>& rawChs, const double rawDt){
-            if(psd.frequency != sourceChs[0].frequency){
-                psd.init(rawChs[0].size(), sourceChs[0].frequency, rawDt);
-            }
-            static double xs[N_DAQ_CHANNEL*N_MULTIPLEXER_CHANNEL];
-            static double ys[N_DAQ_CHANNEL*N_MULTIPLEXER_CHANNEL];
-            for(int i = 0; i < N_DAQ_CHANNEL; ++i){
-                const int ch = i + ch_multi * N_DAQ_CHANNEL;
-                auto const [x, y] = psd.calc(rawChs[ch].data());
-                xs[ch] = x;
-                ys[ch] = y;
-            }
-            ch_multi++;
-            if(ch_multi >= N_MULTIPLEXER_CHANNEL){
-                pop(xs, ys);
-                ch_multi = 0;
-            }
-        }
+        void init(const double rawSize, const double rawDt, const double newRingDt, const int ringSize, const int n_daq_channel, const int n_multiplexer_channel);
+        void pop(const double xs[], const double ys[]);
+        void update(const std::vector<std::vector<double>>& rawChs, const double rawDt);
     } ringBuffer;
 
     class FFTBuffer {
@@ -301,7 +156,55 @@ public:
     }
 };
 
-inline void fft(Config* pCfg) {
+
+inline void fft(Config& cfg) {
+    const auto& in_data = cfg.rawData.chs[0];
+    const size_t N = in_data.size();
+    const size_t N_HARMONICS_ = cfg.fftBuffer.numHarmonics_x.size();
+    // 周波数分解能 df = 1 / (N * dt)
+    const double df = 1.0 / (static_cast<double>(N) * cfg.rawData.rawDt);
+    const double f0 = cfg.ringBuffer.sourceChs[0].frequency;
+    // 正規化用係数（DFT結果を平均振幅に戻すため 2/N を乗算）
+    const double scale = 2.0 / static_cast<double>(N);
+
     // TODO: ここにフーリエ変換のコードを入力
+
+    // 1. pocketfft実行用の入出力形状およびストライドの設定
+    pocketfft::shape_t shape = { N };
+    pocketfft::stride_t stride_in = { sizeof(double) };
+    pocketfft::stride_t stride_out = { sizeof(std::complex<double>) };
+    pocketfft::shape_t axes = { 0 };
+
+    // Real-to-Complex FFT (r2c) の出力サイズは N/2 + 1
+    std::vector<std::complex<double>> fft_out(N / 2 + 1);
+
+    // 2. FFTの実行 (r2c: 実数入力 -> 複素数出力)
+    // 引数: shape, stride_in, stride_out, axes, forward(true), in_ptr, out_ptr, scale(1.0)
+    pocketfft::r2c(
+        shape,
+        stride_in,
+        stride_out,
+        axes,
+        pocketfft::FORWARD,
+        in_data.data(),
+        fft_out.data(),
+        1.0
+    );
+    // ここまで
     
+    // 3. 各倍波に対応する周波数インデックス（ビン）を特定して格納
+    for (int i = 0; i < N_HARMONICS; ++i) {
+        // 抽出対象の高調波倍率 (1倍, 3倍, 5倍, ...)
+        const double target_freq = f0 * (i * 2 + 1);
+        
+        // 最も近い周波数ビンのインデックスを計算
+        const size_t bin_idx = static_cast<size_t>(std::round(target_freq / df));
+
+        // ナイキスト周波数（N/2）以下の範囲内にあるか確認
+        if (bin_idx < fft_out.size()) {
+            // スケーリングを適用して実部(X)と虚部(Y)を格納
+            cfg.fftBuffer.numHarmonics_x[i] = fft_out[bin_idx].real() * scale;
+            cfg.fftBuffer.numHarmonics_y[i] = fft_out[bin_idx].imag() * scale;
+        }
+    }
 }
