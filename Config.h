@@ -102,6 +102,7 @@ public:
             offsets.chs.resize(n_daq_channel * n_multiplexer_channel, 0);
             offsets.phases_deg.resize(n_daq_channel * n_multiplexer_channel, 0);
             sourceChs.resize(2);
+            sourceChs[1].amplitude = 0;
             psd.init(rawSize, sourceChs[0].frequency, rawDt);
         }
         
