@@ -1,12 +1,21 @@
-#include "Config.h"
+#include "RingBuffer.h"
 #include "Psd.h"
 #include "Rbf.h"
-#include <complex>
 #include <cmath>
 #include <chrono>
 
-void Config::RingBuffer::init(const double rawSize, const double rawDt, const double newRingDt, const int ringSize, const int n_daq_channel, const int n_multiplexer_channel){
+void RingBuffer::initSource(const float frequency, const float ampCh1, const float ampCh2){
+    sourceChs.resize(2);
+    sourceChs[0].frequency = frequency;
+    sourceChs[0].amplitude = ampCh1;
+    sourceChs[1].frequency = sourceChs[0].frequency;
+    sourceChs[1].amplitude = ampCh2;
+}
+
+void RingBuffer::init(const double newRingDt, const int ringSize, const int n_daq_channel, const int n_multiplexer_channel){
     dt = newRingDt;
+    scopeCfg.nDaqChannel = n_daq_channel;
+    scopeCfg.nMultiChannel = n_multiplexer_channel;
     scheduleTime.resize(ringSize);
     for (int i = 0; i < scheduleTime.size(); ++i){
         scheduleTime[i] = i * dt * n_multiplexer_channel;
@@ -22,12 +31,11 @@ void Config::RingBuffer::init(const double rawSize, const double rawDt, const do
     matrix2.resize(RBF_K * n_daq_channel * n_multiplexer_channel * ringSize);
     offsets.chs.resize(n_daq_channel * n_multiplexer_channel, 0);
     offsets.phases_deg.resize(n_daq_channel * n_multiplexer_channel, 0);
-    sourceChs.resize(2);
-    sourceChs[1].amplitude = 0;
+    
     idxWrite = 0; idxCurrent = 0; nofm = 0; ch_multi = 0;
 }
 
-void Config::RingBuffer::pop(const double xs[], const double ys[]){
+void RingBuffer::pop(const double xs[], const double ys[]){
     static std::chrono::steady_clock::time_point start_time = std::chrono::steady_clock::now();
     times[idxWrite] = std::chrono::duration<double>(
         std::chrono::steady_clock::now() - start_time
@@ -126,15 +134,14 @@ void Config::RingBuffer::pop(const double xs[], const double ys[]){
     if(idxWrite >= times.size()) {idxWrite = 0;}
 }
 
-void Config::RingBuffer::update(const std::vector<std::vector<double>>& rawChs, const double rawDt){
+void RingBuffer::update(const std::vector<std::vector<double>>& rawChs, const double rawDt){
     static Psd psd;
     if(psd.frequency != sourceChs[0].frequency || psd.getSize() != rawChs[0].size() || psd.dt != rawDt){
         psd.init(rawChs[0].size(), sourceChs[0].frequency, rawDt);
     }
-    static double xs[N_DAQ_CHANNEL*N_MULTIPLEXER_CHANNEL];
-    static double ys[N_DAQ_CHANNEL*N_MULTIPLEXER_CHANNEL];
-    for(int i = 0; i < N_DAQ_CHANNEL; ++i){
-        const int ch = i + ch_multi * N_DAQ_CHANNEL;
+    static std::vector<double> xs(chs.size()), ys(chs.size());
+    for(int i = 0; i < scopeCfg.nDaqChannel; ++i){
+        const int ch = i + ch_multi * scopeCfg.nDaqChannel;
         auto const [x, y] = psd.calc(rawChs[ch].data());
         auto const [x2, y2] = psd.rotate(
             offsets.phases_deg[ch],
@@ -145,8 +152,8 @@ void Config::RingBuffer::update(const std::vector<std::vector<double>>& rawChs, 
         ys[ch] = y2;
     }
     ch_multi++;
-    if(ch_multi >= N_MULTIPLEXER_CHANNEL){
-        pop(xs, ys);
+    if(ch_multi >= scopeCfg.nMultiChannel){
+        pop(xs.data(), ys.data());
         ch_multi = 0;
     }
 }

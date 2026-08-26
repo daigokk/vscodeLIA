@@ -28,24 +28,36 @@ void ControlWindow(GuiConfig& guiCfg, Config& cfg, Daq& daq) {
             if(ImGui::BeginTabItem("W1")){
                 ImGui::SetNextItemWidth(guiCfg.dpi_scale * 100);
                 if(ImGui::SliderFloat("Frequency", &cfg.ringBuffer.sourceChs[0].frequency, 10e3f, 100e3f)) {
-                    if(daq.device_data) daq.wavegen(0, cfg.ringBuffer.sourceChs[0].frequency, cfg.ringBuffer.sourceChs[0].amplitude, 0);
+                    if(daq.device_data) daq.wavegen(0, cfg.ringBuffer.sourceChs[0].frequency, cfg.ringBuffer.sourceChs[0].amplitude, cfg.ringBuffer.sourceChs[0].phase);
+                    cfg.ringBuffer.sourceChs[1].frequency = cfg.ringBuffer.sourceChs[0].frequency;
+                    if(daq.device_data) daq.wavegen(1, cfg.ringBuffer.sourceChs[1].frequency, cfg.ringBuffer.sourceChs[1].amplitude, cfg.ringBuffer.sourceChs[1].phase);
                 }
                 ImGui::SetNextItemWidth(guiCfg.dpi_scale * 100);
                 if(ImGui::SliderFloat("Amplitude", &cfg.ringBuffer.sourceChs[0].amplitude, 0.0f, 5.0f)) {    
-                    if(daq.device_data) daq.wavegen(0, cfg.ringBuffer.sourceChs[0].frequency, cfg.ringBuffer.sourceChs[0].amplitude, 0);
+                    if(daq.device_data) daq.wavegen(0, cfg.ringBuffer.sourceChs[0].frequency, cfg.ringBuffer.sourceChs[0].amplitude, cfg.ringBuffer.sourceChs[0].phase);
                 }
+                ImGui::BeginDisabled();
+                ImGui::SetNextItemWidth(guiCfg.dpi_scale * 100);
+                if(ImGui::SliderFloat("Phase", &cfg.ringBuffer.sourceChs[0].phase, -180.0f, 180.0f)) {    
+                    if(daq.device_data) daq.wavegen(0, cfg.ringBuffer.sourceChs[0].frequency, cfg.ringBuffer.sourceChs[0].amplitude, cfg.ringBuffer.sourceChs[0].phase);
+                }
+                ImGui::EndDisabled();
                 ImGui::EndTabItem();
             }
             if(ImGui::BeginTabItem("W2")){
                 ImGui::BeginDisabled();
                 ImGui::SetNextItemWidth(guiCfg.dpi_scale * 100);
                 if(ImGui::SliderFloat("Frequency", &cfg.ringBuffer.sourceChs[1].frequency, 10e3f, 100e3f)) {
-                    if(daq.device_data) daq.wavegen(1, cfg.ringBuffer.sourceChs[1].frequency, cfg.ringBuffer.sourceChs[1].amplitude, 0);
+                    if(daq.device_data) daq.wavegen(1, cfg.ringBuffer.sourceChs[1].frequency, cfg.ringBuffer.sourceChs[1].amplitude, cfg.ringBuffer.sourceChs[1].phase);
                 }
                 ImGui::EndDisabled();
                 ImGui::SetNextItemWidth(guiCfg.dpi_scale * 100);
                 if(ImGui::SliderFloat("Amplitude", &cfg.ringBuffer.sourceChs[1].amplitude, 0.0f, 5.0f)) {    
                     if(daq.device_data) daq.wavegen(1, cfg.ringBuffer.sourceChs[1].frequency, cfg.ringBuffer.sourceChs[1].amplitude, 0);
+                }
+                ImGui::SetNextItemWidth(guiCfg.dpi_scale * 100);
+                if(ImGui::SliderFloat("Phase", &cfg.ringBuffer.sourceChs[1].phase, -180.0f, 180.0f)) {    
+                    if(daq.device_data) daq.wavegen(1, cfg.ringBuffer.sourceChs[1].frequency, cfg.ringBuffer.sourceChs[1].amplitude, cfg.ringBuffer.sourceChs[1].phase);
                 }
                 ImGui::EndTabItem();
             }

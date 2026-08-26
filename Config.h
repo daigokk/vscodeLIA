@@ -1,4 +1,5 @@
 #pragma once
+#include "RingBuffer.h"
 #include <pocketfft_hdronly.h>
 
 #include <vector>
@@ -9,8 +10,8 @@
 #define RAW_RATE 100e6
 #define EXCITATION_FREQUENCY 10e3
 #define EXCITATION_AMPLITUDE 1.0
-#define N_DAQ_CHANNEL 1
-#define N_MULTIPLEXER_CHANNEL 1
+#define N_DAQ_CHANNEL 2
+#define N_MULTIPLEXER_CHANNEL 8
 #define N_HARMONICS 5
 #define RINGBUFFER_DT 2e-3 // 2ms
 #define RINGBUFFER_SIZE (10 / RINGBUFFER_DT / N_MULTIPLEXER_CHANNEL) // 10s
@@ -45,45 +46,7 @@ public:
         }
     } rawData;
 
-    class RingBuffer {
-    private:
-        struct ComplexVector {
-            std::vector<double> xs, ys;
-        };
-        struct Offsets {
-            std::vector<std::complex<float>> chs;
-            std::vector<float> phases_deg;
-            bool flag = false;
-        };
-        struct SourceCh{
-            float frequency = EXCITATION_FREQUENCY;
-            float amplitude = EXCITATION_AMPLITUDE;
-            float phase = 0.0f;
-        };
-        struct Trigger {
-            bool flag = false;
-            bool readyFlag = false;
-            bool countFlag = false;
-            int nofm = 0;
-            double level = 0.0;
-        };
-    public:
-        bool pauseFlag = false;
-        double dt = 0;
-        int idxWrite = 0, idxCurrent = 0, nofm = 0;
-        int ch_multi = 0;
-        const int RBF_K = 4;
-        std::vector<double> times, scheduleTime;
-        std::vector<ComplexVector> chs;
-        std::vector<double> matrix, matrix2;
-        Offsets offsets;
-        std::vector<SourceCh> sourceChs;
-        Trigger trigger;
-
-        void init(const double rawSize, const double rawDt, const double newRingDt, const int ringSize, const int n_daq_channel, const int n_multiplexer_channel);
-        void pop(const double xs[], const double ys[]);
-        void update(const std::vector<std::vector<double>>& rawChs, const double rawDt);
-    } ringBuffer;
+    RingBuffer ringBuffer;
 
     class FFTBuffer {
     public:
@@ -96,7 +59,8 @@ public:
         const double ringBufferDt=RINGBUFFER_DT, const int ringBufferSize=RINGBUFFER_SIZE
     ){
         rawData.init(1.0 / rawRate, rawSize, nDaqChannel * nMultiplexerChannel);
-        ringBuffer.init(rawData.times.size(), rawData.rawDt, ringBufferDt, ringBufferSize, nDaqChannel, nMultiplexerChannel);
+        ringBuffer.initSource(EXCITATION_FREQUENCY, 1, 0);
+        ringBuffer.init(ringBufferDt, ringBufferSize, nDaqChannel, nMultiplexerChannel);
         fftBuffer.numHarmonics_x.resize(N_HARMONICS);
         fftBuffer.numHarmonics_y.resize(N_HARMONICS);
     }
@@ -191,7 +155,7 @@ inline void fft(Config& cfg) {
         1.0
     );
     // ここまで
-    
+
     // 3. 各倍波に対応する周波数インデックス（ビン）を特定して格納
     for (int i = 0; i < N_HARMONICS; ++i) {
         // 抽出対象の高調波倍率 (1倍, 3倍, 5倍, ...)
