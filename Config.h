@@ -10,11 +10,12 @@
 #define RAW_RATE 100e6
 #define EXCITATION_FREQUENCY 10e3
 #define EXCITATION_AMPLITUDE 1.0
-#define N_DAQ_CHANNEL 2
-#define N_MULTIPLEXER_CHANNEL 8
+#define N_DAQ_CHANNEL 1
+#define N_MULTIPLEXER_CHANNEL 1
 #define N_HARMONICS 5
 #define RINGBUFFER_DT 2e-3 // 2ms
-#define RINGBUFFER_SIZE (10 / RINGBUFFER_DT / N_MULTIPLEXER_CHANNEL) // 10s
+#define HISTORY_SEC 10.0
+//#define RINGBUFFER_SIZE (10 / RINGBUFFER_DT / N_MULTIPLEXER_CHANNEL) // 10s
 
 
 // 測定に関する設定および測定値を保存するクラス
@@ -56,11 +57,11 @@ public:
     void init(
         const double rawRate=RAW_RATE, const int rawSize=RAW_SIZE,
         const int nDaqChannel=N_DAQ_CHANNEL, const int nMultiplexerChannel=N_MULTIPLEXER_CHANNEL,
-        const double ringBufferDt=RINGBUFFER_DT, const int ringBufferSize=RINGBUFFER_SIZE
+        const double ringBufferDt=RINGBUFFER_DT, const int historySec=HISTORY_SEC
     ){
         rawData.init(1.0 / rawRate, rawSize, nDaqChannel * nMultiplexerChannel);
         ringBuffer.initSource(EXCITATION_FREQUENCY, 1, 0);
-        ringBuffer.init(ringBufferDt, ringBufferSize, nDaqChannel, nMultiplexerChannel);
+        ringBuffer.init(ringBufferDt, historySec, nDaqChannel, nMultiplexerChannel);
         fftBuffer.numHarmonics_x.resize(N_HARMONICS);
         fftBuffer.numHarmonics_y.resize(N_HARMONICS);
     }
@@ -70,6 +71,7 @@ public:
     }
 
     void buttonRun(){
+        std::lock_guard lock(ringBuffer.plotMutex);
         ringBuffer.ch_multi = 0;
         ringBuffer.idxCurrent = 0;
         ringBuffer.idxWrite = 0;
@@ -78,10 +80,22 @@ public:
             for(int ch = 0; ch < ringBuffer.chs.size(); ++ch){
                 ringBuffer.chs[ch].xs[i] = 0.0;
                 ringBuffer.chs[ch].ys[i] = 0.0;
-                int idx = ch * ringBuffer.times.size() + i;
+                int idx = i * ringBuffer.chs.size() + ch;
                 ringBuffer.matrix[idx] = 0.0;
             }
         }
+        for(auto& plotBuffer : ringBuffer.plotBuffers){
+            std::fill(plotBuffer.times.begin(), plotBuffer.times.end(), 0.0);
+            for(auto& values : plotBuffer.ys){
+                std::fill(values.begin(), values.end(), 0.0);
+            }
+            std::fill(plotBuffer.matrix.begin(), plotBuffer.matrix.end(), 0.0);
+            std::fill(plotBuffer.matrix2.begin(), plotBuffer.matrix2.end(), 0.0);
+            plotBuffer.idxWrite = 0;
+            plotBuffer.idxCurrent = 0;
+            plotBuffer.nofm = 0;
+        }
+        ringBuffer.plotActive.store(0, std::memory_order_release);
         ringBuffer.pauseFlag = false;
     }
 

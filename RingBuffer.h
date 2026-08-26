@@ -1,5 +1,8 @@
-#include <vector>
+#include <array>
+#include <atomic>
 #include <complex>
+#include <mutex>
+#include <vector>
 
 class RingBuffer {
     private:
@@ -15,6 +18,7 @@ class RingBuffer {
             float frequency = 0.0f;
             float amplitude = 0.0f;
             float phase = 0.0f;
+            int func = 1; //funcSine
         };
         struct ScopeConfig{
             int nDaqChannel = 1;
@@ -28,20 +32,32 @@ class RingBuffer {
             double level = 0.0;
         };
     public:
+        struct PlotBuffer {
+            std::vector<double> times;
+            std::vector<std::vector<double>> ys;
+            std::vector<double> matrix, matrix2;
+            int idxWrite = 0;
+            int idxCurrent = 0;
+            int nofm = 0;
+        };
         bool pauseFlag = false;
         double dt = 0;
+        double historySec = 0;
         int idxWrite = 0, idxCurrent = 0, nofm = 0;
         int ch_multi = 0;
         const int RBF_K = 4;
-        std::vector<double> times, scheduleTime;
+        std::vector<double> times;
         std::vector<ComplexVector> chs;
         std::vector<double> matrix, matrix2;
         Offsets offsets;
         std::vector<SourceCh> sourceChs;
         ScopeConfig scopeCfg;
         Trigger trigger;
+        std::array<PlotBuffer, 2> plotBuffers;
+        std::atomic<int> plotActive = 0;
+        std::mutex plotMutex;
         void initSource(const float frequency, const float ampCh1, const float ampCh2);
-        void init(const double newRingDt, const int ringSize, const int n_daq_channel, const int n_multiplexer_channel);
+        void init(const double newRingDt, const double newHistorySec, const int n_daq_channel, const int n_multiplexer_channel);
         void pop(const double xs[], const double ys[]);
         void update(const std::vector<std::vector<double>>& rawChs, const double rawDt);
     };

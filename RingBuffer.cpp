@@ -12,31 +12,54 @@ void RingBuffer::initSource(const float frequency, const float ampCh1, const flo
     sourceChs[1].amplitude = ampCh2;
 }
 
-void RingBuffer::init(const double newRingDt, const int ringSize, const int n_daq_channel, const int n_multiplexer_channel){
+void RingBuffer::init(const double newRingDt, const double newHistorySec, const int n_daq_channel, const int n_multiplexer_channel){
     dt = newRingDt;
+    historySec = newHistorySec;
     scopeCfg.nDaqChannel = n_daq_channel;
     scopeCfg.nMultiChannel = n_multiplexer_channel;
-    scheduleTime.resize(ringSize);
-    for (int i = 0; i < scheduleTime.size(); ++i){
-        scheduleTime[i] = i * dt * n_multiplexer_channel;
-    }
-
-    times.resize(ringSize);
+    const int ringBufferSize = historySec / newRingDt / n_multiplexer_channel;
+    times.resize(ringBufferSize);
     chs.resize(n_daq_channel * n_multiplexer_channel);
     for(int i=0; i < chs.size(); ++i){
-        chs[i].xs.resize(ringSize, 0);
-        chs[i].ys.resize(ringSize, 0);
+        chs[i].xs.resize(ringBufferSize, 0);
+        chs[i].ys.resize(ringBufferSize, 0);
     }
-    matrix.resize(n_daq_channel * n_multiplexer_channel * ringSize);
-    matrix2.resize(RBF_K * n_daq_channel * n_multiplexer_channel * ringSize);
+    matrix.resize(n_daq_channel * n_multiplexer_channel * ringBufferSize);
+    matrix2.resize(RBF_K * n_daq_channel * n_multiplexer_channel * ringBufferSize);
     offsets.chs.resize(n_daq_channel * n_multiplexer_channel, 0);
     offsets.phases_deg.resize(n_daq_channel * n_multiplexer_channel, 0);
+
+    for(auto& plotBuffer : plotBuffers){
+        plotBuffer.times.resize(ringBufferSize, 0);
+        plotBuffer.ys.resize(chs.size());
+        for(auto& values : plotBuffer.ys){
+            values.resize(ringBufferSize, 0);
+        }
+        plotBuffer.matrix.resize(matrix.size(), 0);
+        plotBuffer.matrix2.resize(matrix2.size(), 0);
+        plotBuffer.idxWrite = 0;
+        plotBuffer.idxCurrent = 0;
+        plotBuffer.nofm = 0;
+    }
+    plotActive.store(0, std::memory_order_relaxed);
     
     idxWrite = 0; idxCurrent = 0; nofm = 0; ch_multi = 0;
 }
 
 void RingBuffer::pop(const double xs[], const double ys[]){
     static std::chrono::steady_clock::time_point start_time = std::chrono::steady_clock::now();
+    const int activePlot = plotActive.load(std::memory_order_acquire);
+    const int backPlot = 1 - activePlot;
+    auto& plot = plotBuffers[backPlot];
+    const int previousColumn = (idxWrite + times.size() - 1) % times.size();
+    plot.times[previousColumn] = times[previousColumn];
+    for(int ch = 0; ch < chs.size(); ++ch){
+        plot.ys[ch][previousColumn] = chs[ch].ys[previousColumn];
+        plot.matrix[previousColumn * chs.size() + ch] = matrix[previousColumn * chs.size() + ch];
+    }
+    for(int ch = 0; ch < chs.size() * RBF_K; ++ch){
+        plot.matrix2[previousColumn * chs.size() * RBF_K + ch] = matrix2[previousColumn * chs.size() * RBF_K + ch];
+    }
     times[idxWrite] = std::chrono::duration<double>(
         std::chrono::steady_clock::now() - start_time
     ).count();
@@ -54,7 +77,7 @@ void RingBuffer::pop(const double xs[], const double ys[]){
     for(int ch = 0; ch < chs.size(); ++ch){
         chs[ch].xs[idxWrite] = xs[ch];
         chs[ch].ys[idxWrite] = ys[ch];
-        const int idx = ch * times.size() + idxWrite;
+        const int idx = idxWrite * chs.size() + ch;
         matrix[idx] = chs[ch].ys[idxWrite];
         x_train[ch] = ch;
         y_train[ch] = chs[ch].ys[idxWrite];
@@ -64,7 +87,7 @@ void RingBuffer::pop(const double xs[], const double ys[]){
     Math::RBFInterpolation1D rbf;
     rbf.fit(x_train, y_train, 0.8, Math::RBFType::Multiquadric);
     for (int ch = 0; ch < x_train.size() * RBF_K; ++ch) {
-        matrix2[ch * times.size() + idxWrite] = rbf.predict((double)ch/RBF_K);
+        matrix2[idxWrite * x_train.size() * RBF_K + ch] = rbf.predict((double)ch/RBF_K);
     }
 
     // トリガー処理
@@ -132,6 +155,22 @@ void RingBuffer::pop(const double xs[], const double ys[]){
     idxCurrent = idxWrite;
     idxWrite++; nofm++;
     if(idxWrite >= times.size()) {idxWrite = 0;}
+
+    plot.times[idxCurrent] = times[idxCurrent];
+    for(int ch = 0; ch < chs.size(); ++ch){
+        plot.ys[ch][idxCurrent] = chs[ch].ys[idxCurrent];
+        plot.matrix[idxCurrent * chs.size() + ch] = matrix[idxCurrent * chs.size() + ch];
+    }
+    for(int ch = 0; ch < chs.size() * RBF_K; ++ch){
+        plot.matrix2[idxCurrent * chs.size() * RBF_K + ch] = matrix2[idxCurrent * chs.size() * RBF_K + ch];
+    }
+    plot.idxWrite = idxWrite;
+    plot.idxCurrent = idxCurrent;
+    plot.nofm = nofm;
+    {
+        std::lock_guard lock(plotMutex);
+        plotActive.store(backPlot, std::memory_order_release);
+    }
 }
 
 void RingBuffer::update(const std::vector<std::vector<double>>& rawChs, const double rawDt){

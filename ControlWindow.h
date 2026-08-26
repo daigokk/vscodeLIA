@@ -61,6 +61,16 @@ void ControlWindow(GuiConfig& guiCfg, Config& cfg, Daq& daq) {
                 }
                 ImGui::EndTabItem();
             }
+            if(ImGui::BeginTabItem("Func")){
+                static const char* funcNames[] = { "Sine", "Square", "Triangle" };
+                int oldFunc = cfg.ringBuffer.sourceChs[0].func - 1;
+                if (ImGui::ListBox("Func", &oldFunc, funcNames, IM_ARRAYSIZE(funcNames), 3)) {
+                    cfg.ringBuffer.sourceChs[0].func = oldFunc + 1;
+                    //cfg.ringBuffer.sourceChs[1].func = oldFunc + 1;
+                    if(daq.device_data) daq.wavegen(0, cfg.ringBuffer.sourceChs[0].frequency, cfg.ringBuffer.sourceChs[0].amplitude, cfg.ringBuffer.sourceChs[0].phase, cfg.ringBuffer.sourceChs[0].func);
+                }
+                ImGui::EndTabItem();
+            }
             ImGui::EndTabBar();
         }
         ImGui::Separator();
