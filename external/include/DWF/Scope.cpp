@@ -88,6 +88,12 @@ void Dwf::Scope::trigger(Dwf::Device::Data *device_data, bool enable, const TRIG
         if (FDwfAnalogInTriggerLevelSet(device_data->handle, level) == 0) {
             Dwf::Device::check_error(device_data);
         }
+        
+        // バッファの先頭にトリガー検出位置を合わせる
+        double bufferSec = (data.buffer_size / 2.0) / data.sampling_frequency;
+        if (FDwfAnalogInTriggerPositionSet(device_data->handle, bufferSec) == 0) {
+            Dwf::Device::check_error(device_data);
+        }
 
         // set trigger edge
         if (edge_rising) {
