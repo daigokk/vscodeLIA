@@ -185,7 +185,7 @@ DAQのドライバおよびSDKを取得するためにインストールしま�
 1. **Makefile Toolsの設定:**
     * フォルダを開いた後、左側サイドバーに **C/C++のアイコンがついた「Makefile Tools」**（または `MAKEFILE` タブ）が表示されます。
         * *※表示されない場合は、左側サイドバーを右クリックし、`Makefile`にチェックをつけてください。もしくは`F5`キーを一回押すと、`Makefile`が認識されて左側サイドバーに *「Makefile Tools」が現れることがあります。*
-    * Makefile Tools のパネル内で、以下のように設定します。
+    * Makefile Tools のパネル内で、以下のように設定します。この操作で、`.vscode/settings.json`が作成されます。
         * **構成 (Configuration):** `Default`
         * **ターゲットのビルド (Build target):** `all`
         * **起動ターゲット (Launch target):** `vscodeLIA.exe`
