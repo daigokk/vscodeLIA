@@ -11,8 +11,8 @@ void XyWindow(GuiConfig& guiCfg, Config& cfg) {
         if (ImPlot::BeginPlot("##XY")) {
             const int activePlot = cfg.ringBuffer.plotActive.load();
             const int idx = cfg.ringBuffer.DoubleBuffers[activePlot].idxCurrent;
-            for(int ch=0; ch<cfg.ringBuffer.chs.size(); ch++){
-                ImPlot::PlotScatter(std::format("Ch{}", ch+1).c_str(), &(cfg.ringBuffer.chs[ch].xs[idx]), &(cfg.ringBuffer.chs[ch].ys[idx]), 1);
+            for(int ch=0; ch<cfg.ringBuffer.meaBuffer.chs.size(); ch++){
+                ImPlot::PlotScatter(std::format("Ch{}", ch+1).c_str(), &(cfg.ringBuffer.meaBuffer.chs[ch].xs[idx]), &(cfg.ringBuffer.meaBuffer.chs[ch].ys[idx]), 1);
             }
             ImPlot::PlotScatter("FFT", cfg.fftBuffer.numHarmonics_x.data(), cfg.fftBuffer.numHarmonics_y.data(), cfg.fftBuffer.numHarmonics_x.size());
             ImPlot::EndPlot();

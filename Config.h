@@ -91,7 +91,7 @@ public:
             
             // ファイルヘッダー
             outFile << "t(s)";
-            for(int ch = 0; ch < ringBuffer.chs.size(); ++ch){
+            for(int ch = 0; ch < ringBuffer.meaBuffer.chs.size(); ++ch){
                 outFile << std::format("{0}ch{1}x{0}ch{1}y", delimiter, ch+1);
             }
             outFile << std::endl;
@@ -104,8 +104,8 @@ public:
             for(int i = 0; i < size; ++i){
                 int idx = (startIdx + i) % plotBuf.times.size();
                 outFile << std::format("{:e}", plotBuf.times[idx]);
-                for(int ch = 0; ch < ringBuffer.chs.size(); ++ch){
-                    outFile << std::format("{0}{1:e}{0}{2:e}", delimiter, ringBuffer.chs[ch].xs[idx], ringBuffer.chs[ch].ys[idx]);
+                for(int ch = 0; ch < ringBuffer.meaBuffer.chs.size(); ++ch){
+                    outFile << std::format("{0}{1:e}{0}{2:e}", delimiter, ringBuffer.meaBuffer.chs[ch].xs[idx], ringBuffer.meaBuffer.chs[ch].ys[idx]);
                 }
                 outFile << std::endl;
             }

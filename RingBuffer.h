@@ -1,4 +1,3 @@
-#include <array>
 #include <atomic>
 #include <complex>
 #include <mutex>
@@ -31,6 +30,13 @@ class RingBuffer {
             int nofm = 0;
             double level = 0.0;
         };
+        struct MeasurementBuffer {
+            std::vector<double> times;
+            std::vector<ComplexVector> chs;
+            int idxWrite = 0;
+            int idxCurrent = 0;
+            int nofm = 0;
+        };
         struct Buffer {
             std::vector<double> times;
             std::vector<std::vector<double>> ys;
@@ -45,12 +51,13 @@ class RingBuffer {
         double historySec = 0;
         int ch_multi = 0;
         const int RBF_K = 4;
-        std::vector<ComplexVector> chs;
+        
         Offsets offsets;
         std::vector<SourceCh> sourceChs;
         ScopeConfig scopeCfg;
         Trigger trigger;
-        std::array<Buffer, 2> DoubleBuffers;
+        MeasurementBuffer meaBuffer;
+        Buffer DoubleBuffers[2];
         std::atomic<int> plotActive = 0;
         std::mutex plotMutex;
         void initSource(const float frequency, const float ampCh1, const float ampCh2);
