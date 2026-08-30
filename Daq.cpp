@@ -184,8 +184,8 @@ void Daq::run(std::stop_token st) {
                 }
             } while (sts != stsDone);
             
-            for(int i=0; i < pCfg_->ringBuffer.chs.size() / N_MULTIPLEXER_CHANNEL; ++i){
-                int ch = i + pCfg_->ringBuffer.ch_multi * N_DAQ_CHANNEL;
+            for(int i=0; i < pCfg_->ringBuffer.scopeCfg.nDaqChannel; ++i){
+                int ch = i + pCfg_->ringBuffer.ch_multi * pCfg_->ringBuffer.scopeCfg.nDaqChannel;
                 FDwfAnalogInStatusData(device_data->handle, i, pCfg_->rawData.chs[ch].data(), pCfg_->rawData.chs[ch].size());
             }
             // 測定値の保存
@@ -231,10 +231,10 @@ void Daq::runWithoutDaq(std::stop_token st) {
         theta += angular_step * pCfg_->ringBuffer.dt;
         theta = std::fmod(theta, 2.0 * pCfg_->PI_);
 
-        for(int i=0; i < pCfg_->ringBuffer.chs.size() / N_MULTIPLEXER_CHANNEL; ++i){
-            int ch = i + pCfg_->ringBuffer.ch_multi * N_DAQ_CHANNEL;
+        for(int i=0; i < pCfg_->ringBuffer.scopeCfg.nDaqChannel; ++i){
+            int ch = i + pCfg_->ringBuffer.ch_multi * pCfg_->ringBuffer.scopeCfg.nDaqChannel;
             for (size_t j = 0; j < times.size(); ++j) {
-                const double wt = 2.0 * pCfg_->PI_ * frequency * times[j] - 360.0/(N_DAQ_CHANNEL*N_MULTIPLEXER_CHANNEL)*ch/180.0*pCfg_->PI_;
+                const double wt = 2.0 * pCfg_->PI_ * frequency * times[j] - 360.0 / (chs.size()) * ch / 180.0*pCfg_->PI_;
                 chs[ch][j] = amplitude * std::sin(wt + theta);
             }
         }

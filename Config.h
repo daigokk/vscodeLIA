@@ -10,8 +10,8 @@
 #define RAW_RATE 100e6
 #define EXCITATION_FREQUENCY 10e3
 #define EXCITATION_AMPLITUDE 1.0
-#define N_DAQ_CHANNEL 1
-#define N_MULTIPLEXER_CHANNEL 1
+#define N_DAQ_CHANNEL 2
+#define N_MULTIPLEXER_CHANNEL 8
 #define N_HARMONICS 5
 #define RINGBUFFER_DT 2e-3 // 2ms
 #define HISTORY_SEC 10.0
@@ -34,15 +34,15 @@ public:
         double rawDt = 0;
         std::vector<double> times;
         std::vector<std::vector<double>> chs;
-        void init(const double newDt, const int raw_count, const int n_channel) {
+        void init(const double newDt, const int rawSize, const int n_channel) {
             rawDt = newDt;
-            times.resize(raw_count);
-            chs.resize(n_channel);
-            for(int i = 0; i < chs.size(); ++i){
-                chs[i].resize(raw_count);
-            }
+            times.resize(rawSize);
             for (int i = 0; i < times.size(); ++i) {
                 times[i] = static_cast<double>(i) * rawDt;
+            }
+            chs.resize(n_channel);
+            for(int i = 0; i < chs.size(); ++i){
+                chs[i].resize(rawSize);
             }
         }
     } rawData;
@@ -71,31 +71,8 @@ public:
     }
 
     void buttonRun(){
-        std::lock_guard lock(ringBuffer.plotMutex);
-        ringBuffer.ch_multi = 0;
-        ringBuffer.idxCurrent = 0;
-        ringBuffer.idxWrite = 0;
-        ringBuffer.nofm = 0;
-        for(int i = 0; i< ringBuffer.times.size(); ++i){
-            for(int ch = 0; ch < ringBuffer.chs.size(); ++ch){
-                ringBuffer.chs[ch].xs[i] = 0.0;
-                ringBuffer.chs[ch].ys[i] = 0.0;
-                int idx = i * ringBuffer.chs.size() + ch;
-                ringBuffer.matrix[idx] = 0.0;
-            }
-        }
-        for(auto& plotBuffer : ringBuffer.plotBuffers){
-            std::fill(plotBuffer.times.begin(), plotBuffer.times.end(), 0.0);
-            for(auto& values : plotBuffer.ys){
-                std::fill(values.begin(), values.end(), 0.0);
-            }
-            std::fill(plotBuffer.matrix.begin(), plotBuffer.matrix.end(), 0.0);
-            std::fill(plotBuffer.matrix2.begin(), plotBuffer.matrix2.end(), 0.0);
-            plotBuffer.idxWrite = 0;
-            plotBuffer.idxCurrent = 0;
-            plotBuffer.nofm = 0;
-        }
-        ringBuffer.plotActive.store(0, std::memory_order_release);
+        rawData.init(rawData.rawDt, rawData.times.size(), ringBuffer.scopeCfg.nDaqChannel * ringBuffer.scopeCfg.nMultiChannel);
+        ringBuffer.init();
         ringBuffer.pauseFlag = false;
     }
 
@@ -109,6 +86,9 @@ public:
         std::ofstream outFile("ect.csv");
         if (outFile.is_open()) {
             const char delimiter = ',';
+            const int activePlot = ringBuffer.plotActive.load();
+            const auto& plotBuf = ringBuffer.DoubleBuffers[activePlot];
+            
             // ファイルヘッダー
             outFile << "t(s)";
             for(int ch = 0; ch < ringBuffer.chs.size(); ++ch){
@@ -116,14 +96,14 @@ public:
             }
             outFile << std::endl;
             // 測定値
-            const int size = ringBuffer.times.size() < ringBuffer.nofm ? ringBuffer.times.size() : ringBuffer.nofm;
+            const int size = plotBuf.times.size() < plotBuf.nofm ? plotBuf.times.size() : plotBuf.nofm;
             int startIdx = 0;
-            if(ringBuffer.nofm > ringBuffer.times.size()){
-                startIdx = ringBuffer.idxWrite;
+            if(plotBuf.nofm > plotBuf.times.size()){
+                startIdx = plotBuf.idxWrite;
             }
             for(int i = 0; i < size; ++i){
-                int idx = (startIdx + i) % ringBuffer.times.size();
-                outFile << std::format("{:e}", ringBuffer.times[idx]);
+                int idx = (startIdx + i) % plotBuf.times.size();
+                outFile << std::format("{:e}", plotBuf.times[idx]);
                 for(int ch = 0; ch < ringBuffer.chs.size(); ++ch){
                     outFile << std::format("{0}{1:e}{0}{2:e}", delimiter, ringBuffer.chs[ch].xs[idx], ringBuffer.chs[ch].ys[idx]);
                 }

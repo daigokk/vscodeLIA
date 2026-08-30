@@ -34,11 +34,30 @@ void MultichannelWindow(GuiConfig& guiCfg, Config& cfg) {
                 cfg.buttonPause();
             }
         }
-        std::lock_guard lock(cfg.ringBuffer.plotMutex);
-        const auto& plot = cfg.ringBuffer.plotBuffers[cfg.ringBuffer.plotActive.load(std::memory_order_acquire)];
-        const double t_current = plot.times[plot.idxCurrent];
-        const double t_start = t_current - cfg.ringBuffer.historySec;
-        const int count = plot.nofm < plot.times.size() ? plot.nofm : plot.times.size();
+        // バッファデータをローカル変数にコピー
+        double t_current, t_start;
+        int count, idxWrite, ringSize, heatmapRows, heatmapRows2;
+        std::vector<double> times_copy;
+        std::vector<std::vector<double>> ys_copy;
+        std::vector<double> matrix_copy, matrix2_copy;
+        
+        {
+            std::lock_guard lock(cfg.ringBuffer.plotMutex);
+            const auto& plot = cfg.ringBuffer.DoubleBuffers[cfg.ringBuffer.plotActive.load(std::memory_order_acquire)];
+            t_current = plot.times[plot.idxCurrent];
+            t_start = t_current - cfg.ringBuffer.historySec;
+            count = plot.nofm < plot.times.size() ? plot.nofm : plot.times.size();
+            idxWrite = plot.idxWrite;
+            ringSize = (int)plot.times.size();
+            heatmapRows = (int)plot.ys.size();
+            heatmapRows2 = heatmapRows * cfg.ringBuffer.RBF_K;
+            
+            times_copy = plot.times;
+            ys_copy = plot.ys;
+            matrix_copy = plot.matrix;
+            matrix2_copy = plot.matrix2;
+        }
+        
         if (ImPlot::BeginPlot("##Line Plot", ImVec2(ImGui::GetWindowWidth() - guiCfg.dpi_scale * 100, ImGui::GetWindowHeight()/3))) {
             ImPlot::SetupAxis(ImAxis_X1, "Time", ImPlotAxisFlags_NoTickLabels);
             ImPlot::SetupAxis(ImAxis_Y1, "y (V)");
@@ -46,12 +65,12 @@ void MultichannelWindow(GuiConfig& guiCfg, Config& cfg) {
             ImPlot::SetupAxisLimits(ImAxis_X1, t_start, t_current, ImGuiCond_Always);
             ImPlot::SetupAxisLimits(ImAxis_Y1, -scale_limit, scale_limit, ImGuiCond_Always);
             ImPlotSpec specLine;
-            specLine.Offset = plot.idxWrite;
-            for(int ch = 0; ch < plot.ys.size(); ++ch){
+            specLine.Offset = idxWrite;
+            for(int ch = 0; ch < ys_copy.size(); ++ch){
                 ImPlot::PlotLine(
                     std::format("Ch{}", ch+1).c_str(),
-                    plot.times.data(),
-                    plot.ys[ch].data(),
+                    times_copy.data(),
+                    ys_copy[ch].data(),
                     count,
                     specLine
                 );
@@ -82,9 +101,6 @@ void MultichannelWindow(GuiConfig& guiCfg, Config& cfg) {
         // 全チャンネルのy成分をコンター表示
         ImPlot::PushColormap(ImPlotColormap_Jet);
         if(ImGui::BeginTabBar("Contour")){
-            const int ringSize = (int)plot.times.size();
-            const int heatmapRows = (int)plot.ys.size();
-            const int heatmapRows2 = heatmapRows * cfg.ringBuffer.RBF_K;
             if(ImGui::BeginTabItem("Original")){
                 if (ImPlot::BeginPlot("##Contour Plot", ImVec2(ImGui::GetWindowWidth() - guiCfg.dpi_scale * 100, -1))) {
                     ImPlot::SetupAxis(ImAxis_X1, "Time", ImPlotAxisFlags_NoTickLabels);
@@ -92,10 +108,10 @@ void MultichannelWindow(GuiConfig& guiCfg, Config& cfg) {
                     ImPlot::SetupAxisLimits(ImAxis_X1, t_start, t_current, ImGuiCond_Always);
                     ImPlot::SetupAxisLimits(ImAxis_Y1, 0, heatmapRows, ImGuiCond_Always);
                     ImPlot::PlotHeatmap(
-                        "##heatmap", plot.matrix.data(), heatmapRows, ringSize,
+                        "##heatmap", matrix_copy.data(), heatmapRows, ringSize,
                         -scale_limit, scale_limit, nullptr,
                         ImPlotPoint(t_start, heatmapRows), ImPlotPoint(t_current, 0),
-                        {ImPlotProp_Offset, plot.idxWrite * heatmapRows,
+                        {ImPlotProp_Offset, idxWrite * heatmapRows,
                          ImPlotProp_Flags, ImPlotHeatmapFlags_ColMajor}
                     );
                     ImPlot::EndPlot();
@@ -111,10 +127,10 @@ void MultichannelWindow(GuiConfig& guiCfg, Config& cfg) {
                     ImPlot::SetupAxisLimits(ImAxis_X1, t_start, t_current, ImGuiCond_Always);
                     ImPlot::SetupAxisLimits(ImAxis_Y1, 0, heatmapRows, ImGuiCond_Always);
                     ImPlot::PlotHeatmap(
-                        "##_heatmap", plot.matrix2.data(), heatmapRows2, ringSize,
+                        "##_heatmap", matrix2_copy.data(), heatmapRows2, ringSize,
                         -scale_limit, scale_limit, nullptr,
                         ImPlotPoint(t_start, heatmapRows), ImPlotPoint(t_current, 0),
-                        {ImPlotProp_Offset, plot.idxWrite * heatmapRows2,
+                        {ImPlotProp_Offset, idxWrite * heatmapRows2,
                          ImPlotProp_Flags, ImPlotHeatmapFlags_ColMajor}
                     );
                     ImPlot::EndPlot();
