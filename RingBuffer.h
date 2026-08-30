@@ -34,7 +34,7 @@ class RingBuffer {
         struct Buffer {
             std::vector<double> times;
             std::vector<std::vector<double>> ys;
-            std::vector<double> matrix, matrix2;
+            std::vector<double> matrix, matrixRBF;
             int idxWrite = 0;
             int idxCurrent = 0;
             int nofm = 0;

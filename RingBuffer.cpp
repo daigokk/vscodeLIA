@@ -35,9 +35,9 @@ void RingBuffer::init(const double newRingDt, const double newHistorySec, const 
             values.resize(ringBufferSize);
         }
         plotBuffer.matrix.resize(nDaqChannel * nMultiplexerChannel * ringBufferSize);
-        plotBuffer.matrix2.resize(RBF_K * nDaqChannel * nMultiplexerChannel * ringBufferSize);
+        plotBuffer.matrixRBF.resize(RBF_K * nDaqChannel * nMultiplexerChannel * ringBufferSize);
         std::fill(plotBuffer.matrix.begin(), plotBuffer.matrix.end(), 0.0);
-        std::fill(plotBuffer.matrix2.begin(), plotBuffer.matrix2.end(), 0.0);
+        std::fill(plotBuffer.matrixRBF.begin(), plotBuffer.matrixRBF.end(), 0.0);
         plotBuffer.idxWrite = 0;
         plotBuffer.idxCurrent = 0;
         plotBuffer.nofm = 0;
@@ -94,7 +94,7 @@ void RingBuffer::pop(const double xs[], const double ys[]){
         Math::RBFInterpolation1D rbf;
         rbf.fit(x_train, y_train, 0.8, Math::RBFType::Multiquadric);
         for (int ch = 0; ch < x_train.size() * RBF_K; ++ch) {
-            activeBuf.matrix2[idxWrite * x_train.size() * RBF_K + ch] = rbf.predict((double)ch/RBF_K);
+            activeBuf.matrixRBF[idxWrite * x_train.size() * RBF_K + ch] = rbf.predict((double)ch/RBF_K);
         }
 
         // トリガー処理
@@ -170,7 +170,7 @@ void RingBuffer::pop(const double xs[], const double ys[]){
             activeBuf.matrix[idxCurrent * chs.size() + ch] = activeBuf.matrix[idxCurrent * chs.size() + ch];
         }
         for(int ch = 0; ch < chs.size() * RBF_K; ++ch){
-            activeBuf.matrix2[idxCurrent * chs.size() * RBF_K + ch] = activeBuf.matrix2[idxCurrent * chs.size() * RBF_K + ch];
+            activeBuf.matrixRBF[idxCurrent * chs.size() * RBF_K + ch] = activeBuf.matrixRBF[idxCurrent * chs.size() * RBF_K + ch];
         }
         
         activeBuf.idxWrite = idxWrite;

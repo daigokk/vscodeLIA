@@ -36,10 +36,10 @@ void MultichannelWindow(GuiConfig& guiCfg, Config& cfg) {
         }
         // バッファデータをローカル変数にコピー
         double t_current, t_start;
-        int count, idxWrite, ringSize, heatmapRows, heatmapRows2;
+        int count, idxWrite, ringSize, heatmapRows, heatmapRowsRBF;
         std::vector<double> times_copy;
         std::vector<std::vector<double>> ys_copy;
-        std::vector<double> matrix_copy, matrix2_copy;
+        std::vector<double> matrix_copy, matrixRBF_copy;
         
         {
             std::lock_guard lock(cfg.ringBuffer.plotMutex);
@@ -50,12 +50,12 @@ void MultichannelWindow(GuiConfig& guiCfg, Config& cfg) {
             idxWrite = plot.idxWrite;
             ringSize = (int)plot.times.size();
             heatmapRows = (int)plot.ys.size();
-            heatmapRows2 = heatmapRows * cfg.ringBuffer.RBF_K;
+            heatmapRowsRBF = heatmapRows * cfg.ringBuffer.RBF_K;
             
             times_copy = plot.times;
             ys_copy = plot.ys;
             matrix_copy = plot.matrix;
-            matrix2_copy = plot.matrix2;
+            matrixRBF_copy = plot.matrixRBF;
         }
         
         if (ImPlot::BeginPlot("##Line Plot", ImVec2(ImGui::GetWindowWidth() - guiCfg.dpi_scale * 100, ImGui::GetWindowHeight()/3))) {
@@ -127,10 +127,10 @@ void MultichannelWindow(GuiConfig& guiCfg, Config& cfg) {
                     ImPlot::SetupAxisLimits(ImAxis_X1, t_start, t_current, ImGuiCond_Always);
                     ImPlot::SetupAxisLimits(ImAxis_Y1, 0, heatmapRows, ImGuiCond_Always);
                     ImPlot::PlotHeatmap(
-                        "##_heatmap", matrix2_copy.data(), heatmapRows2, ringSize,
+                        "##_heatmap", matrixRBF_copy.data(), heatmapRowsRBF, ringSize,
                         -scale_limit, scale_limit, nullptr,
                         ImPlotPoint(t_start, heatmapRows), ImPlotPoint(t_current, 0),
-                        {ImPlotProp_Offset, idxWrite * heatmapRows2,
+                        {ImPlotProp_Offset, idxWrite * heatmapRowsRBF,
                          ImPlotProp_Flags, ImPlotHeatmapFlags_ColMajor}
                     );
                     ImPlot::EndPlot();
