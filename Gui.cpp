@@ -114,7 +114,7 @@ GuiConfig Gui::Initialize(const char* title) {
     guiConfg.dpi_scale = ImGui_ImplGlfw_GetContentScaleForMonitor(monitor);
 
     const char* glsl_version = "#version 130";
-    guiConfg.window = glfwCreateWindow(1280, 720, "codeLIA - Dear ImGui", NULL, NULL);
+    guiConfg.window = glfwCreateWindow(1280*guiConfg.dpi_scale, 720*guiConfg.dpi_scale, "codeLIA - Dear ImGui", NULL, NULL);
     if (!guiConfg.window) {
         std::cerr << "Failed to create GLFW window" << std::endl;
         glfwTerminate();
