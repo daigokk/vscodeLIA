@@ -216,7 +216,7 @@ DAQのドライバおよびSDKを取得するためにインストールしま�
 ---
 ## 6. 課題
 
-* `Raw`Windowと`XY`Windowに適切なラベルが表示してください。例えば`Raw`Windowは以下のようになります。詳しくはImPlotの[Demos](https://github.com/epezent/implot_demos)を参照してください。
+* `RawWindow`と`XyWindow`に適切なラベルが表示してください。例えば`RawWindow`は以下のようになります。ラベルの表示やその他のImplotの設定についてはImPlotの[Demos](https://github.com/epezent/implot_demos)を参照してください。
 ```c++
 void RawWindow(GuiConfig& guiCfg, Config& cfg) {
     if(ImGui::Begin("Raw")){
