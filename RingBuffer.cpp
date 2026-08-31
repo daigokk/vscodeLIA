@@ -169,7 +169,7 @@ void RingBuffer::updatePlotBuffer(){
     Math::RBFInterpolation1D rbf;
     std::vector<double> x_train(meaBuffer.chs.size()), y_train(meaBuffer.chs.size());
     for(int ch = 0; ch < meaBuffer.chs.size(); ++ch){
-        x_train[ch] = ch;
+        x_train[ch] = ch + 0.5;
         y_train[ch] = meaBuffer.chs[ch].ys[meaBuffer.idxCurrent];
     }
     rbf.fit(x_train, y_train, 0.8, Math::RBFType::Multiquadric);
