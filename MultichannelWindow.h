@@ -58,12 +58,13 @@ void MultichannelWindow(GuiConfig& guiCfg, Config& cfg) {
             matrixRBF_copy = plot.matrixRBF;
         }
         
-        if (ImPlot::BeginPlot("##Line Plot", ImVec2(ImGui::GetWindowWidth() - guiCfg.dpi_scale * 100, ImGui::GetWindowHeight()/3))) {
+        if (ImPlot::BeginPlot("##Line Plot", ImVec2(ImGui::GetWindowWidth(), ImGui::GetWindowHeight()/3))) {
             ImPlot::SetupAxis(ImAxis_X1, "Time", ImPlotAxisFlags_NoTickLabels);
             ImPlot::SetupAxis(ImAxis_Y1, "y (V)");
             //ImPlot::SetupLegend(ImPlotLocation_East, true);
             ImPlot::SetupAxisLimits(ImAxis_X1, t_start, t_current, ImGuiCond_Always);
             ImPlot::SetupAxisLimits(ImAxis_Y1, -scale_limit, scale_limit, ImGuiCond_Always);
+            ImPlot::SetupLegend(ImPlotLocation_NorthEast, ImPlotLegendFlags_Outside);
             ImPlotSpec specLine;
             specLine.Offset = idxWrite;
             for(int ch = 0; ch < ys_copy.size(); ++ch){
