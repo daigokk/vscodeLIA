@@ -216,6 +216,24 @@ DAQのドライバおよびSDKを取得するためにインストールしま�
 ---
 ## 6. 課題
 
+* `Raw`Windowと`XY`Windowに適切なラベルが表示してください。例えば`Raw`Windowは以下のようになります。詳しくはImPlotの[Demos](https://github.com/epezent/implot_demos)を参照してください。
+```c++
+void RawWindow(GuiConfig& guiCfg, Config& cfg) {
+    if(ImGui::Begin("Raw")){
+        if (ImPlot::BeginPlot("##Raw")) {
+            // ここから
+            ImPlot::SetupAxis(ImAxis_X1, "time (s)");
+            ImPlot::SetupAxis(ImAxis_Y1, "V (V)");
+            // ここまで
+            for(int i=0; i < cfg.rawData.chs.size(); i++){
+                ImPlot::PlotLine(std::format("Ch{}", i+1).c_str(), cfg.rawData.times.data(), cfg.rawData.chs[i].data(), cfg.rawData.times.size());
+            }
+            ImPlot::EndPlot();
+        }
+    }
+    ImGui::End();
+}
+```
 * `Psd.h`に記載の`Psd::calc`関数を完成させてください。
 * (オプション) `Config.h`に記載の`fft`関数を完成させ、FFTを使ってPSDと同様の結果を得られることを確認してみてください。`fft`関数をどこから呼び出すかも考えてみてください。様々な条件においてどちらが優れているか比較してみるのもよいでしょう。入力波形を矩形波にすることで、高調波成分は正弦波の時より大きくなります。この方法の利点は、一度に複数の周波数成分を得られることです。そして興味深いことにFFTで得た結果はPSDで得た結果と比較して90度ずれています。なぜでしょうか？
 ```c++
