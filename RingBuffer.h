@@ -66,8 +66,8 @@ class RingBuffer {
         void initSource(const float frequency, const float ampCh1, const float ampCh2);
         void init(const double newRingDt, const double newHistorySec, const int n_daq_channel, const int n_multiplexer_channel);
         void init();
-        void pop(const double xs[], const double ys[]);
-        void update(const std::vector<std::vector<double>>& rawChs, const double rawDt);
+        void pop(const double xs[], const double ys[], const double sampleTime);
+        void update(const std::vector<std::vector<double>>& rawChs, const double rawDt, const double sampleTime);
         
     private:
         // ============ プライベート補助関数 ============

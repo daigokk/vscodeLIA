@@ -169,6 +169,7 @@ void Daq::run(std::stop_token st) {
             std::chrono::duration<double>(pCfg_->ringBuffer.dt));
         
         auto next_time = std::chrono::steady_clock::now();
+        const auto start_time = next_time;
         while (!st.stop_requested()) {
             // 一時停止
             if (pCfg_->ringBuffer.pauseFlag){
@@ -176,6 +177,11 @@ void Daq::run(std::stop_token st) {
                 std::this_thread::sleep_until(next_time);
                 continue;
             }
+            // ============ タイムスタンプ取得 ============
+            const double sampleTime = std::chrono::duration<double>(
+                std::chrono::steady_clock::now() - start_time
+            ).count();
+
             // AD変換
             STS sts;
             do {
@@ -189,7 +195,7 @@ void Daq::run(std::stop_token st) {
                 FDwfAnalogInStatusData(device_data->handle, i, pCfg_->rawData.chs[ch].data(), pCfg_->rawData.chs[ch].size());
             }
             // 測定値の保存
-            pCfg_->ringBuffer.update(pCfg_->rawData.chs, pCfg_->rawData.rawDt);
+            pCfg_->ringBuffer.update(pCfg_->rawData.chs, pCfg_->rawData.rawDt, sampleTime);
             // マルチプレクサのチャンネル更新
             dio.set_state(device_data, pCfg_->ringBuffer.ch_multi);
             next_time += loop_period;
@@ -219,6 +225,7 @@ void Daq::runWithoutDaq(std::stop_token st) {
     auto& chs = pCfg_->rawData.chs;
 
     auto next_time = std::chrono::steady_clock::now();
+    const auto start_time = next_time;
     while (!st.stop_requested()) {
         // 一時停止
         if (pCfg_->ringBuffer.pauseFlag){
@@ -226,6 +233,12 @@ void Daq::runWithoutDaq(std::stop_token st) {
             std::this_thread::sleep_until(next_time);
             continue;
         }
+        
+        // ============ タイムスタンプ取得 ============
+        const double sampleTime = std::chrono::duration<double>(
+            std::chrono::steady_clock::now() - start_time
+        ).count();
+
         const auto frequency = pCfg_->ringBuffer.sourceChs[0].frequency;
         const auto amplitude = pCfg_->ringBuffer.sourceChs[0].amplitude;
         theta += angular_step * pCfg_->ringBuffer.dt;
@@ -239,7 +252,7 @@ void Daq::runWithoutDaq(std::stop_token st) {
             }
         }
 
-        pCfg_->ringBuffer.update(pCfg_->rawData.chs, pCfg_->rawData.rawDt);
+        pCfg_->ringBuffer.update(pCfg_->rawData.chs, pCfg_->rawData.rawDt, sampleTime);
         //fft(*pCfg_);
         next_time += loop_period;
         while(next_time > std::chrono::steady_clock::now()){

@@ -2,7 +2,6 @@
 #include "Psd.h"
 #include "Rbf.h"
 #include <cmath>
-#include <chrono>
 
 // ============================================================
 // 初期化処理
@@ -62,13 +61,10 @@ void RingBuffer::init() {
     init(dt, historySec, scopeCfg.nDaqChannel, scopeCfg.nMultiChannel);
 }
 
-void RingBuffer::pop(const double xs[], const double ys[]){
+void RingBuffer::pop(const double xs[], const double ys[], const double sampleTime){
     static std::chrono::steady_clock::time_point start_time = std::chrono::steady_clock::now();
 
-    // ============ タイムスタンプ取得 ============
-    const double sampleTime = std::chrono::duration<double>(
-        std::chrono::steady_clock::now() - start_time
-    ).count();
+
 
     // ============ オフセット適用 ============
     if (offsets.flag){
@@ -232,7 +228,7 @@ void RingBuffer::updatePlotBuffer(){
     }
 }
 
-void RingBuffer::update(const std::vector<std::vector<double>>& rawChs, const double rawDt){
+void RingBuffer::update(const std::vector<std::vector<double>>& rawChs, const double rawDt, const double sampleTime){
     // ============ PSD 解析（初回は初期化） ============
     static Psd psd;
     if(psd.frequency != sourceChs[0].frequency || psd.getSize() != rawChs[0].size() || psd.dt != rawDt){
@@ -256,7 +252,7 @@ void RingBuffer::update(const std::vector<std::vector<double>>& rawChs, const do
     // ============ マルチプレクサの次チャネルへ、または pop() を実行 ============
     ch_multi++;
     if(ch_multi >= scopeCfg.nMultiChannel){
-        pop(xs.data(), ys.data());
+        pop(xs.data(), ys.data(), sampleTime);
         ch_multi = 0;
     }
 }
