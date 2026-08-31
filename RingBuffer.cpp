@@ -60,8 +60,6 @@ void RingBuffer::init() {
 void RingBuffer::pop(const double xs[], const double ys[]){
     static std::chrono::steady_clock::time_point start_time = std::chrono::steady_clock::now();
 
-    const int activePlot = plotActive.load(std::memory_order_relaxed);
-
     const double sampleTime = std::chrono::duration<double>(
         std::chrono::steady_clock::now() - start_time
     ).count();
@@ -74,16 +72,18 @@ void RingBuffer::pop(const double xs[], const double ys[]){
         offsets.flag = false;
     }
 
-    
+    // RBF補間用トレーニングデータ格納配列
     std::vector<double> x_train(meaBuffer.chs.size()), y_train(meaBuffer.chs.size());
+
     meaBuffer.times[meaBuffer.idxWrite] = sampleTime;
     for(int ch = 0; ch < meaBuffer.chs.size(); ++ch){
         meaBuffer.chs[ch].xs[meaBuffer.idxWrite] = xs[ch];
         meaBuffer.chs[ch].ys[meaBuffer.idxWrite] = ys[ch];
         x_train[ch] = ch;
-        y_train[ch] = meaBuffer.chs[ch].ys[meaBuffer.idxWrite];
+        y_train[ch] = ys[ch];
     }
 
+    // RBF補間の学習
     Math::RBFInterpolation1D rbf;
     rbf.fit(x_train, y_train, 0.8, Math::RBFType::Multiquadric);
 
@@ -154,16 +154,19 @@ void RingBuffer::pop(const double xs[], const double ys[]){
     if(meaBuffer.idxWrite >= meaBuffer.times.size()) { meaBuffer.idxWrite = 0; }
 
     // plot用ダブルバッファの更新
+    const int activePlot = plotActive.load(std::memory_order_relaxed);
     {
         std::lock_guard lock(plotMutex);
         auto& activeBuf = DoubleBuffers[activePlot];
-        activeBuf.times[meaBuffer.idxCurrent] = sampleTime;
-        for(int ch = 0; ch < meaBuffer.chs.size(); ++ch){
-            activeBuf.ys[ch][meaBuffer.idxCurrent] = meaBuffer.chs[ch].ys[meaBuffer.idxCurrent];
-            activeBuf.matrix[meaBuffer.idxCurrent * meaBuffer.chs.size() + ch] = meaBuffer.chs[ch].ys[meaBuffer.idxCurrent];
-            const int rbfIdx = meaBuffer.idxCurrent * meaBuffer.chs.size() * RBF_K + ch * RBF_K;
-            for (int k = 0; k < RBF_K; ++k) {
-                activeBuf.matrixRBF[rbfIdx + k] = rbf.predict((double)k / RBF_K + (double)ch / (meaBuffer.chs.size() * RBF_K));
+        for(int idx = activeBuf.idxWrite; idx <= meaBuffer.idxCurrent; ++idx){
+            activeBuf.times[idx] = meaBuffer.times[idx];
+            for(int ch = 0; ch < meaBuffer.chs.size(); ++ch){
+                activeBuf.ys[ch][idx] = meaBuffer.chs[ch].ys[idx];
+                activeBuf.matrix[idx * meaBuffer.chs.size() + ch] = meaBuffer.chs[ch].ys[idx];
+                const int rbfIdx = idx * meaBuffer.chs.size() * RBF_K + ch * RBF_K;
+                for (int k = 0; k < RBF_K; ++k) {
+                    activeBuf.matrixRBF[rbfIdx + k] = rbf.predict((double)(ch * RBF_K + k) / RBF_K);
+                }
             }
         }
         activeBuf.idxWrite = meaBuffer.idxWrite;
