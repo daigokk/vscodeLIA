@@ -190,35 +190,44 @@ void RingBuffer::updatePlotBuffer(){
                             ? meaBuffer.idxCurrent 
                             : activeBuf.times.size() - 1;
         
-        // ============ 通常ラップ処理（書き込み開始から現在位置もしくはリングバッファ終端まで） ============
-        for(int idx = activeBuf.idxWrite; idx <= idxEnd; ++idx){
+        // 1要素分のデータコピーおよびRBF書き込みを行う共通関数
+        auto copyIndexData = [&](int idx) {
             activeBuf.times[idx] = meaBuffer.times[idx];
-            for(int ch = 0; ch < meaBuffer.chs.size(); ++ch){
-                activeBuf.ys[ch][idx] = meaBuffer.chs[ch].ys[idx];
-                activeBuf.matrix[idx * meaBuffer.chs.size() + ch] = meaBuffer.chs[ch].ys[idx];
-                
-                // RBF補間値の計算と格納
-                const int rbfIdx = idx * meaBuffer.chs.size() * RBF_K + ch * RBF_K;
+
+            for (size_t ch = 0; ch < meaBuffer.chs.size(); ++ch) {
+                const double yVal = meaBuffer.chs[ch].ys[idx];
+
+                activeBuf.ys[ch][idx] = yVal;
+                activeBuf.matrix[idx * meaBuffer.chs.size() + ch] = yVal;
+
+                // 事前計算したRBF補間値をコピー
+                const size_t rbfBaseIdx = idx * meaBuffer.chs.size() * RBF_K + ch * RBF_K;
                 for (int k = 0; k < RBF_K; ++k) {
-                    activeBuf.matrixRBF[rbfIdx + k] = rbf.predict((double)(ch * RBF_K + k) / RBF_K);
+                    activeBuf.matrixRBF[rbfBaseIdx + k] = rbf.predict((double)(ch * RBF_K + k) / RBF_K);
                 }
             }
-        }
-        
-        // ============ ラップアラウンド時の処理（バッファの先頭から現在位置まで） ============
-        if (idxEnd != meaBuffer.idxCurrent) {
-            for(int idx = 0; idx <= meaBuffer.idxCurrent; ++idx){
-                activeBuf.times[idx] = meaBuffer.times[idx];
-                for(int ch = 0; ch < meaBuffer.chs.size(); ++ch){
-                    activeBuf.ys[ch][idx] = meaBuffer.chs[ch].ys[idx];
-                    activeBuf.matrix[idx * meaBuffer.chs.size() + ch] = meaBuffer.chs[ch].ys[idx];
-                    
-                    // RBF補間値の計算と格納
-                    const int rbfIdx = idx * meaBuffer.chs.size() * RBF_K + ch * RBF_K;
-                    for (int k = 0; k < RBF_K; ++k) {
-                        activeBuf.matrixRBF[rbfIdx + k] = rbf.predict((double)(ch * RBF_K + k) / RBF_K);
-                    }
-                }
+        };
+
+        // 書き込み範囲の算出
+        const int idxStart = activeBuf.idxWrite;
+        const int idxCurrent = meaBuffer.idxCurrent;
+        const int bufSize = static_cast<int>(activeBuf.times.size());
+
+        if (idxStart <= idxCurrent) {
+            // ============ 通常ラップ処理 ============
+            // 区間: [idxStart, idxCurrent]
+            for (int idx = idxStart; idx <= idxCurrent; ++idx) {
+                copyIndexData(idx);
+            }
+        } else {
+            // ============ ラップアラウンド時の処理 ============
+            // 区間1: [idxStart, bufSize - 1]
+            for (int idx = idxStart; idx < bufSize; ++idx) {
+                copyIndexData(idx);
+            }
+            // 区間2: [0, idxCurrent]
+            for (int idx = 0; idx <= idxCurrent; ++idx) {
+                copyIndexData(idx);
             }
         }
         
