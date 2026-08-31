@@ -37,7 +37,7 @@ class RingBuffer {
             int idxCurrent = 0;
             int nofm = 0;
         };
-        struct Buffer {
+        struct PlotBuffer {
             std::vector<double> times;
             std::vector<std::vector<double>> ys;
             std::vector<double> matrix, matrixRBF;
@@ -59,8 +59,7 @@ class RingBuffer {
         ScopeConfig scopeCfg;                 // スコープ設定
         Trigger trigger;                      // トリガー条件
         MeasurementBuffer meaBuffer;          // 計測データバッファ
-        Buffer DoubleBuffers[2];              // ダブルバッファ（GUI/更新用）
-        std::atomic<int> plotActive = 0;      // アクティブなバッファインデックス
+        PlotBuffer plotBuffer;                // GUI用バッファ
         std::mutex plotMutex;                 // バッファアクセス用ロック
         
         // ============ メンバー関数 ============

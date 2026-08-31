@@ -43,7 +43,7 @@ void MultichannelWindow(GuiConfig& guiCfg, Config& cfg) {
         
         {
             std::lock_guard lock(cfg.ringBuffer.plotMutex);
-            const auto& plot = cfg.ringBuffer.DoubleBuffers[cfg.ringBuffer.plotActive.load(std::memory_order_acquire)];
+            const auto& plot = cfg.ringBuffer.plotBuffer;
             t_current = plot.times[plot.idxCurrent];
             t_start = t_current - cfg.ringBuffer.historySec;
             count = plot.nofm < plot.times.size() ? plot.nofm : plot.times.size();

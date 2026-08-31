@@ -9,6 +9,10 @@
 void RawWindow(GuiConfig& guiCfg, Config& cfg) {
     if(ImGui::Begin("Raw")){
         if (ImPlot::BeginPlot("##Raw")) {
+            // ここから
+            ImPlot::SetupAxis(ImAxis_X1, "time (s)");
+            ImPlot::SetupAxis(ImAxis_Y1, "V (V)");
+            // ここまで
             for(int i=0; i < cfg.rawData.chs.size(); i++){
                 ImPlot::PlotLine(std::format("Ch{}", i+1).c_str(), cfg.rawData.times.data(), cfg.rawData.chs[i].data(), cfg.rawData.times.size());
             }

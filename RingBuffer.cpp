@@ -42,22 +42,19 @@ void RingBuffer::init(const double newRingDt, const double newHistorySec, const 
     // ============ ダブルバッファの初期化 ============
     {
         std::lock_guard lock(plotMutex);
-        for(auto& plotBuffer : DoubleBuffers){
-            plotBuffer.times.resize(ringBufferSize);
-            plotBuffer.ys.resize(meaBuffer.chs.size());
-            for(auto& values : plotBuffer.ys){
-                values.resize(ringBufferSize);
-            }
-            plotBuffer.matrix.resize(nDaqChannel * nMultiplexerChannel * ringBufferSize);
-            plotBuffer.matrixRBF.resize(RBF_K * nDaqChannel * nMultiplexerChannel * ringBufferSize);
-            std::fill(plotBuffer.matrix.begin(), plotBuffer.matrix.end(), 0.0);
-            std::fill(plotBuffer.matrixRBF.begin(), plotBuffer.matrixRBF.end(), 0.0);
-            plotBuffer.idxWrite = 0;
-            plotBuffer.idxCurrent = 0;
-            plotBuffer.nofm = 0;
+        plotBuffer.times.resize(ringBufferSize);
+        plotBuffer.ys.resize(meaBuffer.chs.size());
+        for(auto& values : plotBuffer.ys){
+            values.resize(ringBufferSize);
         }
+        plotBuffer.matrix.resize(nDaqChannel * nMultiplexerChannel * ringBufferSize);
+        plotBuffer.matrixRBF.resize(RBF_K * nDaqChannel * nMultiplexerChannel * ringBufferSize);
+        std::fill(plotBuffer.matrix.begin(), plotBuffer.matrix.end(), 0.0);
+        std::fill(plotBuffer.matrixRBF.begin(), plotBuffer.matrixRBF.end(), 0.0);
+        plotBuffer.idxWrite = 0;
+        plotBuffer.idxCurrent = 0;
+        plotBuffer.nofm = 0;
     }
-    plotActive.store(0, std::memory_order_relaxed);
     ch_multi = 0;
 }
 
@@ -89,7 +86,6 @@ void RingBuffer::pop(const double xs[], const double ys[]){
         meaBuffer.chs[ch].ys[meaBuffer.idxWrite] = ys[ch];
     }
 
-    
     // ============ トリガー処理 ============
     updateTrigger();
 
@@ -182,36 +178,34 @@ void RingBuffer::updatePlotBuffer(){
     }
     rbf.fit(x_train, y_train, 0.8, Math::RBFType::Multiquadric);
 
-    const int activePlot = plotActive.load(std::memory_order_relaxed);
     {
         std::lock_guard lock(plotMutex);
-        auto& activeBuf = DoubleBuffers[activePlot];
-        const int idxEnd = activeBuf.idxWrite <= meaBuffer.idxCurrent 
+        const int idxEnd = plotBuffer.idxWrite <= meaBuffer.idxCurrent 
                             ? meaBuffer.idxCurrent 
-                            : activeBuf.times.size() - 1;
+                            : plotBuffer.times.size() - 1;
         
         // 1要素分のデータコピーおよびRBF書き込みを行う共通関数
         auto copyIndexData = [&](int idx) {
-            activeBuf.times[idx] = meaBuffer.times[idx];
+            plotBuffer.times[idx] = meaBuffer.times[idx];
 
             for (size_t ch = 0; ch < meaBuffer.chs.size(); ++ch) {
                 const double yVal = meaBuffer.chs[ch].ys[idx];
 
-                activeBuf.ys[ch][idx] = yVal;
-                activeBuf.matrix[idx * meaBuffer.chs.size() + ch] = yVal;
+                plotBuffer.ys[ch][idx] = yVal;
+                plotBuffer.matrix[idx * meaBuffer.chs.size() + ch] = yVal;
 
                 // 事前計算したRBF補間値をコピー
                 const size_t rbfBaseIdx = idx * meaBuffer.chs.size() * RBF_K + ch * RBF_K;
                 for (int k = 0; k < RBF_K; ++k) {
-                    activeBuf.matrixRBF[rbfBaseIdx + k] = rbf.predict((double)(ch * RBF_K + k) / RBF_K);
+                    plotBuffer.matrixRBF[rbfBaseIdx + k] = rbf.predict((double)(ch * RBF_K + k) / RBF_K);
                 }
             }
         };
 
         // 書き込み範囲の算出
-        const int idxStart = activeBuf.idxWrite;
+        const int idxStart = plotBuffer.idxWrite;
         const int idxCurrent = meaBuffer.idxCurrent;
-        const int bufSize = static_cast<int>(activeBuf.times.size());
+        const int bufSize = static_cast<int>(plotBuffer.times.size());
 
         if (idxStart <= idxCurrent) {
             // ============ 通常ラップ処理 ============
@@ -232,13 +226,9 @@ void RingBuffer::updatePlotBuffer(){
         }
         
         // ============ メタデータ更新 ============
-        activeBuf.idxWrite = meaBuffer.idxWrite;
-        activeBuf.idxCurrent = meaBuffer.idxCurrent;
-        activeBuf.nofm = meaBuffer.nofm;
-
-        // ============ ダブルバッファ切り替え ============
-        int nextPlot = (activePlot == 0) ? 1 : 0;
-        plotActive.store(nextPlot, std::memory_order_release);
+        plotBuffer.idxWrite = meaBuffer.idxWrite;
+        plotBuffer.idxCurrent = meaBuffer.idxCurrent;
+        plotBuffer.nofm = meaBuffer.nofm;
     }
 }
 

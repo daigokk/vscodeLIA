@@ -86,8 +86,7 @@ public:
         std::ofstream outFile("ect.csv");
         if (outFile.is_open()) {
             const char delimiter = ',';
-            const int activePlot = ringBuffer.plotActive.load();
-            const auto& plotBuf = ringBuffer.DoubleBuffers[activePlot];
+            const auto& plotBuf = ringBuffer.plotBuffer;
             
             // ファイルヘッダー
             outFile << "t(s)";
