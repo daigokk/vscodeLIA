@@ -38,7 +38,7 @@ void RingBuffer::init(const double newRingDt, const double newHistorySec, const 
     offsets.chs.resize(nDaqChannel * nMultiplexerChannel, 0);
     offsets.phases_deg.resize(nDaqChannel * nMultiplexerChannel, 0);
 
-    // ============ ダブルバッファの初期化 ============
+    // ============ プロット用バッファの初期化 ============
     {
         std::lock_guard lock(plotMutex);
         plotBuffer.times.resize(ringBufferSize);
@@ -62,9 +62,6 @@ void RingBuffer::init() {
 }
 
 void RingBuffer::pop(const double xs[], const double ys[], const double sampleTime){
-    static std::chrono::steady_clock::time_point start_time = std::chrono::steady_clock::now();
-
-
 
     // ============ オフセット適用 ============
     if (offsets.flag){
@@ -93,15 +90,14 @@ void RingBuffer::pop(const double xs[], const double ys[], const double sampleTi
         meaBuffer.idxWrite = 0; 
     }
 
-    // ============ ダブルバッファ更新（GUI用） ============
+    // ============ プロット用バッファ更新（GUI用） ============
     updatePlotBuffer();
 }
 
-// ============================================================
-// トリガー処理（条件判定と状態更新）
-// ============================================================
-
 void RingBuffer::updateTrigger(){
+    // ============================================================
+    // トリガー処理（条件判定と状態更新）
+    // ============================================================
     if (!trigger.flag) {
         trigger.nofm = 0;
         return;
@@ -160,26 +156,32 @@ void RingBuffer::updateTrigger(){
     }
 }
 
-// ============================================================
-// ダブルバッファ更新（GPU用にデータを準備）
-// ============================================================
-
 void RingBuffer::updatePlotBuffer(){
-    // ============ RBF補間モデルの学習 ============
-    Math::RBFInterpolation1D rbf;
-    std::vector<double> x_train(meaBuffer.chs.size()), y_train(meaBuffer.chs.size());
-    for(int ch = 0; ch < meaBuffer.chs.size(); ++ch){
-        x_train[ch] = ch + 0.5;
-        y_train[ch] = meaBuffer.chs[ch].ys[meaBuffer.idxCurrent];
-    }
-    rbf.fit(x_train, y_train, 0.8, Math::RBFType::Multiquadric);
-
+    // ============================================================
+    // プロットバッファ更新（ImPlot用にデータを準備）
+    // ============================================================
+    
     {
+        // プロット用バッファをロックしてコピー
         std::lock_guard lock(plotMutex);
         const int idxEnd = plotBuffer.idxWrite <= meaBuffer.idxCurrent 
                             ? meaBuffer.idxCurrent 
                             : plotBuffer.times.size() - 1;
         
+        // 書き込み範囲の算出
+        const int idxStart = plotBuffer.idxWrite;
+        const int idxCurrent = meaBuffer.idxCurrent;
+        const int bufSize = static_cast<int>(plotBuffer.times.size());
+
+        // ============ RBF補間モデルの学習 ============
+        Math::RBFInterpolation1D rbf;
+        std::vector<double> x_train(meaBuffer.chs.size()), y_train(meaBuffer.chs.size());
+        for(int ch = 0; ch < meaBuffer.chs.size(); ++ch){
+            x_train[ch] = ch + 0.5;
+            y_train[ch] = meaBuffer.chs[ch].ys[idxCurrent];
+        }
+        rbf.fit(x_train, y_train, 0.8, Math::RBFType::Multiquadric);
+
         // 1要素分のデータコピーおよびRBF書き込みを行う共通関数
         auto copyIndexData = [&](int idx) {
             plotBuffer.times[idx] = meaBuffer.times[idx];
@@ -197,12 +199,7 @@ void RingBuffer::updatePlotBuffer(){
                 }
             }
         };
-
-        // 書き込み範囲の算出
-        const int idxStart = plotBuffer.idxWrite;
-        const int idxCurrent = meaBuffer.idxCurrent;
-        const int bufSize = static_cast<int>(plotBuffer.times.size());
-
+        
         if (idxStart <= idxCurrent) {
             // ============ 通常ラップ処理 ============
             // 区間: [idxStart, idxCurrent]
