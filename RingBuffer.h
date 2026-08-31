@@ -46,23 +46,32 @@ class RingBuffer {
             int nofm = 0;
         };
     public:
+        // ============ パラメータ ============
         bool pauseFlag = false;
         double dt = 0;
         double historySec = 0;
         int ch_multi = 0;
-        const int RBF_K = 4;
+        const int RBF_K = 4;  // RBF補間の分割数
         
-        Offsets offsets;
-        std::vector<SourceCh> sourceChs;
-        ScopeConfig scopeCfg;
-        Trigger trigger;
-        MeasurementBuffer meaBuffer;
-        Buffer DoubleBuffers[2];
-        std::atomic<int> plotActive = 0;
-        std::mutex plotMutex;
+        // ============ メンバー変数 ============
+        Offsets offsets;                      // オフセット・位相補正
+        std::vector<SourceCh> sourceChs;      // 信号源設定
+        ScopeConfig scopeCfg;                 // スコープ設定
+        Trigger trigger;                      // トリガー条件
+        MeasurementBuffer meaBuffer;          // 計測データバッファ
+        Buffer DoubleBuffers[2];              // ダブルバッファ（GUI/更新用）
+        std::atomic<int> plotActive = 0;      // アクティブなバッファインデックス
+        std::mutex plotMutex;                 // バッファアクセス用ロック
+        
+        // ============ メンバー関数 ============
         void initSource(const float frequency, const float ampCh1, const float ampCh2);
         void init(const double newRingDt, const double newHistorySec, const int n_daq_channel, const int n_multiplexer_channel);
         void init();
         void pop(const double xs[], const double ys[]);
         void update(const std::vector<std::vector<double>>& rawChs, const double rawDt);
+        
+    private:
+        // ============ プライベート補助関数 ============
+        void updateTrigger();
+        void updatePlotBuffer();
     };
