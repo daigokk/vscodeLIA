@@ -158,7 +158,8 @@ void RingBuffer::pop(const double xs[], const double ys[]){
     {
         std::lock_guard lock(plotMutex);
         auto& activeBuf = DoubleBuffers[activePlot];
-        for(int idx = activeBuf.idxWrite; idx <= meaBuffer.idxCurrent; ++idx){
+        const int idxEnd = activeBuf.idxWrite <= meaBuffer.idxCurrent ? meaBuffer.idxCurrent : activeBuf.times.size()-1;
+        for(int idx = activeBuf.idxWrite; idx <= idxEnd; ++idx){
             activeBuf.times[idx] = meaBuffer.times[idx];
             for(int ch = 0; ch < meaBuffer.chs.size(); ++ch){
                 activeBuf.ys[ch][idx] = meaBuffer.chs[ch].ys[idx];
@@ -169,9 +170,25 @@ void RingBuffer::pop(const double xs[], const double ys[]){
                 }
             }
         }
+        if (idxEnd != meaBuffer.idxCurrent) {
+            for(int idx = 0; idx <= meaBuffer.idxCurrent; ++idx){
+                activeBuf.times[idx] = meaBuffer.times[idx];
+                for(int ch = 0; ch < meaBuffer.chs.size(); ++ch){
+                    activeBuf.ys[ch][idx] = meaBuffer.chs[ch].ys[idx];
+                    activeBuf.matrix[idx * meaBuffer.chs.size() + ch] = meaBuffer.chs[ch].ys[idx];
+                    const int rbfIdx = idx * meaBuffer.chs.size() * RBF_K + ch * RBF_K;
+                    for (int k = 0; k < RBF_K; ++k) {
+                        activeBuf.matrixRBF[rbfIdx + k] = rbf.predict((double)(ch * RBF_K + k) / RBF_K);
+                    }
+                }
+            }
+        }
         activeBuf.idxWrite = meaBuffer.idxWrite;
         activeBuf.idxCurrent = meaBuffer.idxCurrent;
         activeBuf.nofm = meaBuffer.nofm;
+
+        int nextPlot = (activePlot == 0) ? 1 : 0;
+        plotActive.store(nextPlot, std::memory_order_release);
     }
 }
 
