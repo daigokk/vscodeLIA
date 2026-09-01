@@ -53,7 +53,7 @@ void ControlWindow(GuiConfig& guiCfg, Config& cfg, Daq& daq) {
                 ImGui::EndDisabled();
                 ImGui::SetNextItemWidth(guiCfg.dpi_scale * 100);
                 if(ImGui::SliderFloat("Amplitude", &cfg.ringBuffer.sourceChs[1].amplitude, 0.0f, 5.0f)) {    
-                    if(daq.device_data) daq.wavegen(1, cfg.ringBuffer.sourceChs[1].frequency, cfg.ringBuffer.sourceChs[1].amplitude, 0);
+                    if(daq.device_data) daq.wavegen(1, cfg.ringBuffer.sourceChs[1].frequency, cfg.ringBuffer.sourceChs[1].amplitude, cfg.ringBuffer.sourceChs[1].phase);
                 }
                 ImGui::SetNextItemWidth(guiCfg.dpi_scale * 100);
                 if(ImGui::SliderFloat("Phase", &cfg.ringBuffer.sourceChs[1].phase, -180.0f, 180.0f)) {    

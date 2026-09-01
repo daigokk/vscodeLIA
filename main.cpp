@@ -8,18 +8,24 @@
 #include "Daq.h"
 #include "Pipe.h"
 
+bool isPipeMode(int argc, char* argv[]) {
+    for (int i = 1; i < argc; ++i) {
+        const std::string_view arg(argv[i]);
+        if (arg == "pipe") {
+            return true;
+        }
+    }
+    return false;
+}
+
 int main(int argc, char* argv[]) {
     Config cfg; // 測定に関する設定および測定値を保存するクラス
     Daq daq(&cfg); // DAQの制御をするクラス
     daq.start(); // `daq.stop();`するまでDAQは波形を測定し続ける
     Pipe pipe; // アプリケーション間通信を担当するクラス
-    for (int i = 1; i < argc; ++i) {
-        const std::string_view arg(argv[i]);
-        if (arg == "pipe") {
-            // 標準入力からコマンドを受け取るモード
-            pipe.start(&cfg);
-            break;
-        }
+    if (isPipeMode(argc, argv)) {
+        // パイプモードの場合、コマンドを受信するスレッドを開始する
+        pipe.start(&cfg);
     }
     // `Gui`: GLFW、ImGUI、ImPlotの初期設定等を行うクラス
     auto guiCfg = Gui::Initialize(
