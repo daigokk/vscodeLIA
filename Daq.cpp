@@ -4,7 +4,6 @@
 #include <cmath>
 #include <numbers>
 #include <iostream>
-#include <thread>
 
 
 Daq::Daq(Config* cfg) : pCfg_(cfg) {

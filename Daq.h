@@ -1,11 +1,13 @@
 #pragma once
 
+#include "Config.h"
+
 #include <DWF/Device.h>
 #include <DWF/Scope.h>
 #include <DWF/Dio.h>
 #include <dwf.h>
+#include <thread>
 
-#include "Config.h"
 
 // DAQの制御をするクラス
 class Daq {

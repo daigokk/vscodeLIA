@@ -76,6 +76,17 @@ public:
         ringBuffer.pauseFlag = false;
     }
 
+    void buttonOffsetAutoOnce(){
+        ringBuffer.offsets.flag = true;
+    }
+
+    void buttonOffsetOff(){
+        for(int ch = 0; ch < ringBuffer.offsets.chs.size(); ++ch){
+            ringBuffer.offsets.chs[ch].real(0);
+            ringBuffer.offsets.chs[ch].imag(0);
+        }
+    }
+
     explicit Config() {
         init();
     }

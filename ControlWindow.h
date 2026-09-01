@@ -75,14 +75,11 @@ void ControlWindow(GuiConfig& guiCfg, Config& cfg, Daq& daq) {
         }
         ImGui::Separator();
         if(ImGui::Button("Auto offset")) {
-            cfg.ringBuffer.offsets.flag = true;
+            cfg.buttonOffsetAutoOnce();
         }
         ImGui::SameLine();
         if(ImGui::Button("Off")) {
-            for(int ch = 0; ch < cfg.ringBuffer.offsets.chs.size(); ++ch){
-                cfg.ringBuffer.offsets.chs[ch].real(0);
-                cfg.ringBuffer.offsets.chs[ch].imag(0);
-            }
+            cfg.buttonOffsetOff();
         }
         ImGui::SameLine();
         if(ImGui::Button(cfg.ringBuffer.pauseFlag ? "Run" : "Pause")) {
