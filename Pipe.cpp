@@ -77,16 +77,34 @@ void Pipe::commandShaping(std::string line, std::vector<std::string>& tokens, st
 }
 
 bool Pipe::commandDispach(std::vector<std::string>& tokens, std::string& argument, Config* pCfg) {
-    bool isCommandRecognized = true;
-    if (tokens[0] == "pause" || tokens[0] == "stop" || tokens[0] == "halt") {
+    if (tokens.empty()) {
+        return false;
+    }
+
+    if (tokens[0] == "help?" || tokens[0] == "h?" || tokens[0] == "?") {
+        std::cout << "Available commands:\n"
+                  << "  end                    : End the program\n"
+                  << "  stop                   : Stop the program\n"
+                  << "  run                    : Run the program\n"
+                  << "  data:xy?               : Display data\n"
+                  << "  post:offset:[auto|off] : Set post offset\n"
+                  << "  error?                 : Display the last error message\n"
+                  << "  help?                  : Display this help message\n";
+        return true;
+    }
+
+    if (tokens[0] == "stop" || tokens[0] == "pause" || tokens[0] == "halt") {
         pCfg->buttonPause();
+        return true;
     }
-    else if (tokens[0] == "resume" || tokens[0] == "unpause" || tokens[0] == "continue" || tokens[0] == "play" || tokens[0] == "start" || tokens[0] == "run") {
+    if (tokens[0] == "run" || tokens[0] == "unpause" || tokens[0] == "continue" ||
+        tokens[0] == "resume" || tokens[0] == "start" || tokens[0] == "play") {
         pCfg->buttonRun();
+        return true;
     }
-    else if (tokens[0] == "data" && tokens.size() > 1) {
-        if(tokens[1] == "xy?") {
-            // 現在の測定値を複素平面上の座標として出力
+
+    if (tokens[0] == "data" && tokens.size() > 1) {
+        if (tokens[1] == "xy?") {
             const size_t idx = pCfg->ringBuffer.meaBuffer.idxCurrent;
             const auto& rb = pCfg->ringBuffer.meaBuffer;
             std::cout << std::format("{:e},{:e}", rb.chs[0].xs[idx], rb.chs[0].ys[idx]);
@@ -94,28 +112,23 @@ bool Pipe::commandDispach(std::vector<std::string>& tokens, std::string& argumen
                 std::cout << std::format(",{:e},{:e}", rb.chs[ch].xs[idx], rb.chs[ch].ys[idx]);
             }
             std::cout << "\n";
+            return true;
         }
     }
-    else if (tokens[0] == "post" && tokens.size() > 1) {
+    
+    if (tokens[0] == "post" && tokens.size() > 1) {
         if (tokens[1] == "offset" && tokens.size() > 2) {
             if (tokens[2] == "auto") {
                 pCfg->buttonOffsetAutoOnce();
+                return true;
             }
-            else if (tokens[2] == "off") {
+            if (tokens[2] == "off") {
                 pCfg->buttonOffsetOff();
-            }
-            else {
-                isCommandRecognized = false;
+                return true;
             }
         }
-        else {
-            isCommandRecognized = false;
-        }
     }
-    else {
-        isCommandRecognized = false;
-    }
-    return isCommandRecognized;
+    return false;
 }
 
 void Pipe::run(std::stop_token st, Config* pCfg) {
@@ -124,6 +137,8 @@ void Pipe::run(std::stop_token st, Config* pCfg) {
         std::string line;
         if (!std::getline(std::cin, line)) {
             // 標準入力が閉じられた場合、ループを終了
+            // std::getlineはユーザー入力がない場合にブロックされる。
+            // 例えばWindowの閉じるボタンを押しても、標準入力が閉じられるわけではないので、`end`コマンドやCtrl+c等を送る必要がある。
             break;
         }
         std::vector<std::string> tokens;
