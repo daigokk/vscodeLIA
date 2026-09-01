@@ -63,17 +63,6 @@ void Pipe::commandShaping(std::string line, std::vector<std::string>& tokens, st
     tokens = utils::split(commandPart, ':');
     
     iss >> argument; // 引数部分を取得
-    float value = 0.0f;
-    try {
-        if (!argument.empty()) {
-            // 引数が存在する場合、floatに変換
-            value = std::stof(argument);
-        }
-    }
-    catch (...) {
-        // 引数がfloatに変換できない場合は0.0fに設定
-        value = 0.0f;
-    }
 }
 
 bool Pipe::commandDispach(std::vector<std::string>& tokens, std::string& argument, Config* pCfg) {
@@ -86,8 +75,8 @@ bool Pipe::commandDispach(std::vector<std::string>& tokens, std::string& argumen
                   << "  end                    : End the program\n"
                   << "  stop                   : Stop the program\n"
                   << "  run                    : Run the program\n"
+                  << "  post:offset [auto|off] : Set post offset\n"
                   << "  data:xy?               : Display data\n"
-                  << "  post:offset:[auto|off] : Set post offset\n"
                   << "  error?                 : Display the last error message\n"
                   << "  help?                  : Display this help message\n";
         return true;
@@ -103,6 +92,19 @@ bool Pipe::commandDispach(std::vector<std::string>& tokens, std::string& argumen
         return true;
     }
 
+    if (tokens[0] == "post" && tokens.size() > 1) {
+        if (tokens[1] == "offset" && !argument.empty()) {
+            if (argument == "auto") {
+                pCfg->buttonOffsetAutoOnce();
+                return true;
+            }
+            if (argument == "off") {
+                pCfg->buttonOffsetOff();
+                return true;
+            }
+        }
+    }
+
     if (tokens[0] == "data" && tokens.size() > 1) {
         if (tokens[1] == "xy?") {
             const size_t idx = pCfg->ringBuffer.meaBuffer.idxCurrent;
@@ -115,19 +117,7 @@ bool Pipe::commandDispach(std::vector<std::string>& tokens, std::string& argumen
             return true;
         }
     }
-    
-    if (tokens[0] == "post" && tokens.size() > 1) {
-        if (tokens[1] == "offset" && tokens.size() > 2) {
-            if (tokens[2] == "auto") {
-                pCfg->buttonOffsetAutoOnce();
-                return true;
-            }
-            if (tokens[2] == "off") {
-                pCfg->buttonOffsetOff();
-                return true;
-            }
-        }
-    }
+
     return false;
 }
 
