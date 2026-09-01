@@ -94,6 +94,7 @@ public:
     Config& operator=(const Config&) = delete;
 
     ~Config(){
+        // 測定値をCSVファイルに保存
         std::ofstream outFile("ect.csv");
         if (outFile.is_open()) {
             const char delimiter = ',';
