@@ -8,7 +8,7 @@
 // DAQが測定した波形を時間軸で表示する
 void RawWindow(GuiConfig& guiCfg, Config& cfg) {
     if(ImGui::Begin("Raw")){
-        if (ImPlot::BeginPlot("##Raw")) {
+        if (ImPlot::BeginPlot("##Raw", ImVec2(-1, -1))) {
             // ここから
             ImPlot::SetupAxis(ImAxis_X1, "time (s)");
             ImPlot::SetupAxis(ImAxis_Y1, "V (V)");

@@ -8,7 +8,7 @@
 // 位相敏感検波した値を複素平面上に表示する
 void XyWindow(GuiConfig& guiCfg, Config& cfg) {
     if(ImGui::Begin("XY")){
-        if (ImPlot::BeginPlot("##XY")) {
+        if (ImPlot::BeginPlot("##XY", ImVec2(-1, -1))) {
             const int idx = cfg.ringBuffer.plotBuffer.idxCurrent;
             for(int ch=0; ch<cfg.ringBuffer.meaBuffer.chs.size(); ch++){
                 ImPlot::PlotScatter(std::format("Ch{}", ch+1).c_str(), &(cfg.ringBuffer.meaBuffer.chs[ch].xs[idx]), &(cfg.ringBuffer.meaBuffer.chs[ch].ys[idx]), 1);
