@@ -3,20 +3,20 @@
 #include <utility>
 #include <vector>
 #include <cmath>
+#define PI std::acos(-1.0)
 
 class Psd{
 private:
     std::vector<double> sin2, cos2;
     std::size_t sampleCount = 0;
     double inverseSampleCount = 0.0;
-    const double PI = std::acos(-1.0);
 public:
     size_t getSize(){ return sin2.size(); }
     double frequency = 0.0;
     double dt = 0.0;
     void init(const int N, const double frequency, const double dt);
     std::pair<double, double> calc(const double* inData);
-    std::pair<double, double> rotate(const double phase_deg, const double inX, const double inY);
+    static std::pair<double, double> rotate(const double phase_deg, const double inX, const double inY);
 };
 
 inline void Psd::init(const int N, const double newFrequency, const double newDt){
@@ -72,7 +72,7 @@ inline std::pair<double, double> Psd::calc(const double* inData){
     return {xSum * inverseSampleCount, ySum * inverseSampleCount};
 }
 
-inline std::pair<double, double> Psd::rotate(const double phase_deg, const double inX, const double inY){
+std::pair<double, double> Psd::rotate(const double phase_deg, const double inX, const double inY){
     const double theta = phase_deg * (PI / 180.0);
     const double sin_t = std::sin(theta);
     const double cos_t = std::cos(theta);

@@ -61,7 +61,7 @@ void RingBuffer::init() {
     init(dt, historySec, scopeCfg.nDaqChannel, scopeCfg.nMultiChannel);
 }
 
-void RingBuffer::pop(const double xs[], const double ys[], const double sampleTime){
+void RingBuffer::pop(double xs[], double ys[], const double sampleTime){
 
     // ============ オフセット適用 ============
     if (offsets.flag){
@@ -71,7 +71,15 @@ void RingBuffer::pop(const double xs[], const double ys[], const double sampleTi
         }
         offsets.flag = false;
     }
-
+    for(int ch = 0; ch < meaBuffer.chs.size(); ++ch){
+        auto const [x, y] = Psd::rotate(
+            offsets.phases_deg[ch],
+            xs[ch] - offsets.chs[ch].real(),
+            ys[ch] - offsets.chs[ch].imag()
+        );
+        xs[ch] = x;
+        ys[ch] = y;
+    }
     // ============ 計測バッファに書き込み ============
     meaBuffer.times[meaBuffer.idxWrite] = sampleTime;
     for(int ch = 0; ch < meaBuffer.chs.size(); ++ch){
@@ -232,18 +240,13 @@ void RingBuffer::update(const std::vector<std::vector<double>>& rawChs, const do
         psd.init(rawChs[0].size(), sourceChs[0].frequency, rawDt);
     }
     
-    // ============ 各チャネルの PSD 計算 + 位相補正 ============
+    // ============ 各チャネルの PSD 計算 ============
     static std::vector<double> xs(meaBuffer.chs.size()), ys(meaBuffer.chs.size());
     for(int i = 0; i < scopeCfg.nDaqChannel; ++i){
         const int ch = i + ch_multi * scopeCfg.nDaqChannel;
         auto const [x, y] = psd.calc(rawChs[ch].data());
-        auto const [x2, y2] = psd.rotate(
-            offsets.phases_deg[ch],
-            x - offsets.chs[ch].real(),
-            y - offsets.chs[ch].imag()
-        );
-        xs[ch] = x2;
-        ys[ch] = y2;
+        xs[ch] = x;
+        ys[ch] = y;
     }
     
     // ============ マルチプレクサの次チャネルへ、または pop() を実行 ============
