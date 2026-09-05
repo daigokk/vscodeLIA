@@ -3,6 +3,7 @@
 #include <IMGUI/imgui_impl_glfw.h>
 #include <IMGUI/imgui_impl_opengl3.h>
 #include <IMGUI/implot.h>
+#include "Gui.h"
 #include "Config.h"
 
 // DAQが測定した波形を時間軸で表示する

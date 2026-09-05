@@ -3,6 +3,7 @@
 #include <IMGUI/imgui_impl_glfw.h>
 #include <IMGUI/imgui_impl_opengl3.h>
 #include <IMGUI/implot.h>
+#include "Gui.h"
 #include "Config.h"
 
 // 位相敏感検波した値を複素平面上に表示する

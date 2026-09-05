@@ -38,7 +38,7 @@ class RingBuffer {
             int nofm = 0;
         };
         struct PlotBuffer {
-            std::vector<double> times;
+            std::vector<double> times, dts;
             std::vector<std::vector<double>> ys;
             std::vector<double> matrix, matrixRBF;
             int idxWrite = 0;

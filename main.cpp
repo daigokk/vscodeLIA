@@ -4,6 +4,7 @@
 #include "XyWindow.h"
 #include "ControlWindow.h"
 #include "MultichannelWindow.h"
+#include "Dtwindow.h"
 #include "Config.h"
 #include "Daq.h"
 #include "Pipe.h"
@@ -39,6 +40,7 @@ int main(int argc, char* argv[]) {
         XyWindow(guiCfg, cfg); // 位相敏感検波した値を複素平面上に表示する
         ControlWindow(guiCfg, cfg, daq); // DAQの出力する波形(周波数、振幅)を制御する
         MultichannelWindow(guiCfg, cfg);
+        DtWindow(guiCfg, cfg);
         
         Gui::EndFrame(guiCfg.window);
     }

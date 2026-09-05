@@ -42,6 +42,7 @@ void RingBuffer::init(const double newRingDt, const double newHistorySec, const 
     {
         std::lock_guard lock(plotMutex);
         plotBuffer.times.resize(ringBufferSize);
+        plotBuffer.dts.resize(ringBufferSize);
         plotBuffer.ys.resize(meaBuffer.chs.size());
         for(auto& values : plotBuffer.ys){
             values.resize(ringBufferSize);
@@ -193,6 +194,8 @@ void RingBuffer::updatePlotBuffer(){
         // 1要素分のデータコピーおよびRBF書き込みを行う共通関数
         auto copyIndexData = [&](int idx) {
             plotBuffer.times[idx] = meaBuffer.times[idx];
+            auto idx_0 = (idx > 0) ? idx - 1: (meaBuffer.nofm >= meaBuffer.times.size() ? meaBuffer.times.size() - 1 : idx);
+            plotBuffer.dts[idx] = plotBuffer.times[idx] - plotBuffer.times[idx_0];
 
             for (size_t ch = 0; ch < meaBuffer.chs.size(); ++ch) {
                 const double yVal = meaBuffer.chs[ch].ys[idx];
