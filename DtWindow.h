@@ -10,29 +10,25 @@
 void DtWindow(GuiConfig& guiCfg, Config& cfg) {
     if(ImGui::Begin("dt")){
         if (ImPlot::BeginPlot("##dt", ImVec2(-1, -1))) {
-            double t_current, t_start;
-            int count, idxWrite;
-            std::vector<double> times_copy, dts_copy;
-            {
-                std::lock_guard lock(cfg.ringBuffer.plotMutex);
-                const auto& plot = cfg.ringBuffer.plotBuffer;
-                t_current = plot.times[plot.idxCurrent];
-                t_start = t_current - cfg.ringBuffer.historySec;
-                count = plot.nofm < plot.times.size() ? plot.nofm : plot.times.size();
-                idxWrite = plot.idxWrite;
-                
-                times_copy = plot.times;
-                dts_copy = plot.dts;
-            }
-
-            ImPlotSpec specLine;
-            specLine.Offset = idxWrite;
+            const auto& plot = cfg.ringBuffer.plotBuffer;
+            const auto count = plot.nofm < plot.times.size() ? plot.nofm : plot.times.size();
+            const auto idxWrite = plot.idxWrite;
+            const auto t_current = plot.times[plot.idxCurrent];
+            const auto t_start = t_current - cfg.ringBuffer.historySec;
+            const auto dt = cfg.ringBuffer.dt * static_cast<double>(cfg.ringBuffer.scopeCfg.nMultiChannel);
+            
             ImPlot::SetupAxis(ImAxis_X1, "Time", ImPlotAxisFlags_NoTickLabels);
-            ImPlot::SetupAxis(ImAxis_Y1, "dt (s)");
             ImPlot::SetupAxisLimits(ImAxis_X1, t_start, t_current, ImGuiCond_Always);
-            auto dt = cfg.ringBuffer.dt * static_cast<double>(cfg.ringBuffer.scopeCfg.nMultiChannel);
+            ImPlot::SetupAxis(ImAxis_Y1, "dt (ms)");
+            ImPlot::SetupAxisFormat(ImAxis_Y1, ImPlotFormatter(Gui::MiliFormatter));
             ImPlot::SetupAxisLimits(ImAxis_Y1, dt * 0.9, dt * 1.1, ImGuiCond_Always);
-            ImPlot::PlotLine("##dt", times_copy.data(), dts_copy.data(), count, specLine);
+            ImPlotSpec spec;
+            spec.Offset = plot.idxWrite;
+            ImPlot::PlotLine(
+                "##dt",
+                plot.times.data(),
+                plot.dts.data(),
+                count, spec);
             ImPlot::EndPlot();
         }
     }

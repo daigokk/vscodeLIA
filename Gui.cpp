@@ -172,3 +172,15 @@ void Gui::EndFrame(GLFWwindow* window){
     glfwSwapBuffers(window);
     glfwPollEvents();
 }
+
+void Gui::MiliFormatter(double value, char* buff, int size, void*) {
+    snprintf(buff, size, "%.1f", value * 1e3);
+}
+
+void Gui::KiloFormatter(double value, char* buff, int size, void*) {
+    snprintf(buff, size, "%.0f", value * 1e-3);
+}
+
+void Gui::ScientificFormatter(double value, char* buff, int size, void*) {
+    snprintf(buff, size, "%.1e", value);
+}
