@@ -9,7 +9,7 @@
 // 位相敏感検波した値を複素平面上に表示する
 void XyWindow(GuiConfig& guiCfg, Config& cfg) {
     if(ImGui::Begin("XY")){
-        if (ImPlot::BeginPlot("##XY", ImVec2(-1, -1))) {
+        if (ImPlot::BeginPlot("##XY", ImVec2(-1, -1), ImPlotFlags_Equal)) {
             ImPlotSpec spec;
             const int idx = cfg.ringBuffer.plotBuffer.idxCurrent;
             const int count = cfg.ringBuffer.plotBuffer.nofm < cfg.ringBuffer.plotBuffer.times.size() ? cfg.ringBuffer.plotBuffer.nofm : cfg.ringBuffer.plotBuffer.times.size();
