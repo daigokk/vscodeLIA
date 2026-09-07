@@ -41,7 +41,6 @@ bool Config::saveSettingsToTxt(const std::string& filename) {
     std::ofstream outFile(filename);
     if (outFile.is_open()) {
         outFile << "Raw Rate: " << 1.0 / rawData.rawDt << " Hz" << std::endl;
-        outFile << "Raw Size: " << rawData.times.size() << std::endl;
         outFile << "Number of DAQ Channels: " << ringBuffer.scopeCfg.nDaqChannel << std::endl;
         outFile << "Number of Multiplexer Channels: " << ringBuffer.scopeCfg.nMultiChannel << std::endl;
         outFile << "Ring Buffer dt: " << ringBuffer.dt << " s" << std::endl;
@@ -71,8 +70,6 @@ bool Config::loadSettingsFromTxt(const std::string& filename) {
                     value.erase(value.find_last_not_of(" \t") + 1);
                     if (key == "Raw Rate") {
                         rawData.rawDt = 1.0 / std::stod(value);
-                    } else if (key == "Raw Size") {
-                        rawData.times.resize(std::stoi(value));
                     } else if (key == "Number of DAQ Channels") {
                         ringBuffer.scopeCfg.nDaqChannel = std::stoi(value);
                     } else if (key == "Number of Multiplexer Channels") {
