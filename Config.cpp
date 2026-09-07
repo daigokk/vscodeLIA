@@ -61,10 +61,11 @@ bool Config::saveSettingsToTxt(const std::string& filename) {
         outFile << "Excitation Frequency: " << ringBuffer.sourceChs[0].frequency << " Hz" << std::endl;
         outFile << "Excitation Amplitude ch1: " << ringBuffer.sourceChs[0].amplitude << " V" << std::endl;
         outFile << "Excitation Amplitude ch2: " << ringBuffer.sourceChs[1].amplitude << " V" << std::endl;
-        outFile << "Raw Plot Scale Limits: " << ringBuffer.plotBuffer.rawScaleLimits.Y.Min << "," << ringBuffer.plotBuffer.rawScaleLimits.Y.Max << std::endl;
-        outFile << "Xy Plot Scale Limits X: " << ringBuffer.plotBuffer.xyScaleLimits.X.Min << "," << ringBuffer.plotBuffer.xyScaleLimits.X.Max << std::endl;
-        outFile << "Xy Plot Scale Limits Y: " << ringBuffer.plotBuffer.xyScaleLimits.Y.Min << "," << ringBuffer.plotBuffer.xyScaleLimits.Y.Max << std::endl;
+        outFile << "Raw Plot Scale Limits: " << ringBuffer.plotBuffer.rawScaleLimits.Y.Min << ", " << ringBuffer.plotBuffer.rawScaleLimits.Y.Max << std::endl;
+        outFile << "Xy Plot Scale Limits X: " << ringBuffer.plotBuffer.xyScaleLimits.X.Min << ", " << ringBuffer.plotBuffer.xyScaleLimits.X.Max << std::endl;
+        outFile << "Xy Plot Scale Limits Y: " << ringBuffer.plotBuffer.xyScaleLimits.Y.Min << ", " << ringBuffer.plotBuffer.xyScaleLimits.Y.Max << std::endl;
         outFile << "Multi Plot Scale Limit: " << ringBuffer.plotBuffer.multiScaleLimit << std::endl;
+        outFile << "Trigger Level: " << ringBuffer.trigger.level << std::endl;
         outFile.close();
         return true;
     }
@@ -117,6 +118,8 @@ bool Config::loadSettingsFromTxt(const std::string& filename) {
                         }
                     } else if (key == "Multi Plot Scale Limit") {
                         ringBuffer.plotBuffer.multiScaleLimit = std::stof(value1);
+                    } else if (key == "Trigger Level") {
+                        ringBuffer.trigger.level = std::stof(value1);
                     }
                 }
             }
@@ -142,7 +145,15 @@ Config::Config() {
     ringBuffer.dt = RINGBUFFER_DT;
     ringBuffer.historySec = HISTORY_SEC;
 
-    ringBuffer.plotBuffer.multiScaleLimit = 1.0f;
+    ringBuffer.plotBuffer.rawScaleLimits.Y.Min = -1.0;
+    ringBuffer.plotBuffer.rawScaleLimits.Y.Max = 1.0;
+    ringBuffer.plotBuffer.xyScaleLimits.X.Min = -1.0;
+    ringBuffer.plotBuffer.xyScaleLimits.X.Max = 1.0;
+    ringBuffer.plotBuffer.xyScaleLimits.Y.Min = -1.0;
+    ringBuffer.plotBuffer.xyScaleLimits.Y.Max = 1.0;
+    ringBuffer.plotBuffer.multiScaleLimit = 1.0;
+
+    ringBuffer.trigger.level = 0.0;
 
     loadSettingsFromTxt();
     
