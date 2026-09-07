@@ -3,6 +3,7 @@
 #include <pocketfft_hdronly.h>
 
 #include <vector>
+#include <string>
 
 #define RAW_SIZE 10000
 #define RAW_RATE 100e6
@@ -72,6 +73,7 @@ public:
         }
     }
 
+    std::string getCurrentTimestamp();
     bool saveMeasurementResultsToCSV(const std::string& filename = "ect.csv");
     bool saveSettingsToTxt(const std::string& filename = "settings.txt");
     bool loadSettingsFromTxt(const std::string& filename = "settings.txt");

@@ -174,7 +174,7 @@ void Gui::EndFrame(GLFWwindow* window){
 }
 
 void Gui::MicroFormatter(double value, char* buff, int size, void*) {
-    snprintf(buff, size, "%gf", value * 1e6);
+    snprintf(buff, size, "%g", value * 1e6);
 }
 
 void Gui::MiliFormatter(double value, char* buff, int size, void*) {

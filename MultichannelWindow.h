@@ -1,20 +1,23 @@
 #pragma once
+#include "Config.h"
+#include "Daq.h"
+
 #include <IMGUI/imgui.h>
 #include <IMGUI/imgui_impl_glfw.h>
 #include <IMGUI/imgui_impl_opengl3.h>
 #include <IMGUI/implot.h>
-#include "Config.h"
-#include "Daq.h"
+
+#include <format>
 
 // マルチプレクサ対応
 void MultichannelWindow(GuiConfig& guiCfg, Config& cfg, const PlotBufferSnapshot& plot) {
     if(ImGui::Begin("Multi channel plot")){
         ImGui::SetNextItemWidth(guiCfg.dpi_scale * 100);
+        ImGui::SliderFloat("y (V)", &cfg.ringBuffer.plotBuffer.multiScaleLimit, 0.01, cfg.rawData.range, "%.2f");
         bool isMiliV = false;
-        if(cfg.ringBuffer.plotBuffer.scaleLimit < 0.1){
+        if(cfg.ringBuffer.plotBuffer.multiScaleLimit < 0.2){
             isMiliV = true;
         }
-        ImGui::SliderFloat("y (V)", &cfg.ringBuffer.plotBuffer.scaleLimit, 0.01, cfg.rawData.range, "%.2f");
         ImGui::SameLine();
         ImGui::Checkbox(
             cfg.ringBuffer.trigger.flag ?
@@ -36,6 +39,10 @@ void MultichannelWindow(GuiConfig& guiCfg, Config& cfg, const PlotBufferSnapshot
                 // Pauseボタンが押されたとき
                 cfg.buttonPause();
             }
+        }
+        ImGui::SameLine();
+        if(ImGui::Button("Save")) {
+            cfg.saveMeasurementResultsToCSV(std::format("ect_{}.csv", cfg.getCurrentTimestamp()));
         }
         // バッファデータをローカル変数にコピー
         double t_current, t_start;
@@ -62,7 +69,7 @@ void MultichannelWindow(GuiConfig& guiCfg, Config& cfg, const PlotBufferSnapshot
             }
             //ImPlot::SetupLegend(ImPlotLocation_East, true);
             ImPlot::SetupAxisLimits(ImAxis_X1, t_start, t_current, ImGuiCond_Always);
-            ImPlot::SetupAxisLimits(ImAxis_Y1, -cfg.ringBuffer.plotBuffer.scaleLimit, cfg.ringBuffer.plotBuffer.scaleLimit, ImGuiCond_Always);
+            ImPlot::SetupAxisLimits(ImAxis_Y1, -cfg.ringBuffer.plotBuffer.multiScaleLimit, cfg.ringBuffer.plotBuffer.multiScaleLimit, ImGuiCond_Always);
             ImPlot::SetupLegend(ImPlotLocation_NorthEast, ImPlotLegendFlags_Outside);
             ImPlotSpec specLine;
             specLine.Offset = idxWrite;
@@ -109,7 +116,7 @@ void MultichannelWindow(GuiConfig& guiCfg, Config& cfg, const PlotBufferSnapshot
                     ImPlot::SetupAxisLimits(ImAxis_Y1, 0, heatmapRows, ImGuiCond_Always);
                     ImPlot::PlotHeatmap(
                         "##heatmap", matrix_copy.data(), heatmapRows, ringSize,
-                        -cfg.ringBuffer.plotBuffer.scaleLimit, cfg.ringBuffer.plotBuffer.scaleLimit, nullptr,
+                        -cfg.ringBuffer.plotBuffer.multiScaleLimit, cfg.ringBuffer.plotBuffer.multiScaleLimit, nullptr,
                         ImPlotPoint(t_start, heatmapRows), ImPlotPoint(t_current, 0),
                         {ImPlotProp_Offset, idxWrite * heatmapRows,
                          ImPlotProp_Flags, ImPlotHeatmapFlags_ColMajor}
@@ -118,10 +125,10 @@ void MultichannelWindow(GuiConfig& guiCfg, Config& cfg, const PlotBufferSnapshot
                 }
                 ImGui::SameLine();
                 if(isMiliV){
-                    ImPlot::ColormapScale("y (mV)", -cfg.ringBuffer.plotBuffer.scaleLimit*1e3, cfg.ringBuffer.plotBuffer.scaleLimit*1e3, ImVec2(75, -1), "%g");
+                    ImPlot::ColormapScale("y (mV)", -cfg.ringBuffer.plotBuffer.multiScaleLimit*1e3, cfg.ringBuffer.plotBuffer.multiScaleLimit*1e3, ImVec2(75, -1), "%g");
                 }
                 else{
-                    ImPlot::ColormapScale("y (V)", -cfg.ringBuffer.plotBuffer.scaleLimit, cfg.ringBuffer.plotBuffer.scaleLimit, ImVec2(75, -1), "%g");
+                    ImPlot::ColormapScale("y (V)", -cfg.ringBuffer.plotBuffer.multiScaleLimit, cfg.ringBuffer.plotBuffer.multiScaleLimit, ImVec2(75, -1), "%g");
                 }
                 
                 ImGui::EndTabItem();
@@ -134,7 +141,7 @@ void MultichannelWindow(GuiConfig& guiCfg, Config& cfg, const PlotBufferSnapshot
                     ImPlot::SetupAxisLimits(ImAxis_Y1, 0, heatmapRows, ImGuiCond_Always);
                     ImPlot::PlotHeatmap(
                         "##_heatmap", matrixRBF_copy.data(), heatmapRowsRBF, ringSize,
-                        -cfg.ringBuffer.plotBuffer.scaleLimit, cfg.ringBuffer.plotBuffer.scaleLimit, nullptr,
+                        -cfg.ringBuffer.plotBuffer.multiScaleLimit, cfg.ringBuffer.plotBuffer.multiScaleLimit, nullptr,
                         ImPlotPoint(t_start, heatmapRows), ImPlotPoint(t_current, 0),
                         {ImPlotProp_Offset, idxWrite * heatmapRowsRBF,
                          ImPlotProp_Flags, ImPlotHeatmapFlags_ColMajor}
@@ -142,7 +149,7 @@ void MultichannelWindow(GuiConfig& guiCfg, Config& cfg, const PlotBufferSnapshot
                     ImPlot::EndPlot();
                 }
                 ImGui::SameLine();
-                ImPlot::ColormapScale("y (V)", -cfg.ringBuffer.plotBuffer.scaleLimit, cfg.ringBuffer.plotBuffer.scaleLimit, ImVec2(75, -1), "%g");
+                ImPlot::ColormapScale("y (V)", -cfg.ringBuffer.plotBuffer.multiScaleLimit, cfg.ringBuffer.plotBuffer.multiScaleLimit, ImVec2(75, -1), "%g");
                 ImGui::EndTabItem();
             }
             ImGui::EndTabBar();

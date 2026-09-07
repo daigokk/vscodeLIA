@@ -2,6 +2,19 @@
 #include <format>
 #include <fstream>
 #include <iostream>
+#include <iomanip> // std::put_time
+#include <ctime>   // std::localtime
+
+std::string Config::getCurrentTimestamp() {
+    auto now = std::chrono::system_clock::now();
+    std::time_t now_time = std::chrono::system_clock::to_time_t(now);
+    std::tm local_tm;
+    if (localtime_s(&local_tm, &now_time) != 0) throw std::runtime_error("localtime_s failed");
+
+    std::ostringstream oss;
+    oss << std::put_time(&local_tm, "%Y%m%d%H%M%S");
+    return oss.str();
+}
 
 bool Config::saveMeasurementResultsToCSV(const std::string& filename) {
     // 測定値をCSVファイルに保存
@@ -48,7 +61,7 @@ bool Config::saveSettingsToTxt(const std::string& filename) {
         outFile << "Excitation Frequency: " << ringBuffer.sourceChs[0].frequency << " Hz" << std::endl;
         outFile << "Excitation Amplitude ch1: " << ringBuffer.sourceChs[0].amplitude << " V" << std::endl;
         outFile << "Excitation Amplitude ch2: " << ringBuffer.sourceChs[1].amplitude << " V" << std::endl;
-        outFile << "Plot Scale Limit: " << ringBuffer.plotBuffer.scaleLimit << " V" << std::endl;
+        outFile << "Plot Scale Limit: " << ringBuffer.plotBuffer.multiScaleLimit << " V" << std::endl;
         outFile.close();
         return true;
     }
@@ -85,7 +98,7 @@ bool Config::loadSettingsFromTxt(const std::string& filename) {
                     } else if (key == "Excitation Amplitude ch2") {
                         ringBuffer.sourceChs[1].amplitude = std::stof(value);
                     } else if (key == "Plot Scale Limit") {
-                        ringBuffer.plotBuffer.scaleLimit = std::stof(value);
+                        ringBuffer.plotBuffer.multiScaleLimit = std::stof(value);
                     }
                 }
             }
@@ -111,7 +124,7 @@ Config::Config() {
     ringBuffer.dt = RINGBUFFER_DT;
     ringBuffer.historySec = HISTORY_SEC;
 
-    ringBuffer.plotBuffer.scaleLimit = 1.0f;
+    ringBuffer.plotBuffer.multiScaleLimit = 1.0f;
 
     loadSettingsFromTxt();
     
@@ -123,7 +136,7 @@ Config::Config() {
 }
 
 Config::~Config(){
-    if(!saveMeasurementResultsToCSV()){
+    if(!saveMeasurementResultsToCSV(std::format("ect_{}.csv", getCurrentTimestamp()))){
         std::cerr << "Failed to save measurement results to CSV." << std::endl;
     }
     if(!saveSettingsToTxt()){
