@@ -221,8 +221,9 @@ DAQのドライバおよびSDKを取得するためにインストールしま�
 void RawWindow(GuiConfig& guiCfg, Config& cfg) {
     if(ImGui::Begin("Raw")){
         if (ImPlot::BeginPlot("##Raw")) {
-            // ここから
-            ImPlot::SetupAxis(ImAxis_X1, "time (s)");
+            //TODO: ここにラベルを表示するコードを入力
+            ImPlot::SetupAxis(ImAxis_X1, "time (µs)");
+            ImPlot::SetupAxisFormat(ImAxis_X1, ImPlotFormatter(Gui::MicroFormatter));
             ImPlot::SetupAxis(ImAxis_Y1, "V (V)");
             // ここまで
             for(int i=0; i < cfg.rawData.chs.size(); i++){
@@ -247,8 +248,6 @@ inline void fft(Config& cfg) {
     // 正規化用係数（DFT結果を平均振幅に戻すため 2/N を乗算）
     const double scale = 2.0 / static_cast<double>(N);
 
-    // TODO: ここにフーリエ変換のコードを入力
-
     // 1. pocketfft実行用の入出力形状およびストライドの設定
     pocketfft::shape_t shape = { N };
     pocketfft::stride_t stride_in = { sizeof(double) };
@@ -260,6 +259,8 @@ inline void fft(Config& cfg) {
 
     // 2. FFTの実行 (r2c: 実数入力 -> 複素数出力)
     // 引数: shape, stride_in, stride_out, axes, forward(true), in_ptr, out_ptr, scale(1.0)
+
+    // TODO: ここにフーリエ変換のコードを入力
     pocketfft::r2c(
         shape,
         stride_in,
@@ -293,7 +294,7 @@ inline void fft(Config& cfg) {
   | ![Multi plexer](./docs/images/Multi.svg) |
   | --- |
   | 図4. マルチプレクサ(ADG1408)を用いた相互誘導検出部の多チャンネル回路 |
-* (オプション) 初期設定では、2msごとに 10000[Sample]/100[MSample/s]=0.1[ms] 分だけAD変換しています(`Config.h`で変更可能)。2msはUSBの制限から決定しました。この方式の利点はPSDの実装が簡単(平均を使える、FFTを使える)であること、100MS/sの高速なAD変換ができること、等が挙げられます。しかしながら全体の時間の 0.1[ms]/[2ms]=5[%] しか使っていません。検出信号の95%は捨てていることを意味します。言い換えると2msの間プローブの検出信号が一定の場合は、問題ないです。この制限(95%を捨てる)は、AD変換の速度を落とすことで使えるようになる、DAQのストリーミング記録(100%使う)を用いることで解決できます。AD変換の速度を落とすことは検出周波数の最大値が下がることを意味しますが([ナイキストのサンプリング定理](https://ja.wikipedia.org/wiki/%E6%A8%99%E6%9C%AC%E5%8C%96%E5%AE%9A%E7%90%86))、AD変換の前段に[スーパーヘテロダイン](https://ja.wikipedia.org/wiki/%E3%83%98%E3%83%86%E3%83%AD%E3%83%80%E3%82%A4%E3%83%B3)を用いることでその制限も回避することができます。何を言っているのかわかったでしょうか？ご理解いただけたら、ハードウェアおよびソフトウェアを改造して、信号の取りこぼしのない、かつ100kHzの検出信号を検波できるLIAを実装してみてください。
+* (オプション) 初期設定では、2msごとに 10000[Sample]/100[MSample/s]=0.1[ms] 分だけAD変換しています(`Config.h`のマクロ(`#define`)で変更可能)。2msはUSBの制限から決定しました。この方式の利点はPSDの実装が簡単(平均を使える、FFTを使える)であること、100MS/sの高速なAD変換ができること、等が挙げられます。しかしながら全体の時間の 0.1[ms]/[2ms]=5[%] しか使っていません。検出信号の95%は捨てていることを意味します。言い換えると2msの間プローブの検出信号が一定の場合は、問題ないです。この制限(95%を捨てる)は、AD変換の速度を落とすことで使えるようになる、DAQのストリーミング記録(100%使う)を用いることで解決できます。AD変換の速度を落とすことは検出周波数の最大値が下がることを意味しますが([ナイキストのサンプリング定理](https://ja.wikipedia.org/wiki/%E6%A8%99%E6%9C%AC%E5%8C%96%E5%AE%9A%E7%90%86))、AD変換の前段に[スーパーヘテロダイン](https://ja.wikipedia.org/wiki/%E3%83%98%E3%83%86%E3%83%AD%E3%83%80%E3%82%A4%E3%83%B3)を用いることでその制限も回避することができます。何を言っているのかわかったでしょうか？ご理解いただけたら、ハードウェアおよびソフトウェアを改造して、信号の取りこぼしのない、かつ100kHzの検出信号を検波できるLIAを実装してみてください。
 * (オプション) 追加したい機能はありませんか？その機能を実装してみましょう。[LIA (daigokk/LIA)](https://github.com/daigokk/LIA/) が参考になるかもしれません。
 * (オプション) C++からメモリ安全なRustに書き換えてみましょう。
 
