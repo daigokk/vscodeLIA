@@ -13,12 +13,15 @@
 void RawWindow(GuiConfig& guiCfg, Config& cfg) {
     if(ImGui::Begin("Raw")){
         if (ImPlot::BeginPlot("##Raw", ImVec2(-1, -1))) {
+            static double y_scale = 1.0;
             //TODO: ここにラベルを表示するコードを入力
-            
+
             // ここまで
             for(int i=0; i < cfg.rawData.chs.size(); i++){
                 ImPlot::PlotLine(std::format("Ch{}", i+1).c_str(), cfg.rawData.times.data(), cfg.rawData.chs[i].data(), cfg.rawData.times.size());
             }
+            const ImPlotRect limits = ImPlot::GetPlotLimits();
+            y_scale = limits.Y.Max - limits.Y.Min;
             ImPlot::EndPlot();
         }
     }

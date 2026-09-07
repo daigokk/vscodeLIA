@@ -23,6 +23,7 @@
 
 # Configuration files
 *.ini
+settings.txt
 
 # Measurement resutls
 *.csv

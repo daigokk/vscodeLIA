@@ -41,8 +41,8 @@ int main(int argc, char* argv[]) {
         RawWindow(guiCfg, cfg); // DAQが測定した波形を時間軸で表示する
         XyWindow(guiCfg, cfg, plot); // 位相敏感検波した値を複素平面上に表示する
         ControlWindow(guiCfg, cfg, daq); // DAQの出力する波形(周波数、振幅)を制御する
-        //MultichannelWindow(guiCfg, cfg, plot);
-        //DtWindow(guiCfg, cfg);
+        MultichannelWindow(guiCfg, cfg, plot);
+        DtWindow(guiCfg, cfg);
         
         Gui::EndFrame(guiCfg.window);
     }

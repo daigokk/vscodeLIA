@@ -178,7 +178,7 @@ void Gui::MicroFormatter(double value, char* buff, int size, void*) {
 }
 
 void Gui::MiliFormatter(double value, char* buff, int size, void*) {
-    snprintf(buff, size, "%.1f", value * 1e3);
+    snprintf(buff, size, "%.0f", value * 1e3);
 }
 
 void Gui::KiloFormatter(double value, char* buff, int size, void*) {

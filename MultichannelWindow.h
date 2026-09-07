@@ -10,6 +10,10 @@
 void MultichannelWindow(GuiConfig& guiCfg, Config& cfg, const PlotBufferSnapshot& plot) {
     if(ImGui::Begin("Multi channel plot")){
         ImGui::SetNextItemWidth(guiCfg.dpi_scale * 100);
+        bool isMiliV = false;
+        if(cfg.ringBuffer.plotBuffer.scaleLimit < 0.1){
+            isMiliV = true;
+        }
         ImGui::SliderFloat("y (V)", &cfg.ringBuffer.plotBuffer.scaleLimit, 0.01, cfg.rawData.range, "%.2f");
         ImGui::SameLine();
         ImGui::Checkbox(
@@ -49,7 +53,13 @@ void MultichannelWindow(GuiConfig& guiCfg, Config& cfg, const PlotBufferSnapshot
         
         if (ImPlot::BeginPlot("##Line Plot", ImVec2(ImGui::GetWindowWidth(), ImGui::GetWindowHeight()/3))) {
             ImPlot::SetupAxis(ImAxis_X1, "Time", ImPlotAxisFlags_NoTickLabels);
-            ImPlot::SetupAxis(ImAxis_Y1, "y (V)");
+            if(isMiliV){
+                ImPlot::SetupAxis(ImAxis_Y1, "y (mV)");
+                ImPlot::SetupAxisFormat(ImAxis_Y1, ImPlotFormatter(Gui::MiliFormatter));
+            }
+            else{
+                ImPlot::SetupAxis(ImAxis_Y1, "y (V)");
+            }
             //ImPlot::SetupLegend(ImPlotLocation_East, true);
             ImPlot::SetupAxisLimits(ImAxis_X1, t_start, t_current, ImGuiCond_Always);
             ImPlot::SetupAxisLimits(ImAxis_Y1, -cfg.ringBuffer.plotBuffer.scaleLimit, cfg.ringBuffer.plotBuffer.scaleLimit, ImGuiCond_Always);
@@ -107,7 +117,13 @@ void MultichannelWindow(GuiConfig& guiCfg, Config& cfg, const PlotBufferSnapshot
                     ImPlot::EndPlot();
                 }
                 ImGui::SameLine();
-                ImPlot::ColormapScale("y (V)", -cfg.ringBuffer.plotBuffer.scaleLimit, cfg.ringBuffer.plotBuffer.scaleLimit, ImVec2(75, -1), "%g");
+                if(isMiliV){
+                    ImPlot::ColormapScale("y (mV)", -cfg.ringBuffer.plotBuffer.scaleLimit*1e3, cfg.ringBuffer.plotBuffer.scaleLimit*1e3, ImVec2(75, -1), "%g");
+                }
+                else{
+                    ImPlot::ColormapScale("y (V)", -cfg.ringBuffer.plotBuffer.scaleLimit, cfg.ringBuffer.plotBuffer.scaleLimit, ImVec2(75, -1), "%g");
+                }
+                
                 ImGui::EndTabItem();
             }
             if(ImGui::BeginTabItem("Interpolation")){
