@@ -113,7 +113,7 @@ Config::Config() {
 
     ringBuffer.plotBuffer.scaleLimit = 1.0f;
 
-    // loadSettingsFromTxt("settings.txt");
+    loadSettingsFromTxt();
     
     rawData.init(rawData.rawDt, rawData.times.size(), ringBuffer.scopeCfg.nDaqChannel * ringBuffer.scopeCfg.nMultiChannel);
     ringBuffer.initSource(ringBuffer.sourceChs[0].frequency, ringBuffer.sourceChs[0].amplitude, ringBuffer.sourceChs[1].amplitude);

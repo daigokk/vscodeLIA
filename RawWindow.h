@@ -15,7 +15,13 @@ void RawWindow(GuiConfig& guiCfg, Config& cfg) {
         if (ImPlot::BeginPlot("##Raw", ImVec2(-1, -1))) {
             static double y_scale = 1.0;
             //TODO: ここにラベルを表示するコードを入力
-
+            ImPlot::SetupAxis(ImAxis_X1, "time (µs)");
+            ImPlot::SetupAxisLimits(ImAxis_X1, cfg.rawData.times.front(), cfg.rawData.times.back(), ImGuiCond_Always);
+            ImPlot::SetupAxisFormat(ImAxis_X1, ImPlotFormatter(Gui::MicroFormatter));
+            ImPlot::SetupAxis(ImAxis_Y1, y_scale < 0.2 ? "V (mV)" : "V (V)");
+            if(y_scale < 0.2){
+                ImPlot::SetupAxisFormat(ImAxis_Y1, ImPlotFormatter(Gui::MiliFormatter));
+            }
             // ここまで
             for(int i=0; i < cfg.rawData.chs.size(); i++){
                 ImPlot::PlotLine(std::format("Ch{}", i+1).c_str(), cfg.rawData.times.data(), cfg.rawData.chs[i].data(), cfg.rawData.times.size());

@@ -46,7 +46,7 @@ inline void Psd::init(const int N, const double newFrequency, const double newDt
         cos2[i] = 2.0 * std::cos(wt);
     }
 }
-
+/*/
 inline std::pair<double, double> Psd::calc(const double* inData){
     const size_t N = this->sampleCount;
     const double DT = this->dt;
@@ -71,7 +71,7 @@ inline std::pair<double, double> Psd::calc(const double* inData){
     }
     return {xSum * inverseSampleCount, ySum * inverseSampleCount};
 }
-/*/
+
 std::pair<double, double> Psd::rotate(const double phase_deg, const double inX, const double inY){
     const double theta = phase_deg * (PI / 180.0);
     const double sin_t = std::sin(theta);

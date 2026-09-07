@@ -174,15 +174,15 @@ void Gui::EndFrame(GLFWwindow* window){
 }
 
 void Gui::MicroFormatter(double value, char* buff, int size, void*) {
-    snprintf(buff, size, "%.0f", value * 1e6);
+    snprintf(buff, size, "%gf", value * 1e6);
 }
 
 void Gui::MiliFormatter(double value, char* buff, int size, void*) {
-    snprintf(buff, size, "%.0f", value * 1e3);
+    snprintf(buff, size, "%g", value * 1e3);
 }
 
 void Gui::KiloFormatter(double value, char* buff, int size, void*) {
-    snprintf(buff, size, "%.0f", value * 1e-3);
+    snprintf(buff, size, "%g", value * 1e-3);
 }
 
 void Gui::ScientificFormatter(double value, char* buff, int size, void*) {
