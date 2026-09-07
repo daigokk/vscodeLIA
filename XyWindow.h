@@ -7,36 +7,44 @@
 #include "Config.h"
 
 // 位相敏感検波した値を複素平面上に表示する
-void XyWindow(GuiConfig& guiCfg, Config& cfg) {
+void XyWindow(GuiConfig& guiCfg, Config& cfg, const PlotBufferSnapshot& plot) {
     if(ImGui::Begin("XY")){
         if (ImPlot::BeginPlot("##XY", ImVec2(-1, -1), ImPlotFlags_Equal)) {
             ImPlotSpec spec;
-            const int idx = cfg.ringBuffer.plotBuffer.idxCurrent;
-            const int count = cfg.ringBuffer.plotBuffer.nofm < cfg.ringBuffer.plotBuffer.times.size() ? cfg.ringBuffer.plotBuffer.nofm : cfg.ringBuffer.plotBuffer.times.size();
-            for(int ch=0; ch<cfg.ringBuffer.meaBuffer.chs.size(); ch++){
+            const auto& xs_copy = plot.xs;
+            const auto& ys_copy = plot.ys;
+            const int idxCurrent = plot.idxCurrent;
+            const int idxWrite = plot.idxWrite;
+            const int ringSize = plot.nofm < plot.times.size() ? plot.nofm : plot.times.size();
+            
+            spec.Offset = idxWrite;
+            for(int ch=0; ch<xs_copy.size(); ch++){
                 ImVec4 color = ImPlot::GetColormapColor(ch);
                 spec.LineColor = color;
-                spec.MarkerFillColor = color;
-                spec.MarkerLineColor = color;
-                spec.Offset = 0;
-                ImPlot::PlotScatter(
-                    std::format("Ch{}", ch+1).c_str(),
-                    &(cfg.ringBuffer.meaBuffer.chs[ch].xs[idx]),
-                    &(cfg.ringBuffer.meaBuffer.chs[ch].ys[idx]),
-                    1,
-                    spec
-                );
-                spec.Offset = cfg.ringBuffer.plotBuffer.idxWrite;
                 ImPlot::PlotLine(
                     std::format("##Ch{}", ch+1).c_str(),
-                    cfg.ringBuffer.meaBuffer.chs[ch].xs.data(),
-                    cfg.ringBuffer.meaBuffer.chs[ch].ys.data(),
-                    count,
+                    xs_copy[ch].data(),
+                    ys_copy[ch].data(),
+                    ringSize,
                     spec
                 );
             }
-            
-            ImPlot::PlotScatter("FFT", cfg.fftBuffer.numHarmonics_x.data(), cfg.fftBuffer.numHarmonics_y.data(), cfg.fftBuffer.numHarmonics_x.size(), ImPlotSpec());
+            spec.Offset = 0;
+            for(int ch=0; ch<xs_copy.size(); ch++){
+                ImVec4 color = ImPlot::GetColormapColor(ch);
+                spec.MarkerFillColor = color;
+                spec.MarkerLineColor = color;
+                ImPlot::PlotScatter(
+                    std::format("Ch{}", ch+1).c_str(),
+                    &(xs_copy[ch][idxCurrent]),
+                    &(ys_copy[ch][idxCurrent]),
+                    1,
+                    spec
+                );
+            }
+            spec.MarkerFillColor = ImVec4(1, 0, 0, 1);
+            spec.MarkerLineColor = spec.MarkerFillColor;
+            ImPlot::PlotScatter("FFT", cfg.fftBuffer.numHarmonics_x.data(), cfg.fftBuffer.numHarmonics_y.data(), cfg.fftBuffer.numHarmonics_x.size(), spec);
             ImPlot::EndPlot();
         }
     }

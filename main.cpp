@@ -35,11 +35,12 @@ int main(int argc, char* argv[]) {
     
     while (!glfwWindowShouldClose(guiCfg.window) && !pipe.endCommandStatus) {
         Gui::BeginFrame(guiCfg.window);
+        const auto plot = cfg.ringBuffer.copyPlotBuffer();
         
         RawWindow(guiCfg, cfg); // DAQが測定した波形を時間軸で表示する
-        XyWindow(guiCfg, cfg); // 位相敏感検波した値を複素平面上に表示する
+        XyWindow(guiCfg, cfg, plot); // 位相敏感検波した値を複素平面上に表示する
         ControlWindow(guiCfg, cfg, daq); // DAQの出力する波形(周波数、振幅)を制御する
-        MultichannelWindow(guiCfg, cfg);
+        MultichannelWindow(guiCfg, cfg, plot);
         DtWindow(guiCfg, cfg);
         
         Gui::EndFrame(guiCfg.window);

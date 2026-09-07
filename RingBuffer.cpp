@@ -43,9 +43,11 @@ void RingBuffer::init(const double newRingDt, const double newHistorySec, const 
         std::lock_guard lock(plotMutex);
         plotBuffer.times.resize(ringBufferSize);
         plotBuffer.dts.resize(ringBufferSize);
+        plotBuffer.xs.resize(meaBuffer.chs.size());
         plotBuffer.ys.resize(meaBuffer.chs.size());
-        for(auto& values : plotBuffer.ys){
-            values.resize(ringBufferSize);
+        for(int i = 0; i < plotBuffer.xs.size(); ++i){
+            plotBuffer.xs[i].resize(ringBufferSize);
+            plotBuffer.ys[i].resize(ringBufferSize);
         }
         plotBuffer.matrix.resize(nDaqChannel * nMultiplexerChannel * ringBufferSize);
         plotBuffer.matrixRBF.resize(RBF_K * nDaqChannel * nMultiplexerChannel * ringBufferSize);
@@ -198,8 +200,8 @@ void RingBuffer::updatePlotBuffer(){
             plotBuffer.dts[idx] = plotBuffer.times[idx] - plotBuffer.times[idx_0];
 
             for (size_t ch = 0; ch < meaBuffer.chs.size(); ++ch) {
+                plotBuffer.xs[ch][idx] = meaBuffer.chs[ch].xs[idx];
                 const double yVal = meaBuffer.chs[ch].ys[idx];
-
                 plotBuffer.ys[ch][idx] = yVal;
                 plotBuffer.matrix[idx * meaBuffer.chs.size() + ch] = yVal;
 
@@ -234,6 +236,21 @@ void RingBuffer::updatePlotBuffer(){
         plotBuffer.idxCurrent = meaBuffer.idxCurrent;
         plotBuffer.nofm = meaBuffer.nofm;
     }
+}
+
+PlotBufferSnapshot RingBuffer::copyPlotBuffer(){
+    std::lock_guard lock(plotMutex);
+    PlotBufferSnapshot snapshot;
+    snapshot.times = plotBuffer.times;
+    snapshot.dts = plotBuffer.dts;
+    snapshot.xs = plotBuffer.xs;
+    snapshot.ys = plotBuffer.ys;
+    snapshot.matrix = plotBuffer.matrix;
+    snapshot.matrixRBF = plotBuffer.matrixRBF;
+    snapshot.idxWrite = plotBuffer.idxWrite;
+    snapshot.idxCurrent = plotBuffer.idxCurrent;
+    snapshot.nofm = plotBuffer.nofm;
+    return snapshot;
 }
 
 void RingBuffer::update(const std::vector<std::vector<double>>& rawChs, const double rawDt, const double sampleTime){

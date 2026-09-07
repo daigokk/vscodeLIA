@@ -19,9 +19,11 @@ public:
     static void BeginFrame(GLFWwindow* window);
     // ImGui のフレーム終了処理を行う関数。ループの最後に呼び出す必要がある
     static void EndFrame(GLFWwindow* window);
-    // ミリ単位でフォーマットするための関数
+    // µ単位でフォーマットするための関数
+    static void MicroFormatter(double value, char* buff, int size, void*);
+    // m単位でフォーマットするための関数
     static void MiliFormatter(double value, char* buff, int size, void*);
-    // キロ単位でフォーマットするための関数
+    // k単位でフォーマットするための関数
     static void KiloFormatter(double value, char* buff, int size, void*);
     // 科学的表記でフォーマットするための関数
     static void ScientificFormatter(double value, char* buff, int size, void*);

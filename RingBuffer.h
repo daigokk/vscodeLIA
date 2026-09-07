@@ -3,6 +3,15 @@
 #include <mutex>
 #include <vector>
 
+struct PlotBufferSnapshot {
+    std::vector<double> times, dts;
+    std::vector<std::vector<double>> xs, ys;
+    std::vector<double> matrix, matrixRBF;
+    int idxWrite = 0;
+    int idxCurrent = 0;
+    int nofm = 0;
+};
+
 class RingBuffer {
     private:
         struct ComplexVector {
@@ -39,7 +48,7 @@ class RingBuffer {
         };
         struct PlotBuffer {
             std::vector<double> times, dts;
-            std::vector<std::vector<double>> ys;
+            std::vector<std::vector<double>> xs, ys;
             std::vector<double> matrix, matrixRBF;
             int idxWrite = 0;
             int idxCurrent = 0;
@@ -68,6 +77,7 @@ class RingBuffer {
         void init();
         void pop(double xs[], double ys[], const double sampleTime);
         void update(const std::vector<std::vector<double>>& rawChs, const double rawDt, const double sampleTime);
+        PlotBufferSnapshot copyPlotBuffer();
         
     private:
         // ============ プライベート補助関数 ============

@@ -173,6 +173,10 @@ void Gui::EndFrame(GLFWwindow* window){
     glfwPollEvents();
 }
 
+void Gui::MicroFormatter(double value, char* buff, int size, void*) {
+    snprintf(buff, size, "%.0f", value * 1e6);
+}
+
 void Gui::MiliFormatter(double value, char* buff, int size, void*) {
     snprintf(buff, size, "%.1f", value * 1e3);
 }

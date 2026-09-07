@@ -7,7 +7,7 @@
 #include "Daq.h"
 
 // マルチプレクサ対応
-void MultichannelWindow(GuiConfig& guiCfg, Config& cfg) {
+void MultichannelWindow(GuiConfig& guiCfg, Config& cfg, const PlotBufferSnapshot& plot) {
     if(ImGui::Begin("Multi channel plot")){
         static float scale_limit = 1;
         ImGui::SetNextItemWidth(guiCfg.dpi_scale * 100);
@@ -36,27 +36,17 @@ void MultichannelWindow(GuiConfig& guiCfg, Config& cfg) {
         }
         // バッファデータをローカル変数にコピー
         double t_current, t_start;
-        int count, idxWrite, ringSize, heatmapRows, heatmapRowsRBF;
-        std::vector<double> times_copy;
-        std::vector<std::vector<double>> ys_copy;
-        std::vector<double> matrix_copy, matrixRBF_copy;
-        
-        {
-            std::lock_guard lock(cfg.ringBuffer.plotMutex);
-            const auto& plot = cfg.ringBuffer.plotBuffer;
-            t_current = plot.times[plot.idxCurrent];
-            t_start = t_current - cfg.ringBuffer.historySec;
-            count = plot.nofm < plot.times.size() ? plot.nofm : plot.times.size();
-            idxWrite = plot.idxWrite;
-            ringSize = (int)plot.times.size();
-            heatmapRows = (int)plot.ys.size();
-            heatmapRowsRBF = heatmapRows * cfg.ringBuffer.RBF_K;
-            
-            times_copy = plot.times;
-            ys_copy = plot.ys;
-            matrix_copy = plot.matrix;
-            matrixRBF_copy = plot.matrixRBF;
-        }
+        const int count = plot.nofm < plot.times.size() ? plot.nofm : plot.times.size();
+        const int idxWrite = plot.idxWrite;
+        const int ringSize = (int)plot.times.size();
+        const int heatmapRows = (int)plot.ys.size();
+        const int heatmapRowsRBF = heatmapRows * cfg.ringBuffer.RBF_K;
+        t_current = plot.times[plot.idxCurrent];
+        t_start = t_current - cfg.ringBuffer.historySec;
+        const auto& times_copy = plot.times;
+        const auto& ys_copy = plot.ys;
+        const auto& matrix_copy = plot.matrix;
+        const auto& matrixRBF_copy = plot.matrixRBF;
         
         if (ImPlot::BeginPlot("##Line Plot", ImVec2(ImGui::GetWindowWidth(), ImGui::GetWindowHeight()/3))) {
             ImPlot::SetupAxis(ImAxis_X1, "Time", ImPlotAxisFlags_NoTickLabels);
