@@ -13,6 +13,8 @@
 void XyWindow(GuiConfig& guiCfg, Config& cfg, const PlotBufferSnapshot& plot) {
     if(ImGui::Begin("XY")){
         if (ImPlot::BeginPlot("##XY", ImVec2(-1, -1), ImPlotFlags_Equal)) {
+            ImPlot::SetupAxisLimits(ImAxis_X1, cfg.ringBuffer.plotBuffer.xyScaleLimits.X.Min, cfg.ringBuffer.plotBuffer.xyScaleLimits.X.Max, ImGuiCond_FirstUseEver);
+            ImPlot::SetupAxisLimits(ImAxis_Y1, cfg.ringBuffer.plotBuffer.xyScaleLimits.Y.Min, cfg.ringBuffer.plotBuffer.xyScaleLimits.Y.Max, ImGuiCond_FirstUseEver);
             //TODO: ここにラベルを表示するコードを入力
             
             // ここまで
@@ -51,6 +53,11 @@ void XyWindow(GuiConfig& guiCfg, Config& cfg, const PlotBufferSnapshot& plot) {
             spec.MarkerFillColor = ImVec4(1, 0, 0, 1);
             spec.MarkerLineColor = spec.MarkerFillColor;
             ImPlot::PlotScatter("FFT", cfg.fftBuffer.numHarmonics_x.data(), cfg.fftBuffer.numHarmonics_y.data(), cfg.fftBuffer.numHarmonics_x.size(), spec);
+            const ImPlotRect limits = ImPlot::GetPlotLimits();
+            cfg.ringBuffer.plotBuffer.xyScaleLimits.X.Max = limits.X.Max;
+            cfg.ringBuffer.plotBuffer.xyScaleLimits.X.Min = limits.X.Min;
+            cfg.ringBuffer.plotBuffer.xyScaleLimits.Y.Max = limits.Y.Max;
+            cfg.ringBuffer.plotBuffer.xyScaleLimits.Y.Min = limits.Y.Min;
             ImPlot::EndPlot();
         }
     }

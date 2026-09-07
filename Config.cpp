@@ -61,7 +61,10 @@ bool Config::saveSettingsToTxt(const std::string& filename) {
         outFile << "Excitation Frequency: " << ringBuffer.sourceChs[0].frequency << " Hz" << std::endl;
         outFile << "Excitation Amplitude ch1: " << ringBuffer.sourceChs[0].amplitude << " V" << std::endl;
         outFile << "Excitation Amplitude ch2: " << ringBuffer.sourceChs[1].amplitude << " V" << std::endl;
-        outFile << "Plot Scale Limit: " << ringBuffer.plotBuffer.multiScaleLimit << " V" << std::endl;
+        outFile << "Raw Plot Scale Limits: " << ringBuffer.plotBuffer.rawScaleLimits.Y.Min << "," << ringBuffer.plotBuffer.rawScaleLimits.Y.Max << std::endl;
+        outFile << "Xy Plot Scale Limits X: " << ringBuffer.plotBuffer.xyScaleLimits.X.Min << "," << ringBuffer.plotBuffer.xyScaleLimits.X.Max << std::endl;
+        outFile << "Xy Plot Scale Limits Y: " << ringBuffer.plotBuffer.xyScaleLimits.Y.Min << "," << ringBuffer.plotBuffer.xyScaleLimits.Y.Max << std::endl;
+        outFile << "Multi Plot Scale Limit: " << ringBuffer.plotBuffer.multiScaleLimit << std::endl;
         outFile.close();
         return true;
     }
@@ -77,28 +80,43 @@ bool Config::loadSettingsFromTxt(const std::string& filename) {
             std::istringstream iss(line);
             std::string key;
             if (std::getline(iss, key, ':')) {
-                std::string value;
-                if (std::getline(iss, value)) {
-                    value.erase(0, value.find_first_not_of(" \t")); // 前後の空白を削除
-                    value.erase(value.find_last_not_of(" \t") + 1);
+                std::string value1, value2;
+                if (std::getline(iss, value1, ',')) {
+                    value1.erase(0, value1.find_first_not_of(" \t")); // 前後の空白を削除
+                    value1.erase(value1.find_last_not_of(" \t") + 1);
                     if (key == "Raw Rate") {
-                        rawData.rawDt = 1.0 / std::stod(value);
+                        rawData.rawDt = 1.0 / std::stod(value1);
                     } else if (key == "Number of DAQ Channels") {
-                        ringBuffer.scopeCfg.nDaqChannel = std::stoi(value);
+                        ringBuffer.scopeCfg.nDaqChannel = std::stoi(value1);
                     } else if (key == "Number of Multiplexer Channels") {
-                        ringBuffer.scopeCfg.nMultiChannel = std::stoi(value);
+                        ringBuffer.scopeCfg.nMultiChannel = std::stoi(value1);
                     } else if (key == "Ring Buffer dt") {
-                        ringBuffer.dt = std::stod(value);
+                        ringBuffer.dt = std::stod(value1);
                     } else if (key == "History Duration") {
-                        ringBuffer.historySec = std::stod(value);
+                        ringBuffer.historySec = std::stod(value1);
                     } else if (key == "Excitation Frequency") {
-                        ringBuffer.sourceChs[0].frequency = std::stof(value);
+                        ringBuffer.sourceChs[0].frequency = std::stof(value1);
                     } else if (key == "Excitation Amplitude ch1") {
-                        ringBuffer.sourceChs[0].amplitude = std::stof(value);
+                        ringBuffer.sourceChs[0].amplitude = std::stof(value1);
                     } else if (key == "Excitation Amplitude ch2") {
-                        ringBuffer.sourceChs[1].amplitude = std::stof(value);
-                    } else if (key == "Plot Scale Limit") {
-                        ringBuffer.plotBuffer.multiScaleLimit = std::stof(value);
+                        ringBuffer.sourceChs[1].amplitude = std::stof(value1);
+                    } else if (key == "Raw Plot Scale Limits") {
+                        if (std::getline(iss, value2)) {
+                            ringBuffer.plotBuffer.rawScaleLimits.Y.Min = std::stof(value1);
+                            ringBuffer.plotBuffer.rawScaleLimits.Y.Max = std::stof(value2);
+                        }
+                    } else if (key == "Xy Plot Scale Limits X") {
+                        if (std::getline(iss, value2)) {
+                            ringBuffer.plotBuffer.xyScaleLimits.X.Min = std::stof(value1);
+                            ringBuffer.plotBuffer.xyScaleLimits.X.Max = std::stof(value2);
+                        }
+                    } else if (key == "Xy Plot Scale Limits Y") {
+                        if (std::getline(iss, value2)) {
+                            ringBuffer.plotBuffer.xyScaleLimits.Y.Min = std::stof(value1);
+                            ringBuffer.plotBuffer.xyScaleLimits.Y.Max = std::stof(value2);
+                        }
+                    } else if (key == "Multi Plot Scale Limit") {
+                        ringBuffer.plotBuffer.multiScaleLimit = std::stof(value1);
                     }
                 }
             }
@@ -136,7 +154,7 @@ Config::Config() {
 }
 
 Config::~Config(){
-    if(!saveMeasurementResultsToCSV(std::format("ect_{}.csv", getCurrentTimestamp()))){
+    if(!saveMeasurementResultsToCSV()){
         std::cerr << "Failed to save measurement results to CSV." << std::endl;
     }
     if(!saveSettingsToTxt()){

@@ -54,6 +54,14 @@ class RingBuffer {
             int idxCurrent = 0;
             int nofm = 0;
             float multiScaleLimit = 1.0f;
+            struct ScaleLimits {
+                struct Axis {
+                    double Min = -1.0;
+                    double Max = 1.0;
+                };
+                Axis X, Y;
+            };
+            ScaleLimits rawScaleLimits, xyScaleLimits;
         };
     public:
         // ============ パラメータ ============
