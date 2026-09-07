@@ -223,6 +223,7 @@ void RawWindow(GuiConfig& guiCfg, Config& cfg) {
         if (ImPlot::BeginPlot("##Raw")) {
             //TODO: ここにラベルを表示するコードを入力
             ImPlot::SetupAxis(ImAxis_X1, "time (µs)");
+            ImPlot::SetupAxisLimits(ImAxis_X1, cfg.rawData.times.front(), cfg.rawData.times.back(), ImGuiCond_Always);
             ImPlot::SetupAxisFormat(ImAxis_X1, ImPlotFormatter(Gui::MicroFormatter));
             ImPlot::SetupAxis(ImAxis_Y1, "V (V)");
             // ここまで
