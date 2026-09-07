@@ -21,7 +21,7 @@ void DtWindow(GuiConfig& guiCfg, Config& cfg) {
             ImPlot::SetupAxisLimits(ImAxis_X1, t_start, t_current, ImGuiCond_Always);
             ImPlot::SetupAxis(ImAxis_Y1, "dt (ms)");
             ImPlot::SetupAxisFormat(ImAxis_Y1, ImPlotFormatter(Gui::MiliFormatter));
-            ImPlot::SetupAxisLimits(ImAxis_Y1, dt * 0.9, dt * 1.1, ImGuiCond_Always);
+            ImPlot::SetupAxisLimits(ImAxis_Y1, dt * 0.5, dt * 1.5, ImGuiCond_Always);
             ImPlotSpec spec;
             spec.Offset = plot.idxWrite;
             ImPlot::PlotLine(

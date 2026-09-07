@@ -9,9 +9,8 @@
 // マルチプレクサ対応
 void MultichannelWindow(GuiConfig& guiCfg, Config& cfg, const PlotBufferSnapshot& plot) {
     if(ImGui::Begin("Multi channel plot")){
-        static float scale_limit = 1;
         ImGui::SetNextItemWidth(guiCfg.dpi_scale * 100);
-        ImGui::SliderFloat("y (V)", &scale_limit, 0.01, cfg.rawData.range, "%.2f");
+        ImGui::SliderFloat("y (V)", &cfg.ringBuffer.plotBuffer.scaleLimit, 0.01, cfg.rawData.range, "%.2f");
         ImGui::SameLine();
         ImGui::Checkbox(
             cfg.ringBuffer.trigger.flag ?
@@ -53,7 +52,7 @@ void MultichannelWindow(GuiConfig& guiCfg, Config& cfg, const PlotBufferSnapshot
             ImPlot::SetupAxis(ImAxis_Y1, "y (V)");
             //ImPlot::SetupLegend(ImPlotLocation_East, true);
             ImPlot::SetupAxisLimits(ImAxis_X1, t_start, t_current, ImGuiCond_Always);
-            ImPlot::SetupAxisLimits(ImAxis_Y1, -scale_limit, scale_limit, ImGuiCond_Always);
+            ImPlot::SetupAxisLimits(ImAxis_Y1, -cfg.ringBuffer.plotBuffer.scaleLimit, cfg.ringBuffer.plotBuffer.scaleLimit, ImGuiCond_Always);
             ImPlot::SetupLegend(ImPlotLocation_NorthEast, ImPlotLegendFlags_Outside);
             ImPlotSpec specLine;
             specLine.Offset = idxWrite;
@@ -100,7 +99,7 @@ void MultichannelWindow(GuiConfig& guiCfg, Config& cfg, const PlotBufferSnapshot
                     ImPlot::SetupAxisLimits(ImAxis_Y1, 0, heatmapRows, ImGuiCond_Always);
                     ImPlot::PlotHeatmap(
                         "##heatmap", matrix_copy.data(), heatmapRows, ringSize,
-                        -scale_limit, scale_limit, nullptr,
+                        -cfg.ringBuffer.plotBuffer.scaleLimit, cfg.ringBuffer.plotBuffer.scaleLimit, nullptr,
                         ImPlotPoint(t_start, heatmapRows), ImPlotPoint(t_current, 0),
                         {ImPlotProp_Offset, idxWrite * heatmapRows,
                          ImPlotProp_Flags, ImPlotHeatmapFlags_ColMajor}
@@ -108,7 +107,7 @@ void MultichannelWindow(GuiConfig& guiCfg, Config& cfg, const PlotBufferSnapshot
                     ImPlot::EndPlot();
                 }
                 ImGui::SameLine();
-                ImPlot::ColormapScale("y (V)", -scale_limit, scale_limit, ImVec2(75, -1), "%g");
+                ImPlot::ColormapScale("y (V)", -cfg.ringBuffer.plotBuffer.scaleLimit, cfg.ringBuffer.plotBuffer.scaleLimit, ImVec2(75, -1), "%g");
                 ImGui::EndTabItem();
             }
             if(ImGui::BeginTabItem("Interpolation")){
@@ -119,7 +118,7 @@ void MultichannelWindow(GuiConfig& guiCfg, Config& cfg, const PlotBufferSnapshot
                     ImPlot::SetupAxisLimits(ImAxis_Y1, 0, heatmapRows, ImGuiCond_Always);
                     ImPlot::PlotHeatmap(
                         "##_heatmap", matrixRBF_copy.data(), heatmapRowsRBF, ringSize,
-                        -scale_limit, scale_limit, nullptr,
+                        -cfg.ringBuffer.plotBuffer.scaleLimit, cfg.ringBuffer.plotBuffer.scaleLimit, nullptr,
                         ImPlotPoint(t_start, heatmapRows), ImPlotPoint(t_current, 0),
                         {ImPlotProp_Offset, idxWrite * heatmapRowsRBF,
                          ImPlotProp_Flags, ImPlotHeatmapFlags_ColMajor}
@@ -127,7 +126,7 @@ void MultichannelWindow(GuiConfig& guiCfg, Config& cfg, const PlotBufferSnapshot
                     ImPlot::EndPlot();
                 }
                 ImGui::SameLine();
-                ImPlot::ColormapScale("y (V)", -scale_limit, scale_limit, ImVec2(75, -1), "%g");
+                ImPlot::ColormapScale("y (V)", -cfg.ringBuffer.plotBuffer.scaleLimit, cfg.ringBuffer.plotBuffer.scaleLimit, ImVec2(75, -1), "%g");
                 ImGui::EndTabItem();
             }
             ImGui::EndTabBar();

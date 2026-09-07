@@ -195,6 +195,7 @@ void Daq::run(std::stop_token st) {
             }
             // 測定値の保存
             pCfg_->ringBuffer.update(pCfg_->rawData.chs, pCfg_->rawData.rawDt, sampleTime);
+            fft(*pCfg_);
             // マルチプレクサのチャンネル更新
             dio.set_state(device_data, pCfg_->ringBuffer.ch_multi);
             next_time += loop_period;
@@ -252,7 +253,7 @@ void Daq::runWithoutDaq(std::stop_token st) {
         }
 
         pCfg_->ringBuffer.update(pCfg_->rawData.chs, pCfg_->rawData.rawDt, sampleTime);
-        //fft(*pCfg_);
+        fft(*pCfg_);
         next_time += loop_period;
         while(next_time > std::chrono::steady_clock::now()){
             //std::this_thread::sleep_for(std::chrono::microseconds(10));

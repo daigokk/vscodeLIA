@@ -1,4 +1,3 @@
-#include <format>
 #include "Gui.h"
 #include "RawWindow.h"
 #include "XyWindow.h"
@@ -8,6 +7,8 @@
 #include "Config.h"
 #include "Daq.h"
 #include "Pipe.h"
+
+#include <format>
 
 bool isPipeMode(int argc, char* argv[]) {
     for (int i = 1; i < argc; ++i) {
@@ -30,7 +31,7 @@ int main(int argc, char* argv[]) {
     }
     // `Gui`: GLFW、ImGUI、ImPlotの初期設定等を行うクラス
     auto guiCfg = Gui::Initialize(
-        std::format("codeLIA - {}", cfg.status.deviceSerial).c_str()
+        std::format("vscodeLIA - {}", cfg.status.deviceSerial).c_str()
     );
     
     while (!glfwWindowShouldClose(guiCfg.window) && !pipe.endCommandStatus) {
@@ -40,8 +41,8 @@ int main(int argc, char* argv[]) {
         RawWindow(guiCfg, cfg); // DAQが測定した波形を時間軸で表示する
         XyWindow(guiCfg, cfg, plot); // 位相敏感検波した値を複素平面上に表示する
         ControlWindow(guiCfg, cfg, daq); // DAQの出力する波形(周波数、振幅)を制御する
-        MultichannelWindow(guiCfg, cfg, plot);
-        DtWindow(guiCfg, cfg);
+        //MultichannelWindow(guiCfg, cfg, plot);
+        //DtWindow(guiCfg, cfg);
         
         Gui::EndFrame(guiCfg.window);
     }

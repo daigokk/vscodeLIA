@@ -53,6 +53,7 @@ class RingBuffer {
             int idxWrite = 0;
             int idxCurrent = 0;
             int nofm = 0;
+            float scaleLimit = 1.0f;
         };
     public:
         // ============ パラメータ ============

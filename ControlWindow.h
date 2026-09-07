@@ -1,10 +1,13 @@
 #pragma once
+#include "Config.h"
+#include "Daq.h"
+
 #include <IMGUI/imgui.h>
 #include <IMGUI/imgui_impl_glfw.h>
 #include <IMGUI/imgui_impl_opengl3.h>
 #include <IMGUI/implot.h>
-#include "Config.h"
-#include "Daq.h"
+
+#include <format>
 
 // DAQの出力する波形(周波数、振幅)を制御する
 void ControlWindow(GuiConfig& guiCfg, Config& cfg, Daq& daq) {

@@ -1,15 +1,21 @@
 #pragma once
+#include "Gui.h"
+#include "Config.h"
+
 #include <IMGUI/imgui.h>
 #include <IMGUI/imgui_impl_glfw.h>
 #include <IMGUI/imgui_impl_opengl3.h>
 #include <IMGUI/implot.h>
-#include "Gui.h"
-#include "Config.h"
+
+#include <format>
 
 // 位相敏感検波した値を複素平面上に表示する
 void XyWindow(GuiConfig& guiCfg, Config& cfg, const PlotBufferSnapshot& plot) {
     if(ImGui::Begin("XY")){
         if (ImPlot::BeginPlot("##XY", ImVec2(-1, -1), ImPlotFlags_Equal)) {
+            //TODO: ここにラベルを表示するコードを入力
+            
+            // ここまで
             ImPlotSpec spec;
             const auto& xs_copy = plot.xs;
             const auto& ys_copy = plot.ys;
