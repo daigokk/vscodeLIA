@@ -52,9 +52,11 @@ void XyWindow(GuiConfig& guiCfg, Config& cfg, const PlotBufferSnapshot& plot) {
                     spec
                 );
             }
-            spec.MarkerFillColor = ImVec4(1, 0, 0, 1);
-            spec.MarkerLineColor = spec.MarkerFillColor;
-            ImPlot::PlotScatter("FFT", cfg.fftBuffer.numHarmonics_x.data(), cfg.fftBuffer.numHarmonics_y.data(), cfg.fftBuffer.numHarmonics_x.size(), spec);
+            if(xs_copy.size() == 1) {
+                spec.MarkerFillColor = ImVec4(1, 0, 0, 1);
+                spec.MarkerLineColor = spec.MarkerFillColor;
+                ImPlot::PlotScatter("FFT", cfg.fftBuffer.numHarmonics_x.data(), cfg.fftBuffer.numHarmonics_y.data(), cfg.fftBuffer.numHarmonics_x.size(), spec);
+            }
             const ImPlotRect limits = ImPlot::GetPlotLimits();
             cfg.ringBuffer.plotBuffer.xyScaleLimits.X.Max = limits.X.Max;
             cfg.ringBuffer.plotBuffer.xyScaleLimits.X.Min = limits.X.Min;

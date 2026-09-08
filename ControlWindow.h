@@ -33,18 +33,18 @@ void ControlWindow(GuiConfig& guiCfg, Config& cfg, Daq& daq) {
             if(ImGui::BeginTabItem("W1")){
                 ImGui::SetNextItemWidth(guiCfg.dpi_scale * 100);
                 if(ImGui::SliderFloat("Frequency", &cfg.ringBuffer.sourceChs[0].frequency, 10e3f, 100e3f)) {
-                    if(daq.device_data) daq.wavegen(0, cfg.ringBuffer.sourceChs[0].frequency, cfg.ringBuffer.sourceChs[0].amplitude, cfg.ringBuffer.sourceChs[0].phase);
+                    if(daq.device_data) daq.wavegen(0, cfg.ringBuffer.sourceChs[0].frequency, cfg.ringBuffer.sourceChs[0].amplitude, cfg.ringBuffer.sourceChs[0].phase, cfg.ringBuffer.sourceChs[0].func);
                     cfg.ringBuffer.sourceChs[1].frequency = cfg.ringBuffer.sourceChs[0].frequency;
-                    if(daq.device_data) daq.wavegen(1, cfg.ringBuffer.sourceChs[1].frequency, cfg.ringBuffer.sourceChs[1].amplitude, cfg.ringBuffer.sourceChs[1].phase);
+                    if(daq.device_data) daq.wavegen(1, cfg.ringBuffer.sourceChs[1].frequency, cfg.ringBuffer.sourceChs[1].amplitude, cfg.ringBuffer.sourceChs[1].phase, cfg.ringBuffer.sourceChs[1].func);
                 }
                 ImGui::SetNextItemWidth(guiCfg.dpi_scale * 100);
                 if(ImGui::SliderFloat("Amplitude", &cfg.ringBuffer.sourceChs[0].amplitude, 0.0f, 5.0f)) {    
-                    if(daq.device_data) daq.wavegen(0, cfg.ringBuffer.sourceChs[0].frequency, cfg.ringBuffer.sourceChs[0].amplitude, cfg.ringBuffer.sourceChs[0].phase);
+                    if(daq.device_data) daq.wavegen(0, cfg.ringBuffer.sourceChs[0].frequency, cfg.ringBuffer.sourceChs[0].amplitude, cfg.ringBuffer.sourceChs[0].phase, cfg.ringBuffer.sourceChs[0].func);
                 }
                 ImGui::BeginDisabled();
                 ImGui::SetNextItemWidth(guiCfg.dpi_scale * 100);
                 if(ImGui::SliderFloat("Phase", &cfg.ringBuffer.sourceChs[0].phase, -180.0f, 180.0f)) {    
-                    if(daq.device_data) daq.wavegen(0, cfg.ringBuffer.sourceChs[0].frequency, cfg.ringBuffer.sourceChs[0].amplitude, cfg.ringBuffer.sourceChs[0].phase);
+                    if(daq.device_data) daq.wavegen(0, cfg.ringBuffer.sourceChs[0].frequency, cfg.ringBuffer.sourceChs[0].amplitude, cfg.ringBuffer.sourceChs[0].phase, cfg.ringBuffer.sourceChs[0].func);
                 }
                 ImGui::EndDisabled();
                 ImGui::EndTabItem();
@@ -53,16 +53,16 @@ void ControlWindow(GuiConfig& guiCfg, Config& cfg, Daq& daq) {
                 ImGui::BeginDisabled();
                 ImGui::SetNextItemWidth(guiCfg.dpi_scale * 100);
                 if(ImGui::SliderFloat("Frequency", &cfg.ringBuffer.sourceChs[1].frequency, 10e3f, 100e3f)) {
-                    if(daq.device_data) daq.wavegen(1, cfg.ringBuffer.sourceChs[1].frequency, cfg.ringBuffer.sourceChs[1].amplitude, cfg.ringBuffer.sourceChs[1].phase);
+                    if(daq.device_data) daq.wavegen(1, cfg.ringBuffer.sourceChs[1].frequency, cfg.ringBuffer.sourceChs[1].amplitude, cfg.ringBuffer.sourceChs[1].phase, cfg.ringBuffer.sourceChs[1].func);
                 }
                 ImGui::EndDisabled();
                 ImGui::SetNextItemWidth(guiCfg.dpi_scale * 100);
                 if(ImGui::SliderFloat("Amplitude", &cfg.ringBuffer.sourceChs[1].amplitude, 0.0f, 5.0f)) {    
-                    if(daq.device_data) daq.wavegen(1, cfg.ringBuffer.sourceChs[1].frequency, cfg.ringBuffer.sourceChs[1].amplitude, cfg.ringBuffer.sourceChs[1].phase);
+                    if(daq.device_data) daq.wavegen(1, cfg.ringBuffer.sourceChs[1].frequency, cfg.ringBuffer.sourceChs[1].amplitude, cfg.ringBuffer.sourceChs[1].phase, cfg.ringBuffer.sourceChs[1].func);
                 }
                 ImGui::SetNextItemWidth(guiCfg.dpi_scale * 100);
                 if(ImGui::SliderFloat("Phase", &cfg.ringBuffer.sourceChs[1].phase, -180.0f, 180.0f)) {    
-                    if(daq.device_data) daq.wavegen(1, cfg.ringBuffer.sourceChs[1].frequency, cfg.ringBuffer.sourceChs[1].amplitude, cfg.ringBuffer.sourceChs[1].phase);
+                    if(daq.device_data) daq.wavegen(1, cfg.ringBuffer.sourceChs[1].frequency, cfg.ringBuffer.sourceChs[1].amplitude, cfg.ringBuffer.sourceChs[1].phase, cfg.ringBuffer.sourceChs[1].func);
                 }
                 ImGui::EndTabItem();
             }
@@ -71,8 +71,10 @@ void ControlWindow(GuiConfig& guiCfg, Config& cfg, Daq& daq) {
                 int oldFunc = cfg.ringBuffer.sourceChs[0].func - 1;
                 if (ImGui::ListBox("Func", &oldFunc, funcNames, IM_ARRAYSIZE(funcNames), 3)) {
                     cfg.ringBuffer.sourceChs[0].func = oldFunc + 1;
+                    cfg.ringBuffer.sourceChs[1].func = cfg.ringBuffer.sourceChs[0].func;
                     //cfg.ringBuffer.sourceChs[1].func = oldFunc + 1;
                     if(daq.device_data) daq.wavegen(0, cfg.ringBuffer.sourceChs[0].frequency, cfg.ringBuffer.sourceChs[0].amplitude, cfg.ringBuffer.sourceChs[0].phase, cfg.ringBuffer.sourceChs[0].func);
+                    if(daq.device_data) daq.wavegen(1, cfg.ringBuffer.sourceChs[1].frequency, cfg.ringBuffer.sourceChs[1].amplitude, cfg.ringBuffer.sourceChs[1].phase, cfg.ringBuffer.sourceChs[1].func);
                 }
                 ImGui::EndTabItem();
             }

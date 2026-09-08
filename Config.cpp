@@ -58,9 +58,11 @@ bool Config::saveSettingsToTxt(const std::string& filename) {
         outFile << "Number of Multiplexer Channels: " << ringBuffer.scopeCfg.nMultiChannel << std::endl;
         outFile << "Ring Buffer dt: " << ringBuffer.dt << " s" << std::endl;
         outFile << "History Duration: " << ringBuffer.historySec << " s" << std::endl;
-        outFile << "Excitation Frequency: " << ringBuffer.sourceChs[0].frequency << " Hz" << std::endl;
-        outFile << "Excitation Amplitude ch1: " << ringBuffer.sourceChs[0].amplitude << " V" << std::endl;
-        outFile << "Excitation Amplitude ch2: " << ringBuffer.sourceChs[1].amplitude << " V" << std::endl;
+        outFile << "Wavegen Function: " << ringBuffer.sourceChs[0].func << std::endl;
+        outFile << "Wavegen Frequency: " << ringBuffer.sourceChs[0].frequency << " Hz" << std::endl;
+        outFile << "Wavegen Amplitude ch1: " << ringBuffer.sourceChs[0].amplitude << " V" << std::endl;
+        outFile << "Wavegen Amplitude ch2: " << ringBuffer.sourceChs[1].amplitude << " V" << std::endl;
+        outFile << "Wavegen Phase ch2: " << ringBuffer.sourceChs[1].phase << " Deg." << std::endl;
         outFile << "Raw Plot Scale Limits: " << ringBuffer.plotBuffer.rawScaleLimits.Y.Min << ", " << ringBuffer.plotBuffer.rawScaleLimits.Y.Max << std::endl;
         outFile << "Xy Plot Scale Limits X: " << ringBuffer.plotBuffer.xyScaleLimits.X.Min << ", " << ringBuffer.plotBuffer.xyScaleLimits.X.Max << std::endl;
         outFile << "Xy Plot Scale Limits Y: " << ringBuffer.plotBuffer.xyScaleLimits.Y.Min << ", " << ringBuffer.plotBuffer.xyScaleLimits.Y.Max << std::endl;
@@ -95,12 +97,18 @@ bool Config::loadSettingsFromTxt(const std::string& filename) {
                         ringBuffer.dt = std::stod(value1);
                     } else if (key == "History Duration") {
                         ringBuffer.historySec = std::stod(value1);
-                    } else if (key == "Excitation Frequency") {
+                    } else if (key == "Wavegen Function") {
+                        ringBuffer.sourceChs[0].func = std::stoi(value1);
+                        ringBuffer.sourceChs[1].func = ringBuffer.sourceChs[0].func;
+                    } else if (key == "Wavegen Frequency") {
                         ringBuffer.sourceChs[0].frequency = std::stof(value1);
-                    } else if (key == "Excitation Amplitude ch1") {
+                        ringBuffer.sourceChs[1].frequency = ringBuffer.sourceChs[0].frequency;
+                    } else if (key == "Wavegen Amplitude ch1") {
                         ringBuffer.sourceChs[0].amplitude = std::stof(value1);
-                    } else if (key == "Excitation Amplitude ch2") {
+                    } else if (key == "Wavegen Amplitude ch2") {
                         ringBuffer.sourceChs[1].amplitude = std::stof(value1);
+                    } else if (key == "Wavegen Phase ch2") {
+                        ringBuffer.sourceChs[1].phase = std::stof(value1);
                     } else if (key == "Raw Plot Scale Limits") {
                         if (std::getline(iss, value2)) {
                             ringBuffer.plotBuffer.rawScaleLimits.Y.Min = std::stof(value1);
@@ -139,8 +147,12 @@ Config::Config() {
     ringBuffer.sourceChs.resize(2);
     ringBuffer.sourceChs[0].frequency = EXCITATION_FREQUENCY;
     ringBuffer.sourceChs[0].amplitude = EXCITATION_AMPLITUDE;
+    ringBuffer.sourceChs[0].phase = 0.0;
+    ringBuffer.sourceChs[0].func = 1;
     ringBuffer.sourceChs[1].frequency = ringBuffer.sourceChs[0].frequency;
     ringBuffer.sourceChs[1].amplitude = 0.0;
+    ringBuffer.sourceChs[1].phase = ringBuffer.sourceChs[0].phase;
+    ringBuffer.sourceChs[1].func = ringBuffer.sourceChs[0].func;
 
     ringBuffer.dt = RINGBUFFER_DT;
     ringBuffer.historySec = HISTORY_SEC;

@@ -110,7 +110,16 @@ inline void fft(Config& cfg) {
     // 引数: shape, stride_in, stride_out, axes, forward(true), in_ptr, out_ptr, scale(1.0)
 
     // TODO: ここにフーリエ変換のコードを入力
-    
+    pocketfft::r2c(
+        shape,
+        stride_in,
+        stride_out,
+        axes,
+        pocketfft::FORWARD,
+        in_data.data(),
+        fft_out.data(),
+        1.0
+    );
     // ここまで
 
     // 3. 各倍波に対応する周波数インデックス（ビン）を特定して格納

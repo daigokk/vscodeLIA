@@ -23,8 +23,8 @@ Daq::Daq(Config* cfg) : pCfg_(cfg) {
         dio.set_mode(device_data, 0xffff);
         dio.set_state(device_data, pCfg_->ringBuffer.ch_multi);
         supplies();
-        wavegen(0, pCfg_->ringBuffer.sourceChs[0].frequency, pCfg_->ringBuffer.sourceChs[0].amplitude, 0);
-        wavegen(1, pCfg_->ringBuffer.sourceChs[1].frequency, pCfg_->ringBuffer.sourceChs[1].amplitude, 0);
+        wavegen(0, pCfg_->ringBuffer.sourceChs[0].frequency, pCfg_->ringBuffer.sourceChs[0].amplitude, 0.0, pCfg_->ringBuffer.sourceChs[0].func);
+        wavegen(1, pCfg_->ringBuffer.sourceChs[1].frequency, pCfg_->ringBuffer.sourceChs[1].amplitude, 0.0, pCfg_->ringBuffer.sourceChs[1].func);
         scope.run(device_data, 1.0 / pCfg_->rawData.rawDt, static_cast<int>(pCfg_->rawData.times.size()), 0.0, pCfg_->rawData.range);
     }
     catch (const Dwf::Error& error) {
