@@ -11,6 +11,8 @@
 
 // マルチプレクサ対応
 void MultichannelWindow(GuiConfig& guiCfg, Config& cfg, const PlotBufferSnapshot& plot) {
+    ImGui::SetNextWindowPos(ImVec2(guiCfg.dpi_scale*0, guiCfg.dpi_scale*310), ImGuiCond_FirstUseEver);
+    ImGui::SetNextWindowSize(ImVec2(guiCfg.dpi_scale*400, guiCfg.dpi_scale*440), ImGuiCond_FirstUseEver);
     if(ImGui::Begin("Multi channel plot")){
         ImGui::SetNextItemWidth(guiCfg.dpi_scale * 100);
         ImGui::SliderFloat("y (V)", &cfg.ringBuffer.plotBuffer.multiScaleLimit, 0.01, cfg.rawData.range, "%.2f");

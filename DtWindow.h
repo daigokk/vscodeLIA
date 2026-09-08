@@ -8,6 +8,8 @@
 
 
 void DtWindow(GuiConfig& guiCfg, Config& cfg) {
+    ImGui::SetNextWindowPos(ImVec2(guiCfg.dpi_scale*400, guiCfg.dpi_scale*560), ImGuiCond_FirstUseEver);
+    ImGui::SetNextWindowSize(ImVec2(guiCfg.dpi_scale*200, guiCfg.dpi_scale*190), ImGuiCond_FirstUseEver);
     if(ImGui::Begin("dt")){
         if (ImPlot::BeginPlot("##dt", ImVec2(-1, -1))) {
             const auto& plot = cfg.ringBuffer.plotBuffer;

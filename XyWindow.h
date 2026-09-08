@@ -11,6 +11,8 @@
 
 // 位相敏感検波した値を複素平面上に表示する
 void XyWindow(GuiConfig& guiCfg, Config& cfg, const PlotBufferSnapshot& plot) {
+    ImGui::SetNextWindowPos(ImVec2(guiCfg.dpi_scale*300, guiCfg.dpi_scale*0), ImGuiCond_FirstUseEver);
+    ImGui::SetNextWindowSize(ImVec2(guiCfg.dpi_scale*300, guiCfg.dpi_scale*310), ImGuiCond_FirstUseEver);
     if(ImGui::Begin("XY")){
         if (ImPlot::BeginPlot("##XY", ImVec2(-1, -1), ImPlotFlags_Equal)) {
             ImPlot::SetupAxisLimits(ImAxis_X1, cfg.ringBuffer.plotBuffer.xyScaleLimits.X.Min, cfg.ringBuffer.plotBuffer.xyScaleLimits.X.Max, ImGuiCond_FirstUseEver);

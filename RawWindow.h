@@ -11,6 +11,8 @@
 
 // DAQが測定した波形を時間軸で表示する
 void RawWindow(GuiConfig& guiCfg, Config& cfg) {
+    ImGui::SetNextWindowPos(ImVec2(guiCfg.dpi_scale*0, guiCfg.dpi_scale*0), ImGuiCond_FirstUseEver);
+    ImGui::SetNextWindowSize(ImVec2(guiCfg.dpi_scale*300, guiCfg.dpi_scale*310), ImGuiCond_FirstUseEver);
     if(ImGui::Begin("Raw")){
         if (ImPlot::BeginPlot("##Raw", ImVec2(-1, -1))) {
             static double y_scale = 1.0;

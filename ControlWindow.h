@@ -16,6 +16,8 @@ void ControlWindow(GuiConfig& guiCfg, Config& cfg, Daq& daq) {
         ImGui::SetNextWindowFocus();
         ImGui::PushStyleColor(ImGuiCol_::ImGuiCol_Border, ImVec4(1.0f, 0.0f, 0.0f, 1.0f)); // 赤
     }
+    ImGui::SetNextWindowPos(ImVec2(guiCfg.dpi_scale*400, guiCfg.dpi_scale*310), ImGuiCond_FirstUseEver);
+    ImGui::SetNextWindowSize(ImVec2(guiCfg.dpi_scale*200, guiCfg.dpi_scale*250), ImGuiCond_FirstUseEver);
     if(ImGui::Begin("Control")){
         if(!cfg.status.isRun){
             // DAQとの接続が切れたとき
