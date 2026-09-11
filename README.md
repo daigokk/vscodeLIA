@@ -17,7 +17,6 @@ https://github.com/user-attachments/assets/82d80d7d-aa7a-41a0-967f-187cdc8ed578
 
 * **主な機能:**
     * Digilent製DAQ([Analog Discovery](https://digilent.com/shop/analog-discovery-3/), 以下AD3)を用いた信号の測定・集録
-      * `Daq.h`、`Daq.cpp`及び`Makefile`を書き換えることで、他のDAQ(例えばNI-DAQ)に対応させることも可能です。
     * [ImPlot](https://github.com/epezent/implot)を用いた波形のリアルタイム描画
     * [位相敏感検波](https://www.youtube.com/watch?v=pHyuB1YW4qY)(同期検波)等による信号処理(図1参照、未実装)
       * **※注意:** 学習を目的の一つとしているため、位相敏感検波処理は**あえて未実装**にしています。
