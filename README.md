@@ -242,7 +242,9 @@ void RawWindow(GuiConfig& guiCfg, Config& cfg) {
 }
 ```
 * `Psd.h`に記載の`Psd::calc`関数を完成させてください。
+
 https://github.com/user-attachments/assets/4458e702-2f32-448c-aca3-0dcc9bc9cf3f
+
 * (オプション) `Config.h`に記載の`fft`関数を完成させ、FFTを使ってPSDと同様の結果を得られることを確認してみてください。`fft`関数をどこから呼び出すかも考えてみてください。様々な条件においてどちらが優れているか比較してみるのもよいでしょう。入力波形を矩形波にすることで、高調波成分は正弦波の時より大きくなります。この方法の利点は、一度に複数の周波数成分を得られることです。そして興味深いことにFFTで得た結果はPSDで得た結果と比較して90度ずれています。なぜでしょうか？
 ```c++
 inline void fft(Config& cfg) {
