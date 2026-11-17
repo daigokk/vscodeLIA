@@ -59,7 +59,7 @@ inline std::pair<double, double> Psd::calc(const double* inData){
 | --- |
 | 図2. 回路図 |
 
-| ![Front of circuit board](./docs/images/CircuitBoard_front.jpg) | ![Back of circuit board](./docs/images/CircuitBoard_back.jpg) |
+| ![Front of circuit board](./docs/images/CircuitBoard_top.jpg) | ![Back of circuit board](./docs/images/CircuitBoard_bottom.jpg) |
 | --- | --- |
 | (a) 表 | (b) 裏 |
 | 図3. 電子回路基板 |  |
