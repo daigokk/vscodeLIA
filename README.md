@@ -70,11 +70,12 @@ inline std::pair<double, double> Psd::calc(const double* inData){
   | DAQ | Digilent, Analog Discovery 3 | [Analog Discovery 3: 125 MS/s USB Oscilloscope, Waveform Generator, Logic Analyzer, and Variable Power Supply](https://digilent.com/reference/test-and-measurement/analog-discovery-3/start) |
   | L型ピンソケット | 2×15 | https://akizukidenshi.com/catalog/g/g113419/ |
   | ブレッドボード | 47×36mm | https://akizukidenshi.com/catalog/g/g111960/ |
-  | パワー・バッファ| Analog Devices, LT1010 | https://akizukidenshi.com/catalog/g/g113244/ |
+  | パワーバッファ| Analog Devices, LT1010 | https://akizukidenshi.com/catalog/g/g113244/ |
   | 計装アンプ | Analog Devices, AD620ANZ | https://akizukidenshi.com/catalog/g/g113693/ |
   | ゲイン設定用抵抗(40dB) | 510Ω | [See "Gain Selection" on page 15 of the AD620 datasheet.](https://www.analog.com/media/en/technical-documentation/data-sheets/AD620.pdf) |
   | コンデンサ | 0.1uF×2 | https://akizukidenshi.com/catalog/g/g110149/ |
   | (表面実装コンデンサ) | 0.1uF×2 | https://akizukidenshi.com/catalog/g/g116143/ |
+  | 電解コンデンサ | 10uF×2 | https://akizukidenshi.com/catalog/g/g117897/ |
   | 可変抵抗器 | 100Ω | https://akizukidenshi.com/catalog/g/g117821/ |
   | 同軸ケーブル | 特性インピーダンス50Ω | https://akizukidenshi.com/catalog/g/g116943/|
   | $L_1$, Sensor coil| 励磁周波数で50Ω程度 | 例えば https://akizukidenshi.com/catalog/g/g116967/ |
