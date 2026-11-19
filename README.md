@@ -72,7 +72,7 @@ inline std::pair<double, double> Psd::calc(const double* inData){
   | ブレッドボード | 47×36mm | https://akizukidenshi.com/catalog/g/g111960/ |
   | パワーバッファ | Analog Devices, LT1010 | https://akizukidenshi.com/catalog/g/g113244/ |
   | 計装アンプ | Analog Devices, AD620ANZ | https://akizukidenshi.com/catalog/g/g113693/ |
-  | ゲイン設定用抵抗(40dB) | 510Ω | [See "Gain Selection" on page 15 of the AD620 datasheet.](https://www.analog.com/media/en/technical-documentation/data-sheets/AD620.pdf) |
+  | ゲイン設定用抵抗 | 40dBであれば510Ω | [See "Gain Selection" on page 15 of the AD620 datasheet.](https://www.analog.com/media/en/technical-documentation/data-sheets/AD620.pdf) |
   | コンデンサ | 0.1uF×2 | https://akizukidenshi.com/catalog/g/g110149/ |
   | (表面実装コンデンサ) | 0.1uF×2 | https://akizukidenshi.com/catalog/g/g116143/ |
   | 電解コンデンサ | 10uF×2 | https://akizukidenshi.com/catalog/g/g117897/ |
