@@ -11,7 +11,7 @@ https://github.com/user-attachments/assets/82d80d7d-aa7a-41a0-967f-187cdc8ed578
 * **このプロジェクトの目的:**
 データ集録・GUI描画・信号処理を組み合わせた、以下のような使用を想定しています。
   * **計測アプリの学習用サンプルコード**
-  * **新規計測プロジェクトの雛形 (テンプレート)**
+  * **Digilent, Analog Discoveryを使った新規計測プロジェクトの雛形 (テンプレート)**
   * [職業能力開発総合大学校](https://www.uitec.jeed.go.jp/) 電気工学専攻 3年時プレゼミ([応用センシング研究室](https://www.uitec.jeed.go.jp/kenkyu/laboratory/lab039/index.html))の課題
 
 * **主な機能:**
