@@ -80,7 +80,7 @@ inline std::pair<double, double> Psd::calc(const double* inData){
   | 同軸ケーブル | 特性インピーダンス50Ω | https://akizukidenshi.com/catalog/g/g116943/|
   | $L_1$, Sensor coil| 励磁周波数で50Ω程度 | 例えば https://akizukidenshi.com/catalog/g/g116967/ |
   | $L_2$, Reference coil | 励磁周波数で50Ω程度 | 例えば https://akizukidenshi.com/catalog/g/g116967/ |
-  | (必要であれば)メスコネクタ | 多治見無線電機, PRC03-12A10-7F10.5 | 探傷器側コネクタ |
+  | (必要であれば)メスコネクタ | 多治見無線電機, PRC03-12A10-7F10.5<br>または、[SMAコネクタ](https://akizukidenshi.com/catalog/g/g102569/) | 探傷器側コネクタ |
 ---
 
 ## 3. 開発環境のセットアップ (Windows)
